@@ -1,0 +1,105 @@
+{
+  "featureName": "inventory-alert-transfer-control",
+  "summary": {
+    "totalSku": 1286,
+    "normal": 1198,
+    "overLimit": 64,
+    "noStandard": 24,
+    "lastSyncTime": "2026-05-25 16:40:12"
+  },
+  "inventoryRows": [
+    {
+      "warehouseName": "英国_分销仓",
+      "sku": "S820BK",
+      "totalQty": 3000,
+      "availableQty": 3000,
+      "bookingQty": 0,
+      "onroadQty": 5000,
+      "currentInventoryQty": 8000,
+      "inventoryThreshold": 7000,
+      "exceedQty": 1000,
+      "stockStatus": "OVER_LIMIT",
+      "standardUpdateTime": "2026-04-01 09:20:00"
+    },
+    {
+      "warehouseName": "德国_海外仓",
+      "sku": "S810BL",
+      "totalQty": 1420,
+      "availableQty": 1420,
+      "bookingQty": 0,
+      "onroadQty": 360,
+      "currentInventoryQty": 1780,
+      "inventoryThreshold": 2500,
+      "exceedQty": 0,
+      "stockStatus": "NORMAL",
+      "standardUpdateTime": "2026-04-01 09:20:00"
+    },
+    {
+      "warehouseName": "法国_谷仓",
+      "sku": "S710PK",
+      "totalQty": 860,
+      "availableQty": 860,
+      "bookingQty": 0,
+      "onroadQty": 980,
+      "currentInventoryQty": 1840,
+      "inventoryThreshold": 1600,
+      "exceedQty": 240,
+      "stockStatus": "OVER_LIMIT",
+      "standardUpdateTime": "2026-04-01 09:20:00"
+    },
+    {
+      "warehouseName": "澳洲_WINIT仓",
+      "sku": "S900GY",
+      "totalQty": 530,
+      "availableQty": 530,
+      "bookingQty": 0,
+      "onroadQty": 210,
+      "currentInventoryQty": 740,
+      "inventoryThreshold": null,
+      "exceedQty": null,
+      "stockStatus": "NO_STANDARD",
+      "standardUpdateTime": null
+    },
+    {
+      "warehouseName": "日本_FBA",
+      "sku": "S611BK",
+      "totalQty": 1220,
+      "availableQty": 1220,
+      "bookingQty": 0,
+      "onroadQty": 480,
+      "currentInventoryQty": 1700,
+      "inventoryThreshold": 3000,
+      "exceedQty": 0,
+      "stockStatus": "NORMAL",
+      "standardUpdateTime": "2026-04-01 09:20:00"
+    }
+  ],
+  "transferRiskItems": [
+    {
+      "planNo": "BP202605250018",
+      "warehouseName": "英国_分销仓",
+      "sku": "S820BK",
+      "currentTotalQty": 8000,
+      "transferInboundQty": 600,
+      "afterTransferQty": 8600,
+      "inventoryThreshold": 7000,
+      "exceedQty": 1600
+    },
+    {
+      "planNo": "BP202605250018",
+      "warehouseName": "法国_谷仓",
+      "sku": "S710PK",
+      "currentTotalQty": 1840,
+      "transferInboundQty": 300,
+      "afterTransferQty": 2140,
+      "inventoryThreshold": 1600,
+      "exceedQty": 540
+    }
+  ],
+  "standardTemplateColumns": [
+    "仓库",
+    "SKU",
+    "库存阈值",
+    "备注"
+  ]
+}
