@@ -1,0 +1,1162 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>新增分销订单原型</title>
+  <style>
+    :root {
+      --primary: #1677ff;
+      --success: #16a34a;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --head: #f5f7fb;
+      --bg: #f3f6fb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      font-size: 12px;
+    }
+
+    .dialog {
+      width: 96vw;
+      min-width: 1180px;
+      margin: 18px auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    .dialog-header {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--line);
+      font-weight: 600;
+    }
+
+    .dialog-body {
+      max-height: calc(100vh - 112px);
+      overflow: auto;
+      padding: 14px;
+    }
+
+    .section-title {
+      margin: 12px 0 10px;
+      font-weight: 700;
+    }
+
+    .card {
+      position: relative;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .main-card {
+      padding-right: 300px;
+      min-height: 210px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px 22px;
+    }
+
+    .field {
+      display: grid;
+      grid-template-columns: 128px minmax(0, 1fr);
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+    }
+
+    label {
+      text-align: right;
+      color: #374151;
+      white-space: nowrap;
+    }
+
+    .required::before {
+      content: "* ";
+      color: var(--danger);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 28px;
+      padding: 4px 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 3px;
+      color: #111827;
+      background: #fff;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 58px;
+      resize: vertical;
+    }
+
+    input[disabled], select[disabled], textarea[disabled] {
+      color: #6b7280;
+      background: #f3f4f6;
+      cursor: not-allowed;
+    }
+
+    .summary {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 260px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .summary-title {
+      padding: 10px 14px;
+      color: #fff;
+      background: var(--primary);
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 9px 14px;
+      border-bottom: 1px solid #eef2f7;
+    }
+
+    .summary-row.total {
+      color: var(--primary);
+      font-size: 14px;
+      font-weight: 700;
+      border-bottom: 0;
+    }
+
+    .attachment {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      padding-left: 136px;
+      color: var(--muted);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      border-radius: 999px;
+      color: #175cd3;
+      background: #eaf3ff;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .btn {
+      min-height: 28px;
+      padding: 0 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 3px;
+      background: #fff;
+      color: #374151;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .btn.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn.success {
+      border-color: var(--success);
+      background: var(--success);
+      color: #fff;
+    }
+
+    .btn.danger {
+      border-color: var(--danger);
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .btn.link {
+      border: 0;
+      background: transparent;
+      color: var(--primary);
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .warning {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      color: #b45309;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 4px;
+      padding: 6px 10px;
+      margin-left: 8px;
+    }
+
+    .warning.show { display: inline-flex; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      min-width: 1900px;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th, td {
+      height: 38px;
+      padding: 6px 8px;
+      border-bottom: 1px solid #eef2f7;
+      border-right: 1px solid #eef2f7;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    th {
+      background: var(--head);
+      color: #374151;
+      font-weight: 600;
+    }
+
+    td input, td select {
+      min-height: 26px;
+      padding: 2px 6px;
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      display: none;
+      min-width: 220px;
+      padding: 10px 14px;
+      border-radius: 4px;
+      color: #fff;
+      background: #111827;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, .2);
+      z-index: 50;
+    }
+
+    .toast.show { display: block; }
+
+    .sku-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.45);
+      z-index: 40;
+    }
+
+    .sku-modal.show { display: flex; }
+
+    .sku-panel {
+      width: 720px;
+      background: #fff;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .sku-head, .sku-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .sku-foot {
+      justify-content: flex-end;
+      gap: 8px;
+      border-top: 1px solid var(--line);
+      border-bottom: 0;
+    }
+
+    .sku-body {
+      padding: 14px;
+    }
+
+    .muted { color: var(--muted); }
+    .money { text-align: right; font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+  <div class="dialog">
+    <div class="dialog-header">
+      <span>新增分销订单</span>
+      <span class="muted">×</span>
+    </div>
+
+    <div class="dialog-body">
+      <form id="orderForm">
+        <div class="section-title">主要信息</div>
+        <section class="card main-card">
+          <div class="grid">
+            <div class="field">
+              <label>系统订单号</label>
+              <input value="自动生成" disabled />
+            </div>
+            <div class="field">
+              <label class="required">客户</label>
+              <select id="customerCode" onchange="handleCustomerChange()">
+                <option value="">请选择客户</option>
+                <option value="C-DE-1001">C-DE-1001</option>
+                <option value="C-DE-1002">C-DE-1002</option>
+                <option value="C-FR-3001">C-FR-3001</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>客户订单号</label>
+              <input id="customerOrderNo" placeholder="请输入客户订单号" />
+            </div>
+            <div class="field">
+              <label class="required">单据类型</label>
+              <select id="orderAttribute" onchange="handleOrderAttributeChange()">
+                <option value="">请选择</option>
+                <option value="5">订单-销售主营产品</option>
+                <option value="2">市场推广单</option>
+                <option value="3">替换品换货</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="required">业务类</label>
+              <select id="businessType" onchange="syncBusinessTypeToItems()">
+                <option value="">请选择业务类</option>
+                <option value="主营产品销售">主营产品销售</option>
+                <option value="市场推广样品">市场推广样品</option>
+                <option value="售后替换">售后替换</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="required">预交日期</label>
+              <input id="expectedDeliveryDate" type="date" />
+            </div>
+            <div class="field">
+              <label class="required">币种</label>
+              <select id="currency" onchange="refreshPrices()">
+                <option value="">请选择币种</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>订单数量</label>
+              <input id="orderQuantity" value="0" disabled />
+            </div>
+            <div class="field">
+              <label>创建日期</label>
+              <input id="createDate" disabled />
+            </div>
+            <div class="field">
+              <label>渠道</label>
+              <select id="channel" disabled>
+                <option>ALL</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="required">草稿推送DMS</label>
+              <select id="draftPushDmsFlag">
+                <option value="">请选择</option>
+                <option value="1">是</option>
+                <option value="0" selected>否</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" style="grid-template-columns:128px 1fr; margin-top:10px">
+            <label>订单备注</label>
+            <textarea id="orderRemark" maxlength="512" placeholder="请输入内容"></textarea>
+          </div>
+          <div class="attachment">
+            <button class="btn primary" type="button" onclick="mockUpload()">选择文件</button>
+            <span>支持多文件上传，最多10个文件，单个文件不超过50MB</span>
+            <span id="attachmentList" class="tag">暂无附件</span>
+          </div>
+          <aside class="summary">
+            <div class="summary-title">汇总</div>
+            <div class="summary-row"><span>小计:</span><strong id="subtotalNoTax">0.00</strong></div>
+            <div class="summary-row"><span>税金总计:</span><strong id="taxTotal">0.00</strong></div>
+            <div class="summary-row total"><span>总计:</span><strong id="total">0.00</strong></div>
+          </aside>
+        </section>
+
+        <div class="section-title">销售信息</div>
+        <section class="card">
+          <div class="grid">
+            <div class="field"><label>销售代表</label><input id="salesRepresentative" disabled placeholder="根据客户信息自动填充" /></div>
+            <div class="field">
+              <label>贸易方式</label>
+              <select id="tradeMode" onchange="recalculateTaxRate()">
+                <option value="">请选择贸易方式</option>
+                <option value="DDP">DDP</option>
+                <option value="DAP">DAP</option>
+                <option value="FOB">FOB</option>
+              </select>
+            </div>
+            <div class="field"><label>账期描述</label><input id="paymentTerms" disabled placeholder="根据客户信息自动填充" /></div>
+          </div>
+        </section>
+
+        <div class="section-title">公司内信息</div>
+        <section class="card">
+          <div class="grid">
+            <div class="field">
+              <label class="required">子公司</label>
+              <select id="subsidiaryCompany" onchange="recalculateTaxRate()">
+                <option value="">请选择子公司</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>部门</label>
+              <select id="department" onchange="fillCostCenter()">
+                <option value="">请选择部门</option>
+                <option value="销售一部" data-cost="CC-SALES-01">销售一部</option>
+                <option value="市场部" data-cost="CC-MKT-02">市场部</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>发货仓库</label>
+              <select id="shipLocation" onchange="syncMainWarehouse()">
+                <option value="">请选择发货仓库</option>
+                <option value="SPL仓" data-country="DE">SPL仓</option>
+                <option value="万邑通德国" data-country="DE">万邑通德国</option>
+                <option value="万邑通法国" data-country="FR">万邑通法国</option>
+              </select>
+            </div>
+            <div class="field"><label>一级区域</label><input id="firstLevelRegion" disabled placeholder="根据客户信息自动填充" /></div>
+            <div class="field"><label>二级区域</label><input id="secondLevelRegion" disabled placeholder="根据客户信息自动填充" /></div>
+            <div class="field">
+              <label class="required">三级区域</label>
+              <select id="thirdLevelRegion" onchange="handleThirdLevelRegionChange()"></select>
+            </div>
+            <div class="field"><label>销售模式</label><input id="salesMode" disabled placeholder="根据客户信息自动填充" /></div>
+            <div class="field"><label>业务相关方</label><input id="businessRelatedParty" disabled placeholder="根据客户信息自动填充" /></div>
+            <div class="field"><label>成本中心</label><input id="costCenter" disabled placeholder="根据部门自动填充" /></div>
+          </div>
+        </section>
+
+        <div class="section-title">发运信息</div>
+        <section class="card">
+          <div class="grid">
+            <div class="field">
+              <label>收货地址</label>
+              <select id="productOrderAddress" onchange="fillAddressInfo()">
+                <option value="">请选择收货地址</option>
+              </select>
+            </div>
+            <div class="field"><label>实际交付日期</label><input id="actualDeliveryDate" disabled placeholder="系统自动回填最晚FH单发货时间" /></div>
+            <div class="field"><label class="required">期望发货日期</label><input id="expectedShipDate" type="date" /></div>
+            <div class="field">
+              <label>付运地址</label>
+              <select id="shippingAddress">
+                <option value="">请选择付运地址</option>
+              </select>
+            </div>
+            <div class="field"><label>收货联系人</label><input id="receiverName" disabled /></div>
+            <div class="field"><label>收货公司名称</label><input id="receiverCompany" disabled /></div>
+            <div class="field"><label>收件人联系电话</label><input id="receiverTel" disabled /></div>
+            <div class="field"><label>国家</label><input id="receiverCountry" disabled /></div>
+            <div class="field"><label>邮编</label><input id="postCode" disabled /></div>
+          </div>
+        </section>
+
+        <div class="section-title">产品信息</div>
+        <section class="card">
+          <div class="toolbar">
+            <button class="btn primary" type="button" onclick="openSkuModal()">添加SKU</button>
+            <button class="btn danger" type="button" onclick="batchRemove()">批量移除</button>
+            <button class="btn success" type="button" onclick="importItems()">导入明细行</button>
+            <span id="splWarning" class="warning">当前选择的是SPL仓，收件人、地址1、邮编、城市、国家为必填项，请前往客户档案维护。</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:46px"><input type="checkbox" onclick="toggleAllRows(this)" /></th>
+                  <th style="width:70px">行ID</th>
+                  <th style="width:150px">SKU</th>
+                  <th style="width:180px">SKU名称</th>
+                  <th style="width:140px">发货仓库</th>
+                  <th style="width:110px">库存现有量</th>
+                  <th style="width:120px">在途调拨数量</th>
+                  <th style="width:140px">在途调拨已锁库存</th>
+                  <th style="width:110px">下单数量</th>
+                  <th style="width:140px">商品不含税单价</th>
+                  <th style="width:230px">收货地址</th>
+                  <th style="width:110px">税率</th>
+                  <th style="width:130px">商品含税单价</th>
+                  <th style="width:140px">商品不含税总价</th>
+                  <th style="width:140px">商品含税总价</th>
+                  <th style="width:130px">业务类</th>
+                  <th style="width:110px">对方货号</th>
+                  <th style="width:130px">承诺入库日期</th>
+                  <th style="width:130px">承诺入库数量</th>
+                  <th style="width:120px">MPS备注</th>
+                  <th style="width:170px">产品描述</th>
+                  <th style="width:80px">操作</th>
+                </tr>
+              </thead>
+              <tbody id="itemRows">
+                <tr><td colspan="22" class="muted" style="text-align:center;height:54px">请先添加 SKU 或导入明细行</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </form>
+    </div>
+
+    <div class="dialog-footer">
+      <button class="btn" type="button">取消</button>
+      <button class="btn primary" type="button" onclick="submitOrder()">确定</button>
+    </div>
+  </div>
+
+  <div class="sku-modal" id="skuModal">
+    <div class="sku-panel">
+      <div class="sku-head">
+        <strong>选择 SKU</strong>
+        <button class="btn link" onclick="closeSkuModal()">关闭</button>
+      </div>
+      <div class="sku-body">
+        <div class="toolbar">
+          <input id="skuKeyword" placeholder="请输入 SKU / SKU名称" oninput="renderSkuCandidates()" />
+        </div>
+        <div class="table-wrap">
+          <table style="min-width:650px">
+            <thead>
+              <tr>
+                <th style="width:140px">SKU</th>
+                <th>SKU名称</th>
+                <th style="width:120px">客户货号</th>
+                <th style="width:80px">操作</th>
+              </tr>
+            </thead>
+            <tbody id="skuCandidates"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sku-foot">
+        <button class="btn" onclick="closeSkuModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const customers = {
+      "C-DE-1001": {
+        name: "Shokz DE GmbH",
+        currencies: ["EUR", "USD"],
+        defaultCurrency: "EUR",
+        salesRep: "Alice",
+        tradeMode: "DDP",
+        paymentTerms: "Net 30",
+        subsidiaryList: ["Shokz Europe GmbH", "Shokz HK Limited"],
+        defaultSubsidiary: "Shokz Europe GmbH",
+        department: "销售一部",
+        first: "分销大货",
+        second: "欧一区",
+        thirdOptions: ["德国", "奥地利", "荷兰"],
+        defaultThird: "德国",
+        salesMode: "分销",
+        party: "EU-Distribution",
+        addresses: [
+          {
+            name: "DE-Berlin Warehouse",
+            contact: "Hans Muller",
+            company: "Shokz DE GmbH",
+            tel: "+49 30 1000 2000",
+            country: "DE",
+            city: "Berlin",
+            province: "Berlin",
+            postCode: "10115",
+            line1: "Invalidenstrasse 12"
+          },
+          {
+            name: "DE-Munich Office",
+            contact: "Anna Schmidt",
+            company: "Shokz DE GmbH",
+            tel: "+49 89 3000 2000",
+            country: "DE",
+            city: "Munich",
+            province: "Bayern",
+            postCode: "80331",
+            line1: "Marienplatz 1"
+          }
+        ]
+      },
+      "C-DE-1002": {
+        name: "Marketing DE Partner",
+        currencies: ["EUR"],
+        defaultCurrency: "EUR",
+        salesRep: "Bob",
+        tradeMode: "DAP",
+        paymentTerms: "Prepaid",
+        subsidiaryList: ["Shokz Europe GmbH"],
+        defaultSubsidiary: "Shokz Europe GmbH",
+        department: "市场部",
+        first: "0单价物料、POP",
+        second: "欧一区",
+        thirdOptions: ["德国", "奥地利"],
+        defaultThird: "德国",
+        salesMode: "营销推广",
+        party: "EU-Marketing",
+        addresses: [
+          {
+            name: "DE-Marketing Sample Address",
+            contact: "Mia Klein",
+            company: "Marketing DE Partner",
+            tel: "+49 40 8888 1000",
+            country: "DE",
+            city: "Hamburg",
+            province: "Hamburg",
+            postCode: "20095",
+            line1: "Sample Strasse 8"
+          }
+        ]
+      },
+      "C-FR-3001": {
+        name: "Shokz FR SAS",
+        currencies: ["EUR"],
+        defaultCurrency: "EUR",
+        salesRep: "Claire",
+        tradeMode: "DDP",
+        paymentTerms: "Net 45",
+        subsidiaryList: ["Shokz Europe GmbH"],
+        defaultSubsidiary: "Shokz Europe GmbH",
+        department: "销售一部",
+        first: "分销大货",
+        second: "欧一区",
+        thirdOptions: ["法国", "西班牙"],
+        defaultThird: "法国",
+        salesMode: "分销",
+        party: "FR-Distribution",
+        addresses: [
+          {
+            name: "FR-Paris Warehouse",
+            contact: "Pierre Martin",
+            company: "Shokz FR SAS",
+            tel: "+33 1 8888 2000",
+            country: "FR",
+            city: "Paris",
+            province: "Ile-de-France",
+            postCode: "75001",
+            line1: "Rue de Rivoli 99"
+          }
+        ]
+      }
+    };
+
+    const skuPool = [
+      { sku: "S810-ST-BK", name: "OpenRun Pro Black", customerSku: "DE-ORP-BK", desc: "主机黑色" },
+      { sku: "S811-ST-BE", name: "OpenRun Pro Beige", customerSku: "DE-ORP-BE", desc: "主机米色" },
+      { sku: "POP-DE-001", name: "Counter Display Stand", customerSku: "POP-001", desc: "柜台展示架" },
+      { sku: "MAT-DE-USB", name: "USB-C Cable", customerSku: "USB-C", desc: "样品线材" }
+    ];
+
+    const priceMap = {
+      "C-DE-1001|S810-ST-BK|EUR|DDP": 129.99,
+      "C-DE-1001|S811-ST-BE|EUR|DDP": 129.99,
+      "C-FR-3001|S810-ST-BK|EUR|DDP": 125.5
+    };
+
+    const inventoryMap = {
+      "SPL仓|S810-ST-BK": { available: 320, transit: 80, locked: 20 },
+      "SPL仓|S811-ST-BE": { available: 160, transit: 30, locked: 10 },
+      "SPL仓|POP-DE-001": { available: 800, transit: 0, locked: 60 },
+      "SPL仓|MAT-DE-USB": { available: 1200, transit: 200, locked: 0 },
+      "万邑通德国|S810-ST-BK": { available: 44, transit: 12, locked: 2 },
+      "万邑通法国|S810-ST-BK": { available: 60, transit: 10, locked: 0 }
+    };
+
+    let items = [];
+
+    function today() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function init() {
+      document.getElementById("createDate").value = today();
+      document.getElementById("expectedDeliveryDate").value = "2026-06-30";
+      document.getElementById("expectedShipDate").value = "2026-06-20";
+      renderSkuCandidates();
+      renderItems();
+    }
+
+    function handleCustomerChange() {
+      const code = document.getElementById("customerCode").value;
+      const customer = customers[code];
+      if (!customer) {
+        clearCustomerFields();
+        return;
+      }
+      setOptions("currency", customer.currencies, customer.defaultCurrency);
+      document.getElementById("salesRepresentative").value = customer.salesRep;
+      document.getElementById("tradeMode").value = customer.tradeMode;
+      document.getElementById("paymentTerms").value = customer.paymentTerms;
+      setOptions("subsidiaryCompany", customer.subsidiaryList, customer.defaultSubsidiary);
+      document.getElementById("department").value = customer.department;
+      fillCostCenter();
+      document.getElementById("firstLevelRegion").value = customer.first;
+      document.getElementById("secondLevelRegion").value = customer.second;
+      setOptions("thirdLevelRegion", customer.thirdOptions, customer.defaultThird);
+      document.getElementById("salesMode").value = customer.salesMode;
+      document.getElementById("businessRelatedParty").value = customer.party;
+      const addressNames = customer.addresses.map(item => item.name);
+      setOptions("productOrderAddress", addressNames, addressNames[0]);
+      setOptions("shippingAddress", addressNames, addressNames[0]);
+      fillAddressInfo();
+      refreshPrices();
+      recalculateTaxRate();
+      showToast("已根据客户档案自动回填销售、区域、公司和发运信息");
+    }
+
+    function clearCustomerFields() {
+      ["salesRepresentative", "paymentTerms", "firstLevelRegion", "secondLevelRegion", "salesMode", "businessRelatedParty"].forEach(id => {
+        document.getElementById(id).value = "";
+      });
+      setOptions("currency", [], "");
+      setOptions("subsidiaryCompany", [], "");
+      setOptions("thirdLevelRegion", [], "");
+      setOptions("productOrderAddress", [], "");
+      setOptions("shippingAddress", [], "");
+    }
+
+    function setOptions(id, options, selected) {
+      const select = document.getElementById(id);
+      const placeholder = select.dataset.placeholder || "请选择";
+      select.innerHTML = `<option value="">${placeholder}</option>` + options.map(item => `<option ${item === selected ? "selected" : ""}>${item}</option>`).join("");
+    }
+
+    function fillCostCenter() {
+      const selected = document.getElementById("department").selectedOptions[0];
+      document.getElementById("costCenter").value = selected?.dataset?.cost || "";
+    }
+
+    function fillAddressInfo() {
+      const customer = customers[document.getElementById("customerCode").value];
+      const addressName = document.getElementById("productOrderAddress").value;
+      const address = customer?.addresses.find(item => item.name === addressName);
+      ["receiverName", "receiverCompany", "receiverTel", "receiverCountry", "postCode"].forEach(id => (document.getElementById(id).value = ""));
+      if (!address) return;
+      document.getElementById("receiverName").value = address.contact;
+      document.getElementById("receiverCompany").value = address.company;
+      document.getElementById("receiverTel").value = address.tel;
+      document.getElementById("receiverCountry").value = address.country;
+      document.getElementById("postCode").value = address.postCode;
+      updateAllReceiverAddress();
+      validateSplRequiredFields();
+      recalculateTaxRate();
+    }
+
+    function generateReceiverAddress() {
+      const customer = customers[document.getElementById("customerCode").value];
+      const addressName = document.getElementById("productOrderAddress").value;
+      const address = customer?.addresses.find(item => item.name === addressName);
+      if (!address) return "";
+      return [address.contact, address.company, address.tel, address.line1, address.country, address.city, address.province, address.postCode].filter(Boolean).join("\n");
+    }
+
+    function updateAllReceiverAddress() {
+      const receiverAddress = generateReceiverAddress();
+      items.forEach(item => {
+        if (!item.imported) item.receiverAddress = receiverAddress;
+      });
+      renderItems();
+    }
+
+    function handleThirdLevelRegionChange() {
+      const third = document.getElementById("thirdLevelRegion").value;
+      const map = { "德国": "欧一区", "奥地利": "欧一区", "法国": "欧一区", "西班牙": "欧一区" };
+      if (third) document.getElementById("secondLevelRegion").value = map[third] || "";
+      recalculateTaxRate();
+    }
+
+    function handleOrderAttributeChange() {
+      const attr = document.getElementById("orderAttribute").value;
+      const businessType = document.getElementById("businessType");
+      if (attr === "5") {
+        businessType.value = "主营产品销售";
+      } else if (attr === "2") {
+        businessType.value = "市场推广样品";
+      } else if (attr === "3") {
+        businessType.value = "售后替换";
+      }
+      syncBusinessTypeToItems();
+      refreshPrices();
+    }
+
+    function syncBusinessTypeToItems() {
+      const businessType = document.getElementById("businessType").value;
+      items.forEach(item => {
+        if (!item.imported) item.businessType = businessType;
+      });
+      renderItems();
+    }
+
+    function syncMainWarehouse() {
+      const warehouse = document.getElementById("shipLocation").value;
+      items.forEach(item => {
+        if (!item.imported || !item.shipLocation) item.shipLocation = warehouse;
+        queryInventory(item);
+      });
+      validateSplRequiredFields();
+      recalculateTaxRate();
+      renderItems();
+    }
+
+    function validateSplRequiredFields() {
+      const warehouse = document.getElementById("shipLocation").value;
+      const warning = document.getElementById("splWarning");
+      if (warehouse !== "SPL仓") {
+        warning.classList.remove("show");
+        return false;
+      }
+      const missing = [];
+      if (!document.getElementById("receiverName").value) missing.push("收件人");
+      if (!generateReceiverAddress()) missing.push("地址1");
+      if (!document.getElementById("postCode").value) missing.push("邮编");
+      if (!document.getElementById("receiverCountry").value) missing.push("收件人国家/地区");
+      warning.textContent = missing.length ? `当前选择的是SPL仓，以下字段为必填项：${missing.join("、")}。请前往客户档案维护相关字段。` : "";
+      warning.classList.toggle("show", missing.length > 0);
+      return missing.length > 0;
+    }
+
+    function openSkuModal() {
+      document.getElementById("skuModal").classList.add("show");
+      renderSkuCandidates();
+    }
+
+    function closeSkuModal() {
+      document.getElementById("skuModal").classList.remove("show");
+    }
+
+    function renderSkuCandidates() {
+      const keyword = (document.getElementById("skuKeyword")?.value || "").toLowerCase();
+      const filtered = skuPool.filter(item => item.sku.toLowerCase().includes(keyword) || item.name.toLowerCase().includes(keyword));
+      document.getElementById("skuCandidates").innerHTML = filtered.map(item => `
+        <tr>
+          <td>${item.sku}</td>
+          <td>${item.name}</td>
+          <td>${item.customerSku}</td>
+          <td><button class="btn link" onclick="chooseSku('${item.sku}')">选择</button></td>
+        </tr>
+      `).join("");
+    }
+
+    function chooseSku(sku) {
+      const source = skuPool.find(item => item.sku === sku);
+      const item = {
+        sku: source.sku,
+        skuName: source.name,
+        shipLocation: document.getElementById("shipLocation").value,
+        availableInventory: 0,
+        inTransitQuantity: 0,
+        inTransitLockedQuantity: 0,
+        orderQuantity: 1,
+        unitPriceExcludeTax: 0,
+        taxRate: 0,
+        unitPriceIncludeTax: 0,
+        amountExcludeTax: 0,
+        amountIncludeTax: 0,
+        businessType: document.getElementById("businessType").value,
+        receiverAddress: generateReceiverAddress(),
+        customerSku: source.customerSku,
+        productDesc: source.desc,
+        imported: false,
+        warehousingDatePromise: "",
+        qtyPromise: 0,
+        mpsRemark: ""
+      };
+      queryInventory(item);
+      fetchPrice(item);
+      items.push(item);
+      recalculateTaxRate();
+      calculateSummary();
+      renderItems();
+      showToast(`已添加 SKU：${sku}`);
+    }
+
+    function importItems() {
+      ["POP-DE-001", "MAT-DE-USB"].forEach((sku, index) => {
+        const source = skuPool.find(item => item.sku === sku);
+        const item = {
+          sku: source.sku,
+          skuName: source.name,
+          shipLocation: document.getElementById("shipLocation").value || "SPL仓",
+          availableInventory: 0,
+          inTransitQuantity: 0,
+          inTransitLockedQuantity: 0,
+          orderQuantity: index + 2,
+          unitPriceExcludeTax: 0,
+          taxRate: 0,
+          unitPriceIncludeTax: 0,
+          amountExcludeTax: 0,
+          amountIncludeTax: 0,
+          businessType: document.getElementById("businessType").value || "市场推广样品",
+          receiverAddress: generateReceiverAddress(),
+          customerSku: source.customerSku,
+          productDesc: source.desc,
+          imported: true,
+          warehousingDatePromise: "2026-07-05",
+          qtyPromise: 200,
+          mpsRemark: "导入明细"
+        };
+        queryInventory(item);
+        items.push(item);
+      });
+      recalculateTaxRate();
+      calculateSummary();
+      renderItems();
+      showToast("导入成功：已追加 2 条明细行");
+    }
+
+    function queryInventory(item) {
+      const key = `${item.shipLocation}|${item.sku}`;
+      const inv = inventoryMap[key] || { available: 0, transit: 0, locked: 0 };
+      item.availableInventory = inv.available;
+      item.inTransitQuantity = inv.transit;
+      item.inTransitLockedQuantity = inv.locked;
+    }
+
+    function fetchPrice(item) {
+      const attr = document.getElementById("orderAttribute").value;
+      if (attr !== "5") {
+        item.unitPriceExcludeTax = 0;
+        return;
+      }
+      const customer = document.getElementById("customerCode").value;
+      const currency = document.getElementById("currency").value;
+      const tradeMode = document.getElementById("tradeMode").value;
+      item.unitPriceExcludeTax = priceMap[`${customer}|${item.sku}|${currency}|${tradeMode}`] || 0;
+    }
+
+    function refreshPrices() {
+      items.forEach(fetchPrice);
+      recalculateTaxRate();
+      renderItems();
+    }
+
+    function recalculateTaxRate() {
+      const third = document.getElementById("thirdLevelRegion").value;
+      const subsidiary = document.getElementById("subsidiaryCompany").value;
+      const country = document.getElementById("receiverCountry").value;
+      const tradeMode = document.getElementById("tradeMode").value;
+      const ready = third && subsidiary && country && tradeMode;
+      items.forEach(item => {
+        if (ready && item.shipLocation) {
+          item.taxRate = tradeMode === "DDP" ? 0.19 : 0;
+        }
+        recalcRow(item);
+      });
+      calculateSummary();
+      renderItems();
+    }
+
+    function recalcRow(item) {
+      const qty = Number(item.orderQuantity || 0);
+      const unitNoTax = Number(item.unitPriceExcludeTax || 0);
+      const taxRate = Number(item.taxRate || 0);
+      item.amountExcludeTax = round2(qty * unitNoTax);
+      item.unitPriceIncludeTax = round2(unitNoTax * (1 + taxRate));
+      item.amountIncludeTax = round2(item.amountExcludeTax * (1 + taxRate));
+    }
+
+    function updateRow(index, field, value) {
+      const item = items[index];
+      if (!item) return;
+      item[field] = field === "orderQuantity" || field === "unitPriceExcludeTax" ? Number(value) : value;
+      if (field === "shipLocation") queryInventory(item);
+      if (field === "orderQuantity" || field === "unitPriceExcludeTax" || field === "shipLocation") {
+        recalculateTaxRate();
+      } else {
+        renderItems();
+      }
+    }
+
+    function calculateSummary() {
+      let subtotal = 0;
+      let total = 0;
+      let quantity = 0;
+      items.forEach(item => {
+        recalcRow(item);
+        subtotal += item.amountExcludeTax;
+        total += item.amountIncludeTax;
+        quantity += Number(item.orderQuantity || 0);
+      });
+      document.getElementById("subtotalNoTax").textContent = round2(subtotal).toFixed(2);
+      document.getElementById("taxTotal").textContent = round2(total - subtotal).toFixed(2);
+      document.getElementById("total").textContent = round2(total).toFixed(2);
+      document.getElementById("orderQuantity").value = quantity;
+    }
+
+    function renderItems() {
+      const tbody = document.getElementById("itemRows");
+      if (!items.length) {
+        tbody.innerHTML = `<tr><td colspan="22" class="muted" style="text-align:center;height:54px">请先添加 SKU 或导入明细行</td></tr>`;
+        calculateSummary();
+        return;
+      }
+      tbody.innerHTML = items.map((item, index) => `
+        <tr>
+          <td><input type="checkbox" class="row-check" data-index="${index}" /></td>
+          <td>${index + 1}</td>
+          <td>${item.sku}</td>
+          <td title="${item.skuName}">${item.skuName}</td>
+          <td>
+            <select onchange="updateRow(${index}, 'shipLocation', this.value)">
+              <option value="">请选择</option>
+              ${["SPL仓", "万邑通德国", "万邑通法国"].map(wh => `<option ${item.shipLocation === wh ? "selected" : ""}>${wh}</option>`).join("")}
+            </select>
+          </td>
+          <td class="money">${item.availableInventory}</td>
+          <td class="money">${item.inTransitQuantity}</td>
+          <td class="money">${item.inTransitLockedQuantity}</td>
+          <td><input type="number" min="1" step="1" value="${item.orderQuantity}" onchange="updateRow(${index}, 'orderQuantity', this.value)" /></td>
+          <td><input type="number" min="0" step="0.01" value="${item.unitPriceExcludeTax}" ${document.getElementById("orderAttribute").value !== "5" ? "disabled" : ""} onchange="updateRow(${index}, 'unitPriceExcludeTax', this.value)" /></td>
+          <td><textarea disabled>${item.receiverAddress || ""}</textarea></td>
+          <td>${formatTaxRate(item.taxRate)}</td>
+          <td class="money">${item.unitPriceIncludeTax.toFixed(2)}</td>
+          <td class="money">${item.amountExcludeTax.toFixed(2)}</td>
+          <td class="money">${item.amountIncludeTax.toFixed(2)}</td>
+          <td>
+            <select onchange="updateRow(${index}, 'businessType', this.value)">
+              ${["", "主营产品销售", "市场推广样品", "售后替换"].map(v => `<option value="${v}" ${item.businessType === v ? "selected" : ""}>${v || "请选择"}</option>`).join("")}
+            </select>
+          </td>
+          <td><input value="${item.customerSku || ""}" onchange="updateRow(${index}, 'customerSku', this.value)" /></td>
+          <td><input type="date" value="${item.warehousingDatePromise || ""}" disabled /></td>
+          <td><input type="number" value="${item.qtyPromise || 0}" disabled /></td>
+          <td><input value="${item.mpsRemark || ""}" disabled /></td>
+          <td><input value="${item.productDesc || ""}" onchange="updateRow(${index}, 'productDesc', this.value)" /></td>
+          <td><button class="btn link" onclick="removeItem(${index})">删除</button></td>
+        </tr>
+      `).join("");
+      calculateSummary();
+    }
+
+    function formatTaxRate(taxRate) {
+      if (taxRate === null || taxRate === undefined) {
+        return `<span style="color:#dc2626">请先联系财务维护税率规则</span>`;
+      }
+      return `${(Number(taxRate || 0) * 100).toFixed(2)}%`;
+    }
+
+    function removeItem(index) {
+      items.splice(index, 1);
+      renderItems();
+    }
+
+    function toggleAllRows(checkbox) {
+      document.querySelectorAll(".row-check").forEach(item => (item.checked = checkbox.checked));
+    }
+
+    function batchRemove() {
+      const selected = Array.from(document.querySelectorAll(".row-check:checked")).map(item => Number(item.dataset.index));
+      if (!selected.length) {
+        showToast("请先选择要移除的明细行");
+        return;
+      }
+      items = items.filter((_, index) => !selected.includes(index));
+      renderItems();
+      showToast("已批量移除所选明细行");
+    }
+
+    function mockUpload() {
+      document.getElementById("attachmentList").textContent = "PO-DE-20260617.pdf 128 KB";
+      showToast("附件上传成功");
+    }
+
+    function submitOrder() {
+      if (validateSplRequiredFields()) return;
+      const required = [
+        ["customerCode", "客户"],
+        ["orderAttribute", "单据类型"],
+        ["businessType", "业务类"],
+        ["currency", "币种"],
+        ["subsidiaryCompany", "子公司"],
+        ["expectedDeliveryDate", "预交日期"],
+        ["expectedShipDate", "期望发货日期"],
+        ["thirdLevelRegion", "三级区域"],
+        ["draftPushDmsFlag", "草稿推送DMS"]
+      ];
+      for (const [id, label] of required) {
+        if (!document.getElementById(id).value) {
+          showToast(`${label}为必填项`);
+          return;
+        }
+      }
+      if (!items.length) {
+        showToast("请添加产品");
+        return;
+      }
+      for (const item of items) {
+        if (!item.shipLocation) return showToast(`${item.sku}，发货仓库必填`);
+        if (!item.orderQuantity || !/^[1-9]\d*$/.test(String(item.orderQuantity))) return showToast("下单数量只能为正整数");
+        if (item.unitPriceExcludeTax === "" || item.unitPriceExcludeTax === undefined) return showToast("请填写商品不含税单价");
+        if (document.getElementById("orderAttribute").value !== "5" && item.unitPriceExcludeTax !== 0) {
+          return showToast('单据类型不是"订单-销售主营产品"时，商品不含税单价必须为0');
+        }
+      }
+      showToast("新增成功，订单已保存为草稿");
+    }
+
+    function round2(num) {
+      return Math.round(Number(num || 0) * 100) / 100;
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById("toast");
+      toast.textContent = text;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    init();
+  </script>
+</body>
+</html>
