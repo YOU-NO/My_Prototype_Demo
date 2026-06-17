@@ -1,0 +1,966 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>分销订单库存占用逻辑改造交互原型</title>
+  <style>
+    :root {
+      --primary: #1677ff;
+      --primary-soft: #eaf3ff;
+      --success: #19a35b;
+      --warning: #f59e0b;
+      --danger: #e5484d;
+      --text: #1f2937;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --radius: 10px;
+      --shadow: 0 10px 30px rgba(18, 38, 63, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    .app-header {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: #0f172a;
+      color: #fff;
+    }
+
+    .app-header strong {
+      font-size: 17px;
+      letter-spacing: 0.2px;
+    }
+
+    .app-header span {
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    .side, .main, .drawer, .toast, .modal-panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .side {
+      padding: 16px;
+      min-height: calc(100vh - 92px);
+    }
+
+    .side h3, .section-title {
+      margin: 0 0 12px;
+      font-size: 15px;
+    }
+
+    .side p {
+      margin: 0 0 12px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: #175cd3;
+      background: var(--primary-soft);
+      border: 1px solid #bfd7ff;
+      white-space: nowrap;
+    }
+
+    .tag.success { color: #027a48; background: #ecfdf3; border-color: #abefc6; }
+    .tag.warn { color: #b54708; background: #fffaeb; border-color: #fedf89; }
+    .tag.danger { color: #b42318; background: #fef3f2; border-color: #fecdca; }
+    .tag.gray { color: #475467; background: #f2f4f7; border-color: #d0d5dd; }
+
+    .main {
+      overflow: hidden;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff, #fbfcff);
+    }
+
+    .toolbar-left, .toolbar-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      min-height: 34px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+
+    .btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .btn.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn.primary:hover { filter: brightness(0.95); }
+    .btn.danger { color: var(--danger); border-color: #fecdca; }
+    .btn.small { min-height: 28px; padding: 0 10px; font-size: 12px; }
+
+    .search {
+      height: 34px;
+      min-width: 220px;
+      padding: 0 11px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      outline: none;
+    }
+
+    .table-wrap {
+      padding: 16px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 11px 10px;
+      border-bottom: 1px solid #eef2f7;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      color: #475467;
+      background: #f8fafc;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    tr:hover td {
+      background: #fbfdff;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 72px;
+      right: 18px;
+      bottom: 18px;
+      width: min(1180px, calc(100vw - 36px));
+      display: none;
+      flex-direction: column;
+      z-index: 20;
+      overflow: hidden;
+    }
+
+    .drawer.open { display: flex; }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .drawer-title {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .drawer-body {
+      overflow: auto;
+      padding: 16px 18px 92px;
+    }
+
+    .drawer-footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 14px 18px;
+      border-top: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+    }
+
+    .section {
+      margin-bottom: 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .field label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 6px;
+      color: #475467;
+      font-size: 13px;
+    }
+
+    .required {
+      color: var(--danger);
+    }
+
+    .field input, .field select {
+      width: 100%;
+      height: 34px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      outline: none;
+      background: #fff;
+    }
+
+    .field input[readonly] {
+      color: #344054;
+      background: #f8fafc;
+    }
+
+    .hint {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .alert {
+      display: none;
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      line-height: 1.6;
+    }
+
+    .alert.show { display: block; }
+    .alert.info { color: #175cd3; background: #eff8ff; border: 1px solid #b2ddff; }
+    .alert.error { color: #b42318; background: #fef3f2; border: 1px solid #fecdca; }
+    .alert.success { color: #027a48; background: #ecfdf3; border: 1px solid #abefc6; }
+
+    .sku-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .qty-input {
+      width: 74px;
+      height: 30px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    .pill-line {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mapping-card {
+      display: grid;
+      grid-template-columns: 1fr 44px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border: 1px dashed #b2ddff;
+      border-radius: 8px;
+      background: #f8fbff;
+    }
+
+    .mapping-box {
+      padding: 10px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #dbeafe;
+    }
+
+    .mapping-box b {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .arrow {
+      text-align: center;
+      color: var(--primary);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.38);
+      z-index: 50;
+    }
+
+    .modal-mask.open { display: flex; }
+
+    .modal-panel {
+      width: min(760px, calc(100vw - 36px));
+      max-height: calc(100vh - 80px);
+      overflow: auto;
+      padding: 18px;
+    }
+
+    .modal-panel h3 {
+      margin: 0 0 12px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: 72px;
+      display: none;
+      transform: translateX(-50%);
+      padding: 10px 14px;
+      color: #027a48;
+      background: #ecfdf3;
+      border-color: #abefc6;
+      z-index: 80;
+    }
+
+    .toast.show { display: block; }
+
+    .muted { color: var(--muted); }
+    .danger-text { color: var(--danger); }
+    .success-text { color: var(--success); }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .side { min-height: auto; }
+      .grid { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: 1fr; }
+      .toolbar { align-items: flex-start; flex-direction: column; }
+      .search { width: 100%; min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <strong>EVA 分销订单库存占用逻辑改造原型</strong>
+    <span>交互重点：父层级选择 + 三级区域映射国家虚拟仓 + 指定 privateId 占用</span>
+  </header>
+
+  <div class="layout">
+    <aside class="side">
+      <h3>原型说明</h3>
+      <p>本原型基于 PRD：分销订单在 SPL 等实体仓下选择父库存层级，例如 <b>分销_EU</b>，系统根据订单三级区域自动解析到德国/法国等国家虚拟仓。</p>
+      <div class="pill-line">
+        <span class="tag">SPL 实体仓</span>
+        <span class="tag">分销_EU 父层级</span>
+        <span class="tag success">德国虚拟仓</span>
+        <span class="tag success">法国虚拟仓</span>
+      </div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:16px 0;">
+      <h3>可操作路径</h3>
+      <p>1. 点击“新增分销订单”。</p>
+      <p>2. 修改发货仓库、发货库存层级、三级区域。</p>
+      <p>3. 查看“实际占用层级”和 SKU 可用库存变化。</p>
+      <p>4. 点击“提交审核”，查看生成的锁定记录。</p>
+    </aside>
+
+    <main class="main">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button class="btn primary" id="openCreateBtn">新增分销订单</button>
+          <button class="btn" id="openMappingBtn">查看虚拟仓映射</button>
+          <button class="btn" id="resetBtn">重置演示数据</button>
+        </div>
+        <div class="toolbar-right">
+          <input class="search" placeholder="输入分销订单号 / 客户订单号 / 发货申请单号" />
+          <button class="btn">查询</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>分销订单号</th>
+              <th>客户</th>
+              <th>发货仓库</th>
+              <th>三级区域</th>
+              <th>发货库存层级</th>
+              <th>实际占用层级</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="orderList"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <section class="drawer" id="orderDrawer" aria-label="新增分销订单抽屉">
+    <div class="drawer-header">
+      <div class="drawer-title">
+        <span>新增分销订单</span>
+        <span class="tag warn" id="drawerStatus">草稿</span>
+      </div>
+      <button class="btn" id="closeDrawerBtn">关闭</button>
+    </div>
+
+    <div class="drawer-body">
+      <div class="alert info show">
+        原型规则：发货仓库为 SPL 且发货库存层级选择“分销_EU”时，系统按三级区域映射实际占用层级。例如德国 -> 德国虚拟仓，法国 -> 法国虚拟仓。
+      </div>
+      <div class="alert error" id="errorBox"></div>
+      <div class="alert success" id="successBox"></div>
+
+      <div class="section">
+        <div class="section-title">
+          <h3>基础信息</h3>
+          <span class="tag gray">参考分销订单新建弹窗</span>
+        </div>
+        <div class="grid">
+          <div class="field">
+            <label><span class="required">*</span>客户</label>
+            <select id="customerSelect">
+              <option>Luxshare Distribution GmbH</option>
+              <option>EU Retail Partner</option>
+              <option>France Channel Customer</option>
+            </select>
+          </div>
+          <div class="field">
+            <label><span class="required">*</span>发货仓库</label>
+            <select id="warehouseSelect">
+              <option value="SPL">SPL 仓</option>
+              <option value="VNW">越南立讯仓</option>
+              <option value="DEMO">普通海外仓</option>
+            </select>
+          </div>
+          <div class="field">
+            <label><span class="required">*</span>发货库存层级</label>
+            <select id="parentLevelSelect">
+              <option value="EU">分销_EU</option>
+              <option value="PUBLIC">公共</option>
+              <option value="SALE">销售可用</option>
+            </select>
+            <div class="hint">选择父层级，系统会根据三级区域解析国家虚拟子层级。</div>
+          </div>
+          <div class="field">
+            <label><span class="required">*</span>三级区域</label>
+            <select id="regionSelect">
+              <option value="DE">德国</option>
+              <option value="FR">法国</option>
+              <option value="ES">西班牙</option>
+              <option value="IT">意大利</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>实际占用层级</label>
+            <input id="actualLevelInput" readonly />
+            <div class="hint">提交审核和 WMS 占用时使用该层级 privateId。</div>
+          </div>
+          <div class="field">
+            <label>订单状态</label>
+            <input id="orderStatusInput" value="草稿" readonly />
+          </div>
+          <div class="field">
+            <label>预交日期</label>
+            <input type="date" value="2026-06-10" />
+          </div>
+          <div class="field">
+            <label>贸易方式</label>
+            <select>
+              <option>DAP</option>
+              <option>DDP</option>
+              <option>FOB</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">
+          <h3>层级解析结果</h3>
+          <span id="mappingBadge" class="tag success">已匹配</span>
+        </div>
+        <div class="mapping-card">
+          <div class="mapping-box">
+            <b>用户选择</b>
+            <div id="selectedInfo">SPL 仓 / 分销_EU / 德国</div>
+            <div class="hint">保存用户选择的父层级，便于业务理解。</div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="mapping-box">
+            <b>系统实际占用</b>
+            <div id="actualInfo">德国虚拟仓（privateId: 2001）</div>
+            <div class="hint">锁定记录和 WMS 出库明细使用该 privateId。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">
+          <h3>SKU 明细</h3>
+          <span class="tag gray">库存查询口径：skuId + whId + actual privateId</span>
+        </div>
+        <div class="sku-actions">
+          <div class="pill-line">
+            <span class="tag" id="inventoryScopeTag">当前查询：SPL 仓 / 德国虚拟仓</span>
+            <span class="tag warn">父层级不兜底扣减</span>
+          </div>
+          <div>
+            <button class="btn small" id="addSkuBtn">添加 SKU</button>
+            <button class="btn small" id="refreshInventoryBtn">刷新库存</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>SKU 名称</th>
+              <th>发货仓库</th>
+              <th>下单数量</th>
+              <th>可用库存</th>
+              <th>实际占用层级</th>
+              <th>校验结果</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="skuTable"></tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="section-title">
+          <h3>锁定记录预览</h3>
+          <span class="tag gray">提交审核后生成</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>orderCode</th>
+              <th>whId</th>
+              <th>sku</th>
+              <th>skuQuantity</th>
+              <th>lockedQuantity</th>
+              <th>unlockedQuantity</th>
+              <th>privateId</th>
+              <th>实际层级</th>
+            </tr>
+          </thead>
+          <tbody id="lockPreview"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="drawer-footer">
+      <button class="btn" id="saveDraftBtn">保存草稿</button>
+      <button class="btn primary" id="submitAuditBtn">提交审核并生成锁定记录</button>
+    </div>
+  </section>
+
+  <div class="modal-mask" id="mappingModal">
+    <div class="modal-panel">
+      <div class="section-title">
+        <h3>虚拟仓映射配置示例</h3>
+        <button class="btn small" id="closeMappingBtn">关闭</button>
+      </div>
+      <p class="muted">该配置用于将“发货仓库 + 父层级 + 三级区域”解析为最终占用的国家虚拟仓 privateId。</p>
+      <table>
+        <thead>
+          <tr>
+            <th>发货仓库</th>
+            <th>父层级</th>
+            <th>三级区域</th>
+            <th>实际占用层级</th>
+            <th>privateId</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>SPL 仓</td><td>分销_EU</td><td>德国</td><td>德国虚拟仓</td><td>2001</td><td><span class="tag success">启用</span></td></tr>
+          <tr><td>SPL 仓</td><td>分销_EU</td><td>法国</td><td>法国虚拟仓</td><td>2002</td><td><span class="tag success">启用</span></td></tr>
+          <tr><td>SPL 仓</td><td>分销_EU</td><td>西班牙</td><td>西班牙虚拟仓</td><td>2003</td><td><span class="tag success">启用</span></td></tr>
+          <tr><td>SPL 仓</td><td>分销_EU</td><td>意大利</td><td>-</td><td>-</td><td><span class="tag danger">未维护</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">已保存</div>
+
+  <script>
+    const mapping = {
+      "SPL|EU|DE": { id: 2001, name: "德国虚拟仓" },
+      "SPL|EU|FR": { id: 2002, name: "法国虚拟仓" },
+      "SPL|EU|ES": { id: 2003, name: "西班牙虚拟仓" },
+      "VNW|PUBLIC|DE": { id: 1, name: "公共" },
+      "DEMO|SALE|DE": { id: 8, name: "销售可用" }
+    };
+
+    const warehouseNames = {
+      SPL: "SPL 仓",
+      VNW: "越南立讯仓",
+      DEMO: "普通海外仓"
+    };
+
+    const parentLevelNames = {
+      EU: "分销_EU",
+      PUBLIC: "公共",
+      SALE: "销售可用"
+    };
+
+    const regionNames = {
+      DE: "德国",
+      FR: "法国",
+      ES: "西班牙",
+      IT: "意大利"
+    };
+
+    const inventory = {
+      "2001|SKU-1001": 48,
+      "2001|SKU-1002": 6,
+      "2001|SKU-1003": 0,
+      "2002|SKU-1001": 22,
+      "2002|SKU-1002": 31,
+      "2002|SKU-1003": 12,
+      "2003|SKU-1001": 9,
+      "2003|SKU-1002": 4,
+      "2003|SKU-1003": 18,
+      "1|SKU-1001": 999,
+      "8|SKU-1001": 77
+    };
+
+    let skuRows = [
+      { sku: "SKU-1001", name: "Docking Station Pro", qty: 12 },
+      { sku: "SKU-1002", name: "USB-C Hub 8 in 1", qty: 8 }
+    ];
+
+    let orderRows = [
+      {
+        code: "FX202606010001",
+        customer: "Luxshare Distribution GmbH",
+        warehouse: "SPL 仓",
+        region: "德国",
+        parent: "分销_EU",
+        actual: "德国虚拟仓",
+        status: "草稿"
+      }
+    ];
+
+    const el = (id) => document.getElementById(id);
+
+    function getActualLevel() {
+      const wh = el("warehouseSelect").value;
+      const parent = el("parentLevelSelect").value;
+      const region = el("regionSelect").value;
+      return mapping[`${wh}|${parent}|${region}`] || null;
+    }
+
+    function showToast(text) {
+      const toast = el("toast");
+      toast.textContent = text;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1600);
+    }
+
+    function showError(text) {
+      const box = el("errorBox");
+      box.textContent = text;
+      box.classList.add("show");
+      el("successBox").classList.remove("show");
+    }
+
+    function showSuccess(text) {
+      const box = el("successBox");
+      box.textContent = text;
+      box.classList.add("show");
+      el("errorBox").classList.remove("show");
+    }
+
+    function clearMessages() {
+      el("errorBox").classList.remove("show");
+      el("successBox").classList.remove("show");
+    }
+
+    function renderOrderList() {
+      el("orderList").innerHTML = orderRows.map((row, index) => `
+        <tr>
+          <td>${row.code}</td>
+          <td>${row.customer}</td>
+          <td>${row.warehouse}</td>
+          <td>${row.region}</td>
+          <td>${row.parent}</td>
+          <td>${row.actual}</td>
+          <td><span class="tag ${row.status === "草稿" ? "warn" : "success"}">${row.status}</span></td>
+          <td><button class="btn small" onclick="openDrawer()">编辑</button></td>
+        </tr>
+      `).join("");
+    }
+
+    function renderSkuTable() {
+      const actual = getActualLevel();
+      const whName = warehouseNames[el("warehouseSelect").value];
+      const actualName = actual ? actual.name : "未匹配";
+      el("skuTable").innerHTML = skuRows.map((row, index) => {
+        const available = actual ? (inventory[`${actual.id}|${row.sku}`] ?? 0) : "-";
+        const ok = actual && Number(available) >= row.qty;
+        const result = actual
+          ? (ok ? '<span class="tag success">库存充足</span>' : '<span class="tag danger">库存不足</span>')
+          : '<span class="tag danger">层级未匹配</span>';
+        return `
+          <tr>
+            <td>${row.sku}</td>
+            <td>${row.name}</td>
+            <td>${whName}</td>
+            <td><input class="qty-input" type="number" min="1" value="${row.qty}" onchange="changeQty(${index}, this.value)" /></td>
+            <td class="${ok ? "success-text" : "danger-text"}">${available}</td>
+            <td>${actualName}</td>
+            <td>${result}</td>
+            <td><button class="btn small danger" onclick="removeSku(${index})">删除</button></td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderLockPreview(lockCreated = false) {
+      const actual = getActualLevel();
+      if (!lockCreated || !actual) {
+        el("lockPreview").innerHTML = `
+          <tr>
+            <td colspan="8" class="muted">提交审核后，系统将按 SKU 生成锁定记录，并保存实际占用 privateId。</td>
+          </tr>
+        `;
+        return;
+      }
+
+      el("lockPreview").innerHTML = skuRows.map(row => `
+        <tr>
+          <td>FX202606010002</td>
+          <td>${el("warehouseSelect").value}</td>
+          <td>${row.sku}</td>
+          <td>${row.qty}</td>
+          <td>0</td>
+          <td>${row.qty}</td>
+          <td>${actual.id}</td>
+          <td>${actual.name}</td>
+        </tr>
+      `).join("");
+    }
+
+    function syncMapping() {
+      const wh = el("warehouseSelect").value;
+      const parent = el("parentLevelSelect").value;
+      const region = el("regionSelect").value;
+      const actual = getActualLevel();
+      const selectedText = `${warehouseNames[wh]} / ${parentLevelNames[parent]} / ${regionNames[region]}`;
+
+      el("selectedInfo").textContent = selectedText;
+
+      if (actual) {
+        el("actualInfo").textContent = `${actual.name}（privateId: ${actual.id}）`;
+        el("actualLevelInput").value = `${actual.name}（privateId: ${actual.id}）`;
+        el("mappingBadge").textContent = "已匹配";
+        el("mappingBadge").className = "tag success";
+        el("inventoryScopeTag").textContent = `当前查询：${warehouseNames[wh]} / ${actual.name}`;
+      } else {
+        el("actualInfo").textContent = "未匹配，请维护虚拟仓映射";
+        el("actualLevelInput").value = "未匹配";
+        el("mappingBadge").textContent = "未匹配";
+        el("mappingBadge").className = "tag danger";
+        el("inventoryScopeTag").textContent = `当前查询：${warehouseNames[wh]} / 未匹配`;
+      }
+
+      renderSkuTable();
+      renderLockPreview(false);
+      clearMessages();
+    }
+
+    function validateBeforeSubmit() {
+      const actual = getActualLevel();
+      if (!actual) {
+        return `当前发货仓库【${warehouseNames[el("warehouseSelect").value]}】、库存层级【${parentLevelNames[el("parentLevelSelect").value]}】、三级区域【${regionNames[el("regionSelect").value]}】未维护虚拟仓映射，请先维护。`;
+      }
+      const shortage = skuRows.find(row => (inventory[`${actual.id}|${row.sku}`] ?? 0) < row.qty);
+      if (shortage) {
+        return `SKU【${shortage.sku}】在【${actual.name}】可用库存不足，请补货、调拨或调整订单数量。`;
+      }
+      return "";
+    }
+
+    function openDrawer() {
+      el("orderDrawer").classList.add("open");
+      syncMapping();
+    }
+
+    function closeDrawer() {
+      el("orderDrawer").classList.remove("open");
+      clearMessages();
+    }
+
+    function changeQty(index, value) {
+      skuRows[index].qty = Math.max(1, Number(value) || 1);
+      renderSkuTable();
+      renderLockPreview(false);
+    }
+
+    function removeSku(index) {
+      skuRows.splice(index, 1);
+      renderSkuTable();
+      renderLockPreview(false);
+    }
+
+    window.openDrawer = openDrawer;
+    window.changeQty = changeQty;
+    window.removeSku = removeSku;
+
+    el("openCreateBtn").addEventListener("click", openDrawer);
+    el("closeDrawerBtn").addEventListener("click", closeDrawer);
+    el("warehouseSelect").addEventListener("change", syncMapping);
+    el("parentLevelSelect").addEventListener("change", syncMapping);
+    el("regionSelect").addEventListener("change", syncMapping);
+
+    el("addSkuBtn").addEventListener("click", () => {
+      const next = skuRows.length % 3;
+      const candidates = [
+        { sku: "SKU-1001", name: "Docking Station Pro", qty: 5 },
+        { sku: "SKU-1002", name: "USB-C Hub 8 in 1", qty: 3 },
+        { sku: "SKU-1003", name: "Travel Charger 65W", qty: 2 }
+      ];
+      skuRows.push({ ...candidates[next] });
+      renderSkuTable();
+      renderLockPreview(false);
+    });
+
+    el("refreshInventoryBtn").addEventListener("click", () => {
+      renderSkuTable();
+      showToast("库存已按实际占用层级刷新");
+    });
+
+    el("saveDraftBtn").addEventListener("click", () => {
+      showSuccess("草稿已保存：保留用户选择父层级和系统解析出的实际占用层级。");
+      showToast("草稿已保存");
+    });
+
+    el("submitAuditBtn").addEventListener("click", () => {
+      const error = validateBeforeSubmit();
+      if (error) {
+        showError(error);
+        renderLockPreview(false);
+        return;
+      }
+      renderLockPreview(true);
+      el("orderStatusInput").value = "审核中";
+      el("drawerStatus").textContent = "审核中";
+      el("drawerStatus").className = "tag success";
+      showSuccess("提交审核成功：已创建库存预占记录，锁定任务将按实际 privateId 占用国家虚拟仓库存。");
+      const actual = getActualLevel();
+      orderRows.unshift({
+        code: "FX202606010002",
+        customer: el("customerSelect").value,
+        warehouse: warehouseNames[el("warehouseSelect").value],
+        region: regionNames[el("regionSelect").value],
+        parent: parentLevelNames[el("parentLevelSelect").value],
+        actual: actual.name,
+        status: "审核中"
+      });
+      renderOrderList();
+    });
+
+    el("openMappingBtn").addEventListener("click", () => el("mappingModal").classList.add("open"));
+    el("closeMappingBtn").addEventListener("click", () => el("mappingModal").classList.remove("open"));
+    el("mappingModal").addEventListener("click", (event) => {
+      if (event.target === el("mappingModal")) el("mappingModal").classList.remove("open");
+    });
+
+    el("resetBtn").addEventListener("click", () => {
+      skuRows = [
+        { sku: "SKU-1001", name: "Docking Station Pro", qty: 12 },
+        { sku: "SKU-1002", name: "USB-C Hub 8 in 1", qty: 8 }
+      ];
+      el("warehouseSelect").value = "SPL";
+      el("parentLevelSelect").value = "EU";
+      el("regionSelect").value = "DE";
+      el("orderStatusInput").value = "草稿";
+      el("drawerStatus").textContent = "草稿";
+      el("drawerStatus").className = "tag warn";
+      syncMapping();
+      showToast("演示数据已重置");
+    });
+
+    renderOrderList();
+    syncMapping();
+  </script>
+</body>
+</html>
