@@ -1,0 +1,1084 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>分销区域库存层级映射配置原型</title>
+  <style>
+    :root {
+      --primary: #1677ff;
+      --primary-hover: #0958d9;
+      --success: #16a34a;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d9e0ea;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --head: #f3f6fb;
+      --shadow: 0 10px 30px rgba(18, 38, 63, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      font-size: 13px;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    .topbar {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      color: #374151;
+      font-size: 13px;
+    }
+
+    .nav strong {
+      color: #111827;
+      font-size: 15px;
+    }
+
+    .nav span {
+      padding: 15px 0 13px;
+      border-bottom: 2px solid transparent;
+    }
+
+    .nav span.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      font-weight: 600;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #6b7280;
+    }
+
+    .page {
+      padding: 14px 16px 28px;
+    }
+
+    .filter-card, .table-card {
+      background: var(--card);
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .table-card {
+      overflow-x: auto;
+    }
+
+    .filter-card {
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .filter-row, .toolbar, .form-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .field {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    label {
+      color: #4b5563;
+      white-space: nowrap;
+    }
+
+    input, select, textarea {
+      min-height: 30px;
+      padding: 5px 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 3px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.12);
+    }
+
+    input:disabled, select:disabled, textarea:disabled {
+      color: #6b7280;
+      background: #f3f4f6;
+      cursor: not-allowed;
+    }
+
+    .w120 { width: 120px; }
+    .w160 { width: 160px; }
+    .w220 { width: 220px; }
+    .w300 { width: 300px; }
+
+    .btn {
+      min-height: 30px;
+      padding: 0 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 3px;
+      background: #fff;
+      color: #374151;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .btn.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: var(--primary-hover);
+      color: #fff;
+    }
+
+    .btn.link {
+      min-height: auto;
+      padding: 0 4px;
+      border: 0;
+      color: var(--primary);
+      background: transparent;
+    }
+
+    .btn.danger {
+      color: var(--danger);
+      border: 0;
+      background: transparent;
+    }
+
+    .action-cell {
+      overflow: visible;
+    }
+
+    .toolbar {
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .toolbar h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th, td {
+      height: 42px;
+      padding: 8px 10px;
+      border-bottom: 1px solid #eef2f7;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    th {
+      height: 38px;
+      background: var(--head);
+      color: #374151;
+      font-weight: 600;
+    }
+
+    tr:hover td {
+      background: #fafcff;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--success);
+    }
+
+    .switch {
+      width: 34px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 2px;
+      border-radius: 999px;
+      background: var(--primary);
+      vertical-align: middle;
+    }
+
+    .switch::after {
+      content: "";
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0,0,0,.18);
+    }
+
+    .switch-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      border: 0;
+      background: transparent;
+      color: var(--success);
+      cursor: pointer;
+    }
+
+    .switch-control.off {
+      color: var(--muted);
+    }
+
+    .switch-control.off .switch {
+      justify-content: flex-start;
+      background: #d1d5db;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      color: #1d4ed8;
+      background: #eff6ff;
+      font-size: 12px;
+    }
+
+    .tag.warn {
+      color: #b45309;
+      border-color: #fde68a;
+      background: #fffbeb;
+    }
+
+    .tag.gray {
+      color: #4b5563;
+      border-color: #d1d5db;
+      background: #f3f4f6;
+    }
+
+    .tag.purple {
+      color: #6d28d9;
+      border-color: #ddd6fe;
+      background: #f5f3ff;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      background: rgba(15, 23, 42, .45);
+      z-index: 20;
+    }
+
+    .overlay.show {
+      display: block;
+    }
+
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 860px;
+      max-width: calc(100vw - 32px);
+      max-height: calc(100vh - 64px);
+      display: none;
+      flex-direction: column;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: var(--shadow);
+      z-index: 30;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-header, .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .modal-footer {
+      justify-content: flex-end;
+      gap: 10px;
+      border-top: 1px solid #e5e7eb;
+      border-bottom: 0;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow: auto;
+      padding: 18px 20px;
+    }
+
+    .section {
+      margin-bottom: 18px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #edf1f7;
+    }
+
+    .section h4 {
+      margin: 0 0 12px;
+      font-size: 14px;
+    }
+
+    .modal-form {
+      display: grid;
+      gap: 14px;
+      max-width: 720px;
+    }
+
+    .modal-field {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-field label {
+      justify-self: end;
+    }
+
+    .modal-field input,
+    .modal-field select,
+    .modal-field textarea {
+      width: 100%;
+    }
+
+    .modal-field.hidden {
+      display: none;
+    }
+
+    .transfer {
+      display: grid;
+      grid-template-columns: 1fr 58px 1fr;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .transfer-panel {
+      min-height: 220px;
+      border: 1px solid #dbe3ef;
+      border-radius: 4px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .transfer-title {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      background: #f5f7fb;
+      border-bottom: 1px solid #e5e7eb;
+      color: #374151;
+      font-weight: 600;
+    }
+
+    .transfer-title span:last-child {
+      color: #9ca3af;
+      font-weight: 600;
+    }
+
+    .transfer-search {
+      padding: 8px 10px;
+      border-bottom: 1px solid #eef2f7;
+    }
+
+    .transfer-search input {
+      width: 100%;
+    }
+
+    .transfer-list {
+      height: 150px;
+      overflow-y: auto;
+      padding: 6px 10px;
+    }
+
+    .transfer-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 24px;
+      color: #4b5563;
+    }
+
+    .transfer-item.disabled {
+      color: #b6beca;
+      cursor: not-allowed;
+    }
+
+    .transfer-item.disabled input {
+      cursor: not-allowed;
+    }
+
+    .transfer-item input {
+      min-height: auto;
+    }
+
+    .transfer-empty {
+      padding: 18px 0;
+      color: #9ca3af;
+      text-align: center;
+    }
+
+    .transfer-actions {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+    }
+
+    .transfer-action {
+      width: 36px;
+      min-height: 28px;
+      padding: 0;
+      border-color: #9bb8f5;
+      background: #8fb0f7;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .transfer-action:disabled {
+      border-color: #d1d5db;
+      background: #e5e7eb;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .sub-level-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 18px 0 10px;
+    }
+
+    .sub-level-header h4 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .sub-level-table th,
+    .sub-level-table td {
+      height: 38px;
+      padding: 6px 8px;
+    }
+
+    .sub-level-table input,
+    .sub-level-table select {
+      width: 100%;
+    }
+
+    .required {
+      color: var(--danger);
+      margin-right: 3px;
+    }
+
+    .mapping-table th, .mapping-table td {
+      height: 40px;
+      padding: 6px 8px;
+    }
+
+    .mapping-table select, .mapping-table input {
+      width: 100%;
+    }
+
+    .tip {
+      margin-top: 8px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .message {
+      display: none;
+      margin-bottom: 12px;
+      padding: 9px 12px;
+      border-radius: 4px;
+      line-height: 1.5;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.error {
+      color: #991b1b;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+    }
+
+    .message.success {
+      color: #166534;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+    }
+
+    .toast {
+      position: fixed;
+      top: 68px;
+      right: 24px;
+      display: none;
+      padding: 10px 14px;
+      border-color: #bbf7d0;
+      color: #166534;
+      background: #f0fdf4;
+      z-index: 40;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    @media (max-width: 900px) {
+      .modal { width: calc(100vw - 32px); }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="nav">
+      <strong>EVA</strong>
+      <span>首页</span>
+      <span>分销订单列表</span>
+      <span>仓库管理</span>
+      <span class="active">库存层级映射</span>
+      <span>库存明细</span>
+    </div>
+    <div class="user">
+      <span>017014</span>
+      <span>⟳</span>
+      <span>⚙</span>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="filter-card">
+      <div class="filter-row">
+        <div class="field">
+          <label>三级区域</label>
+          <input class="w160" id="regionFilter" placeholder="请输入三级区域" />
+        </div>
+        <div class="field">
+          <label>客户ID</label>
+          <input class="w160" id="customerFilter" placeholder="请输入客户ID" />
+        </div>
+        <div class="field">
+          <label>状态</label>
+          <select class="w120" id="statusFilter">
+            <option value="">全部</option>
+            <option>正常</option>
+            <option>停用</option>
+          </select>
+        </div>
+        <button class="btn primary" onclick="searchRows()">查询</button>
+        <button class="btn" onclick="resetSearch()">重置</button>
+      </div>
+    </section>
+
+    <section class="table-card">
+      <div class="toolbar">
+        <div>
+          <button class="btn primary" onclick="openModal('新增明细')">新增</button>
+          <button class="btn" onclick="showToast('已导出当前筛选结果')">导出</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:150px">映射名称</th>
+            <th style="width:120px">三级区域</th>
+            <th style="width:180px">客户ID</th>
+            <th style="width:80px">状态</th>
+            <th style="width:180px">备注</th>
+            <th style="width:100px">创建人</th>
+            <th style="width:150px">创建时间</th>
+            <th style="width:100px">更新人</th>
+            <th style="width:150px">更新时间</th>
+            <th style="width:270px">操作</th>
+          </tr>
+        </thead>
+        <tbody id="mappingRows"></tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <div class="overlay" id="overlay" onclick="closeAllModals()"></div>
+  <aside class="modal" id="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">新增明细</h3>
+      <button class="btn link" onclick="closeModal()">关闭</button>
+    </div>
+    <div class="modal-body">
+      <div class="message error" id="errorBox"></div>
+      <div class="message success" id="successBox">保存成功，映射已更新。</div>
+
+      <div class="section">
+        <div class="modal-form">
+          <div class="modal-field">
+            <label><span class="required">*</span>映射名称</label>
+            <input id="formMappingName" placeholder="例如：德国-通讯线客户" />
+          </div>
+          <div class="modal-field">
+            <label><span class="required">*</span>三级区域</label>
+            <select id="formRegion" onchange="renderCustomerOptions()">
+              <option value="">请选择三级区域</option>
+              <option>德国</option>
+              <option>法国</option>
+              <option>奥地利</option>
+              <option>西班牙</option>
+              <option>意大利</option>
+              <option>荷兰</option>
+            </select>
+          </div>
+          <div class="modal-field">
+            <label><span class="required">*</span>客户ID</label>
+            <div class="transfer" id="customerTransfer">
+              <div class="transfer-panel">
+                <div class="transfer-title">
+                  <span>未添加</span>
+                  <span id="availableCustomerCount">0/0</span>
+                </div>
+                <div class="transfer-search">
+                  <input id="availableCustomerSearch" placeholder="请输入" oninput="renderCustomerTransfer()" />
+                </div>
+                <div class="transfer-list" id="availableCustomerList"></div>
+              </div>
+              <div class="transfer-actions">
+                <button type="button" class="btn transfer-action" onclick="moveCustomers('remove')">‹</button>
+                <button type="button" class="btn transfer-action" onclick="moveCustomers('add')">›</button>
+              </div>
+              <div class="transfer-panel">
+                <div class="transfer-title">
+                  <span>已添加</span>
+                  <span id="selectedCustomerCount">0/0</span>
+                </div>
+                <div class="transfer-search">
+                  <input id="selectedCustomerSearch" placeholder="请输入" oninput="renderCustomerTransfer()" />
+                </div>
+                <div class="transfer-list" id="selectedCustomerList"></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-field" id="statusField">
+            <label><span class="required">*</span>状态</label>
+            <div>
+              <input type="hidden" id="formStatus" value="正常" />
+              <button type="button" class="switch-control" id="formStatusSwitch" onclick="toggleFormStatus()">
+                <span class="switch"></span>
+                <span id="formStatusText">启用</span>
+              </button>
+            </div>
+          </div>
+          <div class="modal-field">
+            <label>备注</label>
+            <input id="formRemark" placeholder="请输入备注（选填）" />
+          </div>
+        </div>
+
+        <div class="sub-level-header">
+          <h4>绑定库存层级</h4>
+          <button type="button" class="btn link" id="addChildLevelBtn" onclick="addChildLevelRow()">添加子层级</button>
+        </div>
+        <table class="sub-level-table">
+          <thead>
+            <tr>
+              <th style="width:54px">操作</th>
+              <th><span class="required">*</span>绑定库存层级</th>
+              <th style="width:100px">扣减顺序</th>
+              <th>备注</th>
+            </tr>
+          </thead>
+          <tbody id="childLevelRows"></tbody>
+        </table>
+        <p class="tip">示例：德国通讯线客户只能绑定“2B_分销”；德国营销推广客户可绑定“DE_分销”和“DE_物料”，提交审核时按扣减顺序定位到实际发货库存层级。</p>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="closeBtn" onclick="closeModal()">取消</button>
+      <button class="btn primary" id="saveBtn" onclick="saveMapping()">确定</button>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast">保存成功</div>
+
+  <script>
+    const mappings = [
+      { mappingName: "德国-通讯线客户", region: "德国", customerIds: ["C-DE-1001"], status: "正常", remark: "通讯线客户仅占用2B分销层级", createdBy: "张三", createdAt: "2026-06-08 10:12:33", updatedBy: "李四", updatedAt: "2026-06-08 18:12:33", childLevels: [{ level: "2B_分销", deductSort: "1", privateId: "400200", remark: "通讯线客户专用库存" }] },
+      { mappingName: "德国-营销推广客户", region: "德国", customerIds: ["C-DE-1002", "C-DE-1003"], status: "正常", remark: "营销推广客户按分销、大货物料顺序占用", createdBy: "张三", createdAt: "2026-06-08 10:15:09", updatedBy: "李四", updatedAt: "2026-06-08 18:11:09", childLevels: [{ level: "DE_分销", deductSort: "1", privateId: "300302", remark: "德国分销库存" }, { level: "DE_物料", deductSort: "2", privateId: "200302", remark: "德国物料库存" }] },
+      { mappingName: "法国-营销推广客户", region: "法国", customerIds: ["C-FR-3001", "C-FR-3002"], status: "正常", remark: "法国客户订单占用", createdBy: "王五", createdAt: "2026-06-08 10:20:27", updatedBy: "王五", updatedAt: "2026-06-08 18:10:27", childLevels: [{ level: "FR_分销", deductSort: "1", privateId: "300301", remark: "" }, { level: "FR_物料", deductSort: "2", privateId: "200301", remark: "" }] },
+      { mappingName: "西班牙-营销推广客户", region: "西班牙", customerIds: ["C-ES-4001"], status: "停用", remark: "待库存层级初始化", createdBy: "赵六", createdAt: "2026-06-07 14:20:18", updatedBy: "系统", updatedAt: "2026-06-07 15:20:18", childLevels: [] }
+    ];
+
+    const levels = {
+      "2B_分销": "400200",
+      "DE_分销": "300302",
+      "DE_物料": "200302",
+      "FR_分销": "300301",
+      "FR_物料": "200301",
+      "ES_分销": "300501",
+      "ES_物料": "200501"
+    };
+
+    const customersByRegion = {
+      "德国": ["C-DE-1001", "C-DE-1002", "C-DE-1003", "C-DE-1004", "C-DE-1005", "C-DE-1006"],
+      "法国": ["C-FR-3001", "C-FR-3002", "C-FR-3003", "C-FR-3004"],
+      "奥地利": ["C-AT-2001", "C-AT-2002", "C-AT-2003"],
+      "西班牙": ["C-ES-4001", "C-ES-4002"],
+      "意大利": ["C-IT-5001", "C-IT-5002"],
+      "荷兰": ["C-NL-6001", "C-NL-6002"]
+    };
+
+    let editingIndex = null;
+    let modalReadonly = false;
+    let selectedCustomerIds = [];
+
+    function renderCustomerOptions(selected = []) {
+      const region = document.getElementById("formRegion").value;
+      const options = customersByRegion[region] || [];
+      selectedCustomerIds = selected.filter(item => options.includes(item));
+      document.getElementById("availableCustomerSearch").value = "";
+      document.getElementById("selectedCustomerSearch").value = "";
+      renderCustomerTransfer();
+    }
+
+    function renderCustomerTransfer() {
+      const region = document.getElementById("formRegion").value;
+      const allCustomers = customersByRegion[region] || [];
+      const availableSearch = document.getElementById("availableCustomerSearch").value.trim().toLowerCase();
+      const selectedSearch = document.getElementById("selectedCustomerSearch").value.trim().toLowerCase();
+      const availableCustomers = allCustomers.filter(item => !selectedCustomerIds.includes(item));
+      const filteredAvailable = availableCustomers.filter(item => item.toLowerCase().includes(availableSearch));
+      const filteredSelected = selectedCustomerIds.filter(item => item.toLowerCase().includes(selectedSearch));
+      document.getElementById("availableCustomerCount").textContent = `${availableCustomers.length}/${allCustomers.length}`;
+      document.getElementById("selectedCustomerCount").textContent = `${selectedCustomerIds.length}/${allCustomers.length}`;
+      renderCustomerList("availableCustomerList", filteredAvailable, "available");
+      renderCustomerList("selectedCustomerList", filteredSelected, "selected");
+      if (modalReadonly) setModalReadonly(true);
+    }
+
+    function renderCustomerList(containerId, list, type) {
+      document.getElementById(containerId).innerHTML = list.length
+        ? list.map(item => {
+          const disabled = type === "available" && isCustomerOccupied(item);
+          return `
+          <label class="transfer-item ${disabled ? "disabled" : ""}" title="${disabled ? "已被其他映射占用" : ""}">
+            <input type="checkbox" value="${item}" data-customer-type="${type}" ${disabled ? "disabled" : ""} />
+            <span>${item}${disabled ? "（已占用）" : ""}</span>
+          </label>
+        `;
+        }).join("")
+        : `<div class="transfer-empty">暂无数据</div>`;
+    }
+
+    function isCustomerOccupied(customerId) {
+      const region = document.getElementById("formRegion").value;
+      return mappings.some((row, index) => {
+        return index !== editingIndex
+          && row.status === "正常"
+          && row.region === region
+          && (row.customerIds || []).includes(customerId);
+      });
+    }
+
+    function getCheckedTransferValues(type) {
+      return Array.from(document.querySelectorAll(`input[data-customer-type="${type}"]:checked:not(:disabled)`)).map(item => item.value);
+    }
+
+    function moveCustomers(direction) {
+      if (modalReadonly) return;
+      if (direction === "add") {
+        const checked = getCheckedTransferValues("available");
+        selectedCustomerIds = Array.from(new Set([...selectedCustomerIds, ...checked]));
+      } else {
+        const checked = getCheckedTransferValues("selected");
+        selectedCustomerIds = selectedCustomerIds.filter(item => !checked.includes(item));
+      }
+      renderCustomerTransfer();
+    }
+
+    function setFormStatus(status = "正常") {
+      const enabled = status !== "停用";
+      document.getElementById("formStatus").value = enabled ? "正常" : "停用";
+      document.getElementById("formStatusText").textContent = enabled ? "启用" : "停用";
+      document.getElementById("formStatusSwitch").classList.toggle("off", !enabled);
+    }
+
+    function toggleFormStatus() {
+      const current = document.getElementById("formStatus").value;
+      setFormStatus(current === "正常" ? "停用" : "正常");
+    }
+
+    function renderRows(list = mappings) {
+      const html = list.map((row, index) => `
+        <tr>
+          <td>${row.mappingName || "-"}</td>
+          <td>${row.region}</td>
+          <td>${(row.customerIds || []).map(item => `<span class="tag purple">${item}</span>`).join(" ") || "-"}</td>
+          <td>${row.status === "正常" ? '<span class="status"><i class="switch"></i>正常</span>' : '<span class="tag gray">停用</span>'}</td>
+          <td title="${row.remark || ""}">${row.remark || "-"}</td>
+          <td>${row.createdBy || "-"}</td>
+          <td>${row.createdAt || "-"}</td>
+          <td>${row.updatedBy || "-"}</td>
+          <td>${row.updatedAt || "-"}</td>
+          <td class="action-cell">
+            <button class="btn link" onclick="openModal('编辑明细', ${index})">编辑</button>
+            <button class="btn link" onclick="openModal('查看明细', ${index}, true)">查看</button>
+            ${row.status === "停用" ? `<button class="btn danger" onclick="deleteRow(event, ${index})">删除</button>` : ""}
+            <button class="btn link" onclick="showLog(event, ${index})">日志</button>
+          </td>
+        </tr>
+      `).join("");
+      document.getElementById("mappingRows").innerHTML = html;
+    }
+
+    function searchRows() {
+      const region = document.getElementById("regionFilter").value.trim();
+      const customerId = document.getElementById("customerFilter").value.trim();
+      const status = document.getElementById("statusFilter").value;
+      const filtered = mappings.filter(row => {
+        return (!region || row.region.includes(region))
+          && (!customerId || (row.customerIds || []).some(item => item.includes(customerId)))
+          && (!status || row.status === status);
+      });
+      renderRows(filtered);
+      showToast(`已查询到 ${filtered.length} 条映射`);
+    }
+
+    function resetSearch() {
+      document.getElementById("regionFilter").value = "";
+      document.getElementById("customerFilter").value = "";
+      document.getElementById("statusFilter").value = "";
+      renderRows();
+    }
+
+    function openModal(title, index, readonly = false) {
+      document.getElementById("modalTitle").textContent = title;
+      document.getElementById("overlay").classList.add("show");
+      document.getElementById("modal").classList.add("show");
+      clearMessages();
+      editingIndex = title === "新增明细" ? null : index;
+      modalReadonly = readonly;
+      const row = editingIndex === null ? {} : mappings[index];
+      const isEdit = editingIndex !== null;
+      const regionSelect = document.getElementById("formRegion");
+      document.getElementById("formMappingName").value = row.mappingName || "";
+      regionSelect.value = row.region || "";
+      regionSelect.disabled = isEdit || readonly;
+      document.getElementById("statusField").classList.toggle("hidden", isEdit);
+      renderCustomerOptions(row.customerIds || []);
+      renderChildLevelRows(row.childLevels || []);
+      setFormStatus(row.status || "正常");
+      document.getElementById("formRemark").value = row.remark || "";
+      setModalReadonly(readonly);
+    }
+
+    function closeModal() {
+      document.getElementById("overlay").classList.remove("show");
+      document.getElementById("modal").classList.remove("show");
+      modalReadonly = false;
+    }
+
+    function closeAllModals() {
+      closeModal();
+    }
+
+    function validateMapping() {
+      const message = getValidationMessage();
+      clearMessages();
+      if (message) {
+        showError(message);
+        return false;
+      }
+      return true;
+    }
+
+    function saveMapping() {
+      if (!validateMapping()) return;
+      const mappingName = document.getElementById("formMappingName").value.trim();
+      const region = document.getElementById("formRegion").value;
+      const customerIds = selectedCustomerIds;
+      const status = document.getElementById("formStatus").value;
+      const now = "2026-06-10 18:26:00";
+      const payload = {
+        mappingName,
+        region,
+        customerIds,
+        status,
+        remark: document.getElementById("formRemark").value.trim(),
+        createdBy: editingIndex === null ? "当前用户" : mappings[editingIndex].createdBy,
+        createdAt: editingIndex === null ? now : mappings[editingIndex].createdAt,
+        updatedBy: "当前用户",
+        updatedAt: now,
+        childLevels: collectChildLevels()
+      };
+      if (editingIndex === null) {
+        mappings.unshift(payload);
+      } else {
+        mappings[editingIndex] = payload;
+      }
+      renderRows();
+      closeModal();
+      showToast("保存成功，分销订单将按三级区域和客户ID解析发货库存层级");
+    }
+
+    function renderChildLevelRows(rows = []) {
+      const tbody = document.getElementById("childLevelRows");
+      tbody.innerHTML = "";
+      const data = rows.length ? rows : [{ level: "", privateId: "", remark: "" }, { level: "", privateId: "", remark: "" }];
+      data.forEach((row, index) => addChildLevelRow(row, index + 1));
+    }
+
+    function addChildLevelRow(row = {}, defaultSort) {
+      const tr = document.createElement("tr");
+      const sortValue = row.deductSort || defaultSort || document.querySelectorAll("#childLevelRows tr").length + 1;
+      tr.innerHTML = `
+        <td><button type="button" class="btn danger child-delete-btn" onclick="this.closest('tr').remove()">删除</button></td>
+        <td>
+          <select class="child-level">
+            <option value="">请选择绑定库存层级</option>
+            ${Object.keys(levels).map(item => `<option ${item === (row.level || "") ? "selected" : ""}>${item}</option>`).join("")}
+          </select>
+        </td>
+        <td><input class="child-deduct-sort" type="number" min="1" step="1" value="${sortValue}" placeholder="顺序" /></td>
+        <td><input class="child-remark" value="${row.remark || ""}" placeholder="备注" /></td>
+      `;
+      document.getElementById("childLevelRows").appendChild(tr);
+      if (modalReadonly) setModalReadonly(true);
+    }
+
+    function collectChildLevels() {
+      return Array.from(document.querySelectorAll("#childLevelRows tr"))
+        .map(tr => {
+          const level = tr.querySelector(".child-level").value;
+          const deductSort = tr.querySelector(".child-deduct-sort").value.trim();
+          return {
+            level,
+            deductSort,
+            privateId: levels[level] || "",
+            remark: tr.querySelector(".child-remark").value.trim()
+          };
+        });
+    }
+
+    function getValidationMessage() {
+      const mappingName = document.getElementById("formMappingName").value.trim();
+      const region = document.getElementById("formRegion").value;
+      const customerIds = selectedCustomerIds;
+      const status = document.getElementById("formStatus").value;
+      if (!mappingName) return "映射名称不能为空。";
+      if (!region) return "三级区域不能为空。";
+      if (!customerIds.length) return "客户ID不能为空。";
+      if (!status) return "状态不能为空。";
+      const childRows = collectChildLevels();
+      if (!childRows.length) return "请至少维护一条绑定库存层级。";
+      if (childRows.some(row => !row.level)) return "绑定库存层级不能为空。";
+      if (childRows.some(row => !/^[1-9]\d*$/.test(row.deductSort))) return "扣减顺序需填写正整数。";
+      const duplicated = status === "正常" && mappings.some((row, index) => {
+        const hasSameCustomer = (row.customerIds || []).some(item => customerIds.includes(item));
+        return index !== editingIndex && row.status === "正常" && row.region === region && hasSameCustomer;
+      });
+      if (duplicated) return `三级区域【${region}】下存在重复启用的客户ID映射。`;
+      return "";
+    }
+
+    function setModalReadonly(readonly) {
+      document.querySelectorAll("#modal input, #modal select, #modal textarea, #formStatusSwitch").forEach(item => {
+        const occupiedAvailableCustomer = item.dataset.customerType === "available" && isCustomerOccupied(item.value);
+        item.disabled = readonly || occupiedAvailableCustomer || item.id === "formRegion" && editingIndex !== null;
+      });
+      document.querySelectorAll(".transfer-action").forEach(item => {
+        item.disabled = readonly;
+      });
+      document.querySelectorAll(".child-delete-btn").forEach(item => {
+        item.disabled = readonly;
+      });
+      document.getElementById("addChildLevelBtn").classList.toggle("hidden", readonly);
+      document.getElementById("saveBtn").classList.toggle("hidden", readonly);
+      document.getElementById("closeBtn").textContent = readonly ? "关闭" : "取消";
+    }
+
+    function showError(text) {
+      const box = document.getElementById("errorBox");
+      box.textContent = text;
+      box.classList.add("show");
+    }
+
+    function clearMessages() {
+      document.getElementById("errorBox").classList.remove("show");
+      document.getElementById("successBox").classList.remove("show");
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById("toast");
+      toast.textContent = text;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function showLog(event, index) {
+      event.stopPropagation();
+      const row = mappings[index];
+      showToast(`已查看【${row.region}-${(row.customerIds || []).join(",")}】日志`);
+    }
+
+    function deleteRow(event, index) {
+      if (event) event.stopPropagation();
+      mappings.splice(index, 1);
+      renderRows();
+      showToast("已删除映射");
+    }
+
+    renderRows();
+  </script>
+</body>
+</html>
