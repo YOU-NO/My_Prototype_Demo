@@ -221,54 +221,6 @@
       background: #fafcff;
     }
 
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--success);
-    }
-
-    .switch {
-      width: 34px;
-      height: 18px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: flex-end;
-      padding: 2px;
-      border-radius: 999px;
-      background: var(--primary);
-      vertical-align: middle;
-    }
-
-    .switch::after {
-      content: "";
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 1px 2px rgba(0,0,0,.18);
-    }
-
-    .switch-control {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      width: fit-content;
-      border: 0;
-      background: transparent;
-      color: var(--success);
-      cursor: pointer;
-    }
-
-    .switch-control.off {
-      color: var(--muted);
-    }
-
-    .switch-control.off .switch {
-      justify-content: flex-start;
-      background: #d1d5db;
-    }
-
     .tag {
       display: inline-flex;
       align-items: center;
@@ -284,12 +236,6 @@
       color: #b45309;
       border-color: #fde68a;
       background: #fffbeb;
-    }
-
-    .tag.gray {
-      color: #4b5563;
-      border-color: #d1d5db;
-      background: #f3f4f6;
     }
 
     .tag.purple {
@@ -610,14 +556,6 @@
           <label>客户ID</label>
           <input class="w160" id="customerFilter" placeholder="请输入客户ID" />
         </div>
-        <div class="field">
-          <label>状态</label>
-          <select class="w120" id="statusFilter">
-            <option value="">全部</option>
-            <option>正常</option>
-            <option>停用</option>
-          </select>
-        </div>
         <button class="btn primary" onclick="searchRows()">查询</button>
         <button class="btn" onclick="resetSearch()">重置</button>
       </div>
@@ -636,7 +574,6 @@
             <th style="width:150px">映射名称</th>
             <th style="width:120px">三级区域</th>
             <th style="width:180px">客户ID</th>
-            <th style="width:80px">状态</th>
             <th style="width:180px">备注</th>
             <th style="width:100px">创建人</th>
             <th style="width:150px">创建时间</th>
@@ -708,16 +645,6 @@
               </div>
             </div>
           </div>
-          <div class="modal-field" id="statusField">
-            <label><span class="required">*</span>状态</label>
-            <div>
-              <input type="hidden" id="formStatus" value="正常" />
-              <button type="button" class="switch-control" id="formStatusSwitch" onclick="toggleFormStatus()">
-                <span class="switch"></span>
-                <span id="formStatusText">启用</span>
-              </button>
-            </div>
-          </div>
           <div class="modal-field">
             <label>备注</label>
             <input id="formRemark" placeholder="请输入备注（选填）" />
@@ -753,10 +680,10 @@
 
   <script>
     const mappings = [
-      { mappingName: "德国-通讯线客户", region: "德国", customerIds: ["C-DE-1001"], status: "正常", remark: "通讯线客户仅占用2B分销层级", createdBy: "张三", createdAt: "2026-06-08 10:12:33", updatedBy: "李四", updatedAt: "2026-06-08 18:12:33", childLevels: [{ level: "2B_分销", deductSort: "1", privateId: "400200", remark: "通讯线客户专用库存" }] },
-      { mappingName: "德国-营销推广客户", region: "德国", customerIds: ["C-DE-1002", "C-DE-1003"], status: "正常", remark: "营销推广客户按分销、大货物料顺序占用", createdBy: "张三", createdAt: "2026-06-08 10:15:09", updatedBy: "李四", updatedAt: "2026-06-08 18:11:09", childLevels: [{ level: "DE_分销", deductSort: "1", privateId: "300302", remark: "德国分销库存" }, { level: "DE_物料", deductSort: "2", privateId: "200302", remark: "德国物料库存" }] },
-      { mappingName: "法国-营销推广客户", region: "法国", customerIds: ["C-FR-3001", "C-FR-3002"], status: "正常", remark: "法国客户订单占用", createdBy: "王五", createdAt: "2026-06-08 10:20:27", updatedBy: "王五", updatedAt: "2026-06-08 18:10:27", childLevels: [{ level: "FR_分销", deductSort: "1", privateId: "300301", remark: "" }, { level: "FR_物料", deductSort: "2", privateId: "200301", remark: "" }] },
-      { mappingName: "西班牙-营销推广客户", region: "西班牙", customerIds: ["C-ES-4001"], status: "停用", remark: "待库存层级初始化", createdBy: "赵六", createdAt: "2026-06-07 14:20:18", updatedBy: "系统", updatedAt: "2026-06-07 15:20:18", childLevels: [] }
+      { mappingName: "德国-通讯线客户", region: "德国", customerIds: ["C-DE-1001"], remark: "通讯线客户仅占用2B分销层级", createdBy: "张三", createdAt: "2026-06-08 10:12:33", updatedBy: "李四", updatedAt: "2026-06-08 18:12:33", childLevels: [{ level: "2B_分销", deductSort: "1", privateId: "400200", remark: "通讯线客户专用库存" }] },
+      { mappingName: "德国-营销推广客户", region: "德国", customerIds: ["C-DE-1002", "C-DE-1003"], remark: "营销推广客户按分销、大货物料顺序占用", createdBy: "张三", createdAt: "2026-06-08 10:15:09", updatedBy: "李四", updatedAt: "2026-06-08 18:11:09", childLevels: [{ level: "DE_分销", deductSort: "1", privateId: "300302", remark: "德国分销库存" }, { level: "DE_物料", deductSort: "2", privateId: "200302", remark: "德国物料库存" }] },
+      { mappingName: "法国-营销推广客户", region: "法国", customerIds: ["C-FR-3001", "C-FR-3002"], remark: "法国客户订单占用", createdBy: "王五", createdAt: "2026-06-08 10:20:27", updatedBy: "王五", updatedAt: "2026-06-08 18:10:27", childLevels: [{ level: "FR_分销", deductSort: "1", privateId: "300301", remark: "" }, { level: "FR_物料", deductSort: "2", privateId: "200301", remark: "" }] },
+      { mappingName: "西班牙-营销推广客户", region: "西班牙", customerIds: ["C-ES-4001"], remark: "待库存层级初始化", createdBy: "赵六", createdAt: "2026-06-07 14:20:18", updatedBy: "系统", updatedAt: "2026-06-07 15:20:18", childLevels: [] }
     ];
 
     const levels = {
@@ -824,7 +751,6 @@
       const region = document.getElementById("formRegion").value;
       return mappings.some((row, index) => {
         return index !== editingIndex
-          && row.status === "正常"
           && row.region === region
           && (row.customerIds || []).includes(customerId);
       });
@@ -846,25 +772,12 @@
       renderCustomerTransfer();
     }
 
-    function setFormStatus(status = "正常") {
-      const enabled = status !== "停用";
-      document.getElementById("formStatus").value = enabled ? "正常" : "停用";
-      document.getElementById("formStatusText").textContent = enabled ? "启用" : "停用";
-      document.getElementById("formStatusSwitch").classList.toggle("off", !enabled);
-    }
-
-    function toggleFormStatus() {
-      const current = document.getElementById("formStatus").value;
-      setFormStatus(current === "正常" ? "停用" : "正常");
-    }
-
     function renderRows(list = mappings) {
       const html = list.map((row, index) => `
         <tr>
           <td>${row.mappingName || "-"}</td>
           <td>${row.region}</td>
           <td>${(row.customerIds || []).map(item => `<span class="tag purple">${item}</span>`).join(" ") || "-"}</td>
-          <td>${row.status === "正常" ? '<span class="status"><i class="switch"></i>正常</span>' : '<span class="tag gray">停用</span>'}</td>
           <td title="${row.remark || ""}">${row.remark || "-"}</td>
           <td>${row.createdBy || "-"}</td>
           <td>${row.createdAt || "-"}</td>
@@ -873,7 +786,7 @@
           <td class="action-cell">
             <button class="btn link" onclick="openModal('编辑明细', ${index})">编辑</button>
             <button class="btn link" onclick="openModal('查看明细', ${index}, true)">查看</button>
-            ${row.status === "停用" ? `<button class="btn danger" onclick="deleteRow(event, ${index})">删除</button>` : ""}
+            <button class="btn danger" onclick="deleteRow(event, ${index})">删除</button>
             <button class="btn link" onclick="showLog(event, ${index})">日志</button>
           </td>
         </tr>
@@ -884,11 +797,9 @@
     function searchRows() {
       const region = document.getElementById("regionFilter").value.trim();
       const customerId = document.getElementById("customerFilter").value.trim();
-      const status = document.getElementById("statusFilter").value;
       const filtered = mappings.filter(row => {
         return (!region || row.region.includes(region))
-          && (!customerId || (row.customerIds || []).some(item => item.includes(customerId)))
-          && (!status || row.status === status);
+          && (!customerId || (row.customerIds || []).some(item => item.includes(customerId)));
       });
       renderRows(filtered);
       showToast(`已查询到 ${filtered.length} 条映射`);
@@ -897,7 +808,6 @@
     function resetSearch() {
       document.getElementById("regionFilter").value = "";
       document.getElementById("customerFilter").value = "";
-      document.getElementById("statusFilter").value = "";
       renderRows();
     }
 
@@ -914,10 +824,8 @@
       document.getElementById("formMappingName").value = row.mappingName || "";
       regionSelect.value = row.region || "";
       regionSelect.disabled = isEdit || readonly;
-      document.getElementById("statusField").classList.toggle("hidden", isEdit);
       renderCustomerOptions(row.customerIds || []);
       renderChildLevelRows(row.childLevels || []);
-      setFormStatus(row.status || "正常");
       document.getElementById("formRemark").value = row.remark || "";
       setModalReadonly(readonly);
     }
@@ -947,13 +855,11 @@
       const mappingName = document.getElementById("formMappingName").value.trim();
       const region = document.getElementById("formRegion").value;
       const customerIds = selectedCustomerIds;
-      const status = document.getElementById("formStatus").value;
       const now = "2026-06-10 18:26:00";
       const payload = {
         mappingName,
         region,
         customerIds,
-        status,
         remark: document.getElementById("formRemark").value.trim(),
         createdBy: editingIndex === null ? "当前用户" : mappings[editingIndex].createdBy,
         createdAt: editingIndex === null ? now : mappings[editingIndex].createdAt,
@@ -1014,25 +920,23 @@
       const mappingName = document.getElementById("formMappingName").value.trim();
       const region = document.getElementById("formRegion").value;
       const customerIds = selectedCustomerIds;
-      const status = document.getElementById("formStatus").value;
       if (!mappingName) return "映射名称不能为空。";
       if (!region) return "三级区域不能为空。";
       if (!customerIds.length) return "客户ID不能为空。";
-      if (!status) return "状态不能为空。";
       const childRows = collectChildLevels();
       if (!childRows.length) return "请至少维护一条绑定库存层级。";
       if (childRows.some(row => !row.level)) return "绑定库存层级不能为空。";
       if (childRows.some(row => !/^[1-9]\d*$/.test(row.deductSort))) return "扣减顺序需填写正整数。";
-      const duplicated = status === "正常" && mappings.some((row, index) => {
+      const duplicated = mappings.some((row, index) => {
         const hasSameCustomer = (row.customerIds || []).some(item => customerIds.includes(item));
-        return index !== editingIndex && row.status === "正常" && row.region === region && hasSameCustomer;
+        return index !== editingIndex && row.region === region && hasSameCustomer;
       });
-      if (duplicated) return `三级区域【${region}】下存在重复启用的客户ID映射。`;
+      if (duplicated) return `三级区域【${region}】下存在重复的客户ID映射。`;
       return "";
     }
 
     function setModalReadonly(readonly) {
-      document.querySelectorAll("#modal input, #modal select, #modal textarea, #formStatusSwitch").forEach(item => {
+      document.querySelectorAll("#modal input, #modal select, #modal textarea").forEach(item => {
         const occupiedAvailableCustomer = item.dataset.customerType === "available" && isCustomerOccupied(item.value);
         item.disabled = readonly || occupiedAvailableCustomer || item.id === "formRegion" && editingIndex !== null;
       });
