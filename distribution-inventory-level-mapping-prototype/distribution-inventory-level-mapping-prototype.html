@@ -340,6 +340,91 @@
       display: none;
     }
 
+    .confirm-mask {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, .45);
+      z-index: 50;
+    }
+
+    .confirm-mask.show {
+      display: flex;
+    }
+
+    .confirm-dialog {
+      width: 380px;
+      max-width: calc(100vw - 32px);
+      border-radius: 2px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .confirm-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 42px;
+      padding: 0 16px;
+    }
+
+    .confirm-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .confirm-close {
+      border: 0;
+      background: transparent;
+      color: #8b95a1;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .confirm-body {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 20px 18px;
+    }
+
+    .confirm-icon {
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      color: #fff;
+      background: #f5a623;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .confirm-body p {
+      margin: 0;
+      color: #303133;
+      line-height: 1.6;
+    }
+
+    .confirm-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 0 18px 16px;
+    }
+
+    .confirm-actions .btn {
+      min-height: 28px;
+      padding: 0 14px;
+    }
+
     .transfer {
       display: grid;
       grid-template-columns: 1fr 58px 1fr;
@@ -676,6 +761,23 @@
     </div>
   </aside>
 
+  <div class="confirm-mask" id="deleteConfirmDialog">
+    <div class="confirm-dialog">
+      <div class="confirm-header">
+        <h3>提示</h3>
+        <button class="confirm-close" type="button" onclick="cancelDelete()" aria-label="关闭">×</button>
+      </div>
+      <div class="confirm-body">
+        <span class="confirm-icon">!</span>
+        <p>删除后数据将不可找回，确认是否删除？</p>
+      </div>
+      <div class="confirm-actions">
+        <button class="btn" type="button" onclick="cancelDelete()">取消</button>
+        <button class="btn primary" type="button" onclick="confirmDelete()">确定</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast">保存成功</div>
 
   <script>
@@ -708,6 +810,7 @@
     let editingIndex = null;
     let modalReadonly = false;
     let selectedCustomerIds = [];
+    let pendingDeleteIndex = null;
 
     function renderCustomerOptions(selected = []) {
       const region = document.getElementById("formRegion").value;
@@ -977,7 +1080,20 @@
 
     function deleteRow(event, index) {
       if (event) event.stopPropagation();
-      mappings.splice(index, 1);
+      pendingDeleteIndex = index;
+      document.getElementById("deleteConfirmDialog").classList.add("show");
+    }
+
+    function cancelDelete() {
+      pendingDeleteIndex = null;
+      document.getElementById("deleteConfirmDialog").classList.remove("show");
+    }
+
+    function confirmDelete() {
+      if (pendingDeleteIndex === null) return;
+      mappings.splice(pendingDeleteIndex, 1);
+      pendingDeleteIndex = null;
+      document.getElementById("deleteConfirmDialog").classList.remove("show");
       renderRows();
       showToast("已删除映射");
     }
