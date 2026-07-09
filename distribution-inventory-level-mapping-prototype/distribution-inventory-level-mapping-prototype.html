@@ -471,14 +471,23 @@
       height: 150px;
       overflow-y: auto;
       padding: 6px 10px;
+      text-align: left;
     }
 
     .transfer-item {
       display: flex;
       align-items: center;
+      justify-content: flex-start;
+      justify-self: stretch;
       gap: 7px;
       min-height: 24px;
       color: #4b5563;
+      text-align: left;
+    }
+
+    .transfer-item span {
+      flex: 1;
+      text-align: left;
     }
 
     .transfer-item.disabled {
@@ -491,7 +500,10 @@
     }
 
     .transfer-item input {
+      width: auto;
       min-height: auto;
+      flex: 0 0 auto;
+      margin: 0;
     }
 
     .transfer-empty {
