@@ -1,0 +1,1767 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SKU库存水位查询原型</title>
+  <style>
+    :root {
+      --primary: #1677ff;
+      --primary-weak: #eaf3ff;
+      --primary-border: #b9d8ff;
+      --danger: #f56c6c;
+      --danger-weak: #fff2f0;
+      --warning: #e6a23c;
+      --warning-weak: #fff7e6;
+      --success: #67c23a;
+      --success-weak: #f0f9eb;
+      --text: #303133;
+      --regular: #606266;
+      --secondary: #909399;
+      --placeholder: #c0c4cc;
+      --border: #ebeef5;
+      --border-dark: #dcdfe6;
+      --table-head: #f5f7fa;
+      --page-bg: #f5f7fb;
+      --sidebar-bg: #fff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--page-bg);
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+      font-size: 12px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      min-height: 100vh;
+      background: var(--page-bg);
+    }
+
+    .sidebar {
+      color: var(--text);
+      background: var(--sidebar-bg);
+      border-right: 1px solid #e4e7ed;
+      z-index: 8;
+      overflow: hidden;
+    }
+
+    .aside-box {
+      width: 210px;
+      height: 100vh;
+      background: #fff;
+      box-shadow: 0 1px 10px rgb(0 0 0 / 10%);
+    }
+
+    .el-menu-mock {
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      color: #333;
+      background: #fff;
+      border-right: 0;
+      list-style: none;
+    }
+
+    .el-sub-menu__title,
+    .el-menu-item {
+      position: relative;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      color: #333;
+      font-size: 12px;
+      line-height: 52px;
+      white-space: nowrap;
+      cursor: default;
+    }
+
+    .el-sub-menu__title {
+      padding: 0 28px;
+    }
+
+    .el-menu-item {
+      padding: 0 20px 0 52px;
+    }
+
+    .el-sub-menu__title:hover {
+      color: #333;
+      background-color: transparent;
+    }
+
+    .el-menu-item:hover {
+      color: #333;
+    }
+
+    .el-menu-item.is-active {
+      color: var(--primary);
+      background: var(--primary-weak);
+    }
+
+    .el-menu-item.is-active::before {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 4px;
+      content: "";
+      background-color: var(--primary);
+    }
+
+    .menu-icon {
+      width: 16px;
+      height: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      margin-right: 8px;
+      color: inherit;
+    }
+
+    .menu-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .sle {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .submenu-arrow {
+      margin-left: auto;
+      color: #909399;
+      font-size: 12px;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 8px 9px 16px;
+    }
+
+    .search-bar {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 5px 8px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+
+    .control,
+    .input-control {
+      height: 22px;
+      color: var(--regular);
+      background: #fff;
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .control {
+      width: 132px;
+      padding: 0 22px 0 8px;
+    }
+
+    .control.short {
+      width: 92px;
+    }
+
+    .control.status {
+      width: 128px;
+    }
+
+    .input-control {
+      width: 214px;
+      padding: 0 8px;
+    }
+
+    .multi-select {
+      position: relative;
+      width: 128px;
+    }
+
+    .multi-select-trigger {
+      position: relative;
+      width: 100%;
+      display: block;
+      overflow: hidden;
+      padding-right: 20px;
+      text-align: left;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .multi-select-trigger::after {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 0;
+      height: 0;
+      content: "";
+      border-top: 4px solid var(--secondary);
+      border-right: 4px solid transparent;
+      border-left: 4px solid transparent;
+    }
+
+    .multi-select-panel {
+      position: absolute;
+      top: 26px;
+      left: 0;
+      z-index: 20;
+      display: none;
+      min-width: 150px;
+      padding: 6px 0;
+      background: #fff;
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+    }
+
+    .multi-select.open .multi-select-panel {
+      display: block;
+    }
+
+    .multi-option {
+      height: 26px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 10px;
+      color: var(--regular);
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .multi-option:hover {
+      background: #f5f7fa;
+    }
+
+    .btn {
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 0 10px;
+      color: var(--regular);
+      background: #fff;
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      font-size: 12px;
+      line-height: 22px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      color: #fff;
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .btn.light {
+      color: #2f73d9;
+      background: var(--primary-weak);
+      border-color: var(--primary-border);
+    }
+
+    .btn.danger {
+      color: #fff;
+      background: var(--danger);
+      border-color: var(--danger);
+    }
+
+    .btn:disabled {
+      color: var(--placeholder);
+      background: #f5f7fa;
+      border-color: var(--border);
+      cursor: not-allowed;
+    }
+
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(130px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .summary-item {
+      min-height: 46px;
+      padding: 7px 10px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+
+    .summary-item .label {
+      color: var(--secondary);
+      margin-bottom: 4px;
+    }
+
+    .summary-item .value {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .summary-item .value.danger {
+      color: var(--danger);
+    }
+
+    .summary-item .value.warning {
+      color: var(--warning);
+    }
+
+    .table-shell {
+      margin-top: 9px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tool-icon {
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--secondary);
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1520px;
+      table-layout: fixed;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th,
+    td {
+      height: 28px;
+      padding: 0 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      height: 30px;
+      color: var(--regular);
+      background: var(--table-head);
+      font-weight: 600;
+      text-align: left;
+    }
+
+    td.num,
+    th.num {
+      text-align: right;
+    }
+
+    th.help-th {
+      overflow: visible;
+    }
+
+    .header-help {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+
+    .help-icon {
+      width: 13px;
+      height: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: #303133;
+      border-radius: 50%;
+      font-size: 10px;
+      line-height: 13px;
+      cursor: help;
+    }
+
+    .floating-tooltip {
+      position: fixed;
+      z-index: 999;
+      display: none;
+      max-width: 320px;
+      padding: 8px 12px;
+      color: #fff;
+      background: #303133;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 18px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    tbody tr:hover {
+      background: #f9fbff;
+    }
+
+    tr.risk-high {
+      background: #fff;
+    }
+
+    tr.risk-low {
+      background: #fff;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      height: 20px;
+      padding: 0 7px;
+      border-radius: 2px;
+      border: 1px solid var(--border-dark);
+      background: #f4f4f5;
+      color: var(--regular);
+      line-height: 18px;
+    }
+
+    .tag.danger {
+      color: var(--danger);
+      background: var(--danger-weak);
+      border-color: #ffccc7;
+    }
+
+    .tag.warning {
+      color: #ad6800;
+      background: var(--warning-weak);
+      border-color: #ffd591;
+    }
+
+    .tag.success {
+      color: #2d7b16;
+      background: var(--success-weak);
+      border-color: #d8efcf;
+    }
+
+    .tag.info {
+      color: var(--secondary);
+      background: #f4f4f5;
+      border-color: #e9e9eb;
+    }
+
+    .tag.blue {
+      color: var(--primary);
+      background: var(--primary-weak);
+      border-color: var(--primary-border);
+    }
+
+    .link {
+      color: var(--primary);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .link.danger {
+      color: var(--danger);
+    }
+
+    .link.warning {
+      color: var(--warning);
+    }
+
+    .pager {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 0 10px;
+      color: var(--regular);
+      background: #fff;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 50px;
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .overlay.open {
+      display: flex;
+    }
+
+    .dialog {
+      width: 720px;
+      max-height: calc(100vh - 90px);
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .dialog.wide {
+      width: 1080px;
+    }
+
+    .dialog.onroad {
+      width: 96vw;
+    }
+
+    .dialog.stockup {
+      width: min(960px, calc(100vw - 48px));
+    }
+
+    .dialog.stockup .dialog-body {
+      overflow-x: hidden;
+    }
+
+    .dialog.stockup .table-wrap {
+      overflow-x: visible;
+    }
+
+    .dialog.stockup table {
+      width: 100%;
+      min-width: 0;
+      table-layout: auto;
+    }
+
+    .dialog.stockup th,
+    .dialog.stockup td {
+      overflow: visible;
+      text-overflow: clip;
+    }
+
+    .dialog-header {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .close {
+      width: 24px;
+      height: 24px;
+      color: var(--secondary);
+      background: transparent;
+      border: 0;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .dialog-body {
+      padding: 14px 16px;
+      overflow: auto;
+    }
+
+    .onroad-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 22px 0 24px;
+    }
+
+    .onroad-search .input-control {
+      width: 170px;
+    }
+
+    .btn.purple {
+      color: #fff;
+      background: #8e44ad;
+      border-color: #8e44ad;
+    }
+
+    .table-pagination {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 14px;
+      color: var(--regular);
+      background: #fff;
+    }
+
+    .page-size,
+    .page-jump {
+      height: 32px;
+      padding: 0 12px;
+      color: var(--regular);
+      background: #fff;
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      font-size: 12px;
+    }
+
+    .page-no {
+      min-width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: #8e44ad;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+
+    .dialog-footer {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 0 16px;
+      border-top: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .alert {
+      margin-bottom: 12px;
+      padding: 8px 10px;
+      border-radius: 2px;
+      line-height: 18px;
+    }
+
+    .alert.warning {
+      color: #ad6800;
+      background: var(--warning-weak);
+      border: 1px solid #ffd591;
+    }
+
+    .alert.danger {
+      color: #cf1322;
+      background: var(--danger-weak);
+      border: 1px solid #ffccc7;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px 16px;
+    }
+
+    .form-item label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--regular);
+    }
+
+    .form-item input,
+    .form-item textarea {
+      width: 100%;
+      height: 28px;
+      padding: 0 8px;
+      color: var(--text);
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      outline: none;
+      font-size: 12px;
+      font-family: inherit;
+    }
+
+    .form-item textarea {
+      height: 58px;
+      padding: 6px 8px;
+      resize: none;
+    }
+
+    .form-item input:disabled {
+      color: var(--secondary);
+      background: #f5f7fa;
+    }
+
+    .section-title {
+      margin: 12px 0 8px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .mini-table {
+      min-width: 680px;
+    }
+
+    .upload {
+      height: 106px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 10px;
+      color: var(--secondary);
+      background: #fbfdff;
+      border: 1px dashed #c6e2ff;
+      border-radius: 3px;
+    }
+
+    .empty {
+      padding: 18px 0;
+      color: var(--secondary);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="aside-box">
+        <nav class="el-menu-mock">
+          <div class="el-sub-menu__title">
+            <span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M4 2.5h6l2 2v9H4z" /><path d="M10 2.5v2h2" /><path d="M6 8h4" /><path d="M6 10.5h3" /></svg></span>
+            <span class="sle">库存同步</span>
+            <span class="submenu-arrow">⌄</span>
+          </div>
+          <div class="el-sub-menu__title">
+            <span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M3 7.5 8 3l5 4.5" /><path d="M4.5 7v5.5h7V7" /><path d="M6.5 12.5V9h3v3.5" /><path d="M11.5 4.5v-2h1.5v3.3" /></svg></span>
+            <span class="sle">退货管理</span>
+            <span class="submenu-arrow">⌄</span>
+          </div>
+          <div class="el-sub-menu__title">
+            <span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M3 4h10v10H3z" /><path d="M5 2h6v3H5z" /><path d="M5.5 8h5" /><path d="M5.5 10.5h4" /></svg></span>
+            <span class="sle">库存管理</span>
+            <span class="submenu-arrow">⌃</span>
+          </div>
+          <div class="el-menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M4 2.5h7.5L13 4v9.5H4z" /><path d="M11.5 2.5V4H13" /><path d="M6 7h4" /><path d="M6 9.5h4" /></svg></span><span class="sle">库存日志</span></div>
+          <div class="el-menu-item" data-menu="summary" onclick="showPrototypePage('summary')"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="m8 2.5 5 2.8-5 2.8-5-2.8z" /><path d="M3 5.3v5.4l5 2.8 5-2.8V5.3" /><path d="M8 8.1v5.4" /></svg></span><span class="sle">汇总库存</span></div>
+          <div class="el-menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="m8 2.5 5 2.6-5 2.6-5-2.6z" /><path d="m3 8 5 2.6L13 8" /><path d="m3 10.8 5 2.7 5-2.7" /></svg></span><span class="sle">层级库存</span></div>
+          <div class="el-menu-item is-active" data-menu="water" onclick="showPrototypePage('water')"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M3.5 3.5h9v9h-9z" /><path d="M6 6h4" /><path d="M6 8h4" /><path d="M6 10h2" /></svg></span><span class="sle">库存水位</span></div>
+          <div class="el-menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M4 3.5h8v10H4z" /><path d="M6 2.5h4" /><path d="M6 6h4" /><path d="M6 8.5h4" /><path d="M6 11h2" /></svg></span><span class="sle">盘点单</span></div>
+          <div class="el-menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M5 2.5h6v11H5z" /><path d="M3.5 5h9" /><path d="M6.5 7.5h3" /><path d="M6.5 10h3" /></svg></span><span class="sle">加工单</span></div>
+          <div class="el-sub-menu__title">
+            <span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M3 11.5h10" /><path d="m10.5 8 2.5 3.5-2.5 2" /><path d="M13 4.5H3" /><path d="m5.5 2.5-2.5 2 2.5 3" /></svg></span>
+            <span class="sle">调拨管理</span>
+            <span class="submenu-arrow">⌄</span>
+          </div>
+          <div class="el-sub-menu__title">
+            <span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M2.5 4h8v6.5h-8z" /><path d="M10.5 6h2l1 2v2.5h-3z" /><path d="M5 12a1 1 0 1 0 0-2 1 1 0 0 0 0 2" /><path d="M12 12a1 1 0 1 0 0-2 1 1 0 0 0 0 2" /></svg></span>
+            <span class="sle">发货管理</span>
+            <span class="submenu-arrow">⌄</span>
+          </div>
+          <div class="el-sub-menu__title">
+            <span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M3 5h10v8H3z" /><path d="M5 3h6v2H5z" /><path d="M6 8h4" /></svg></span>
+            <span class="sle">出入库</span>
+            <span class="submenu-arrow">⌄</span>
+          </div>
+          <div class="el-sub-menu__title">
+            <span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M2.5 7 8 3l5.5 4" /><path d="M4 6.5v6h8v-6" /><path d="M5.5 9h5" /><path d="M5.5 11h5" /></svg></span>
+            <span class="sle">仓储设置</span>
+            <span class="submenu-arrow">⌄</span>
+          </div>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div id="waterLevelPage" class="page-panel">
+      <div class="search-bar">
+        <select id="warehouseFilter" class="control" onchange="renderTable()">
+          <option value="">仓库名称</option>
+          <option value="万邑通澳洲仓">万邑通澳洲仓</option>
+          <option value="万邑通德国仓">万邑通德国仓</option>
+          <option value="筋斗云DWA仓">筋斗云DWA仓</option>
+          <option value="筋斗云GLC仓">筋斗云GLC仓</option>
+          <option value="法国谷仓售后仓">法国谷仓售后仓</option>
+          <option value="新加坡待维修仓">新加坡待维修仓</option>
+        </select>
+        <select id="productTypeFilter" class="control" onchange="renderTable()">
+          <option value="">产品分类</option>
+          <option value="整机">整机</option>
+          <option value="配件类">配件类</option>
+          <option value="POP">POP</option>
+          <option value="赠品">赠品</option>
+          <option value="虚拟产品">虚拟产品</option>
+          <option value="裸机">裸机</option>
+          <option value="半成品">半成品</option>
+          <option value="POP半成品">POP半成品</option>
+        </select>
+        <select class="control short">
+          <option>SKU</option>
+        </select>
+        <select id="codeMode" class="control short">
+          <option value="exact">精确</option>
+          <option value="fuzzy">模糊</option>
+        </select>
+        <input id="skuInput" class="input-control" placeholder="双击批量查询，默认查全部 SKU" ondblclick="showHint('已打开批量 SKU 查询输入框，此处为原型提示')" />
+        <div id="statusMultiSelect" class="multi-select">
+          <button id="statusFilterLabel" type="button" class="control status multi-select-trigger" onclick="toggleStatusPanel(event)">水位状态</button>
+          <div id="statusFilterPanel" class="multi-select-panel">
+            <label class="multi-option"><input type="checkbox" value="HIGH" onchange="handleStatusChange()" />库存过高</label>
+            <label class="multi-option"><input type="checkbox" value="LOW" onchange="handleStatusChange()" />库存偏低</label>
+            <label class="multi-option"><input type="checkbox" value="NORMAL" onchange="handleStatusChange()" />正常</label>
+            <label class="multi-option"><input type="checkbox" value="NO_THRESHOLD" onchange="handleStatusChange()" />未维护阈值</label>
+          </div>
+        </div>
+        <button class="btn primary" onclick="searchTable()">搜索</button>
+        <button class="btn" onclick="resetSearch()">重置</button>
+      </div>
+
+      <div class="summary-strip">
+        <div class="summary-item">
+          <div class="label">库存过高</div>
+          <div id="summaryHigh" class="value danger">0</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">库存偏低</div>
+          <div id="summaryLow" class="value warning">0</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">未维护阈值</div>
+          <div id="summaryNoThreshold" class="value">0</div>
+        </div>
+      </div>
+
+      <section class="table-shell">
+        <div class="table-toolbar">
+          <div class="toolbar-left">
+            <button class="btn light" onclick="showHint('整机库存水位导出任务已创建')">导出</button>
+            <button class="btn light" onclick="openDialog('importDialog')">导入阈值</button>
+          </div>
+          <div class="toolbar-right">
+            <span class="tool-icon" onclick="refreshData()">R</span>
+            <span class="tool-icon">D</span>
+            <span class="tool-icon">S</span>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 150px;">仓库名称</th>
+                <th style="width: 170px;">SKU</th>
+                <th style="width: 230px;">产品名称</th>
+                <th style="width: 70px;">产品分类</th>
+                <th class="num" style="width: 90px;">可用</th>
+                <th class="num" style="width: 90px;">锁定</th>
+                <th class="num" style="width: 90px;">调拨在途</th>
+                <th class="num help-th" style="width: 110px;">
+                  <span class="header-help">在库库存<span class="help-icon" data-tip="在库库存=可用+锁定">?</span></span>
+                </th>
+                <th class="num help-th" style="width: 120px;">
+                  <span class="header-help">总库存<span class="help-icon" data-tip="总库存=可用+锁定+调拨在途">?</span></span>
+                </th>
+                <th class="num" style="width: 130px;">备货已下单未发货</th>
+                <th class="num help-th" style="width: 110px;">
+                  <span class="header-help">预计水位<span class="help-icon" data-tip="预计水位=总库存+备货已下单未发货">?</span></span>
+                </th>
+                <th class="num" style="width: 100px;">低水位阈值</th>
+                <th class="num" style="width: 100px;">高水位阈值</th>
+                <th class="num help-th" style="width: 90px;">
+                  <span class="header-help">偏差<span class="help-icon" data-tip="偏差=总库存-水位阈值">?</span></span>
+                </th>
+                <th style="width: 120px;">水位状态</th>
+                <th style="width: 130px;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryBody"></tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <span id="pagerInfo">共 0 条</span>
+          <button class="btn" disabled>上一页</button>
+          <button class="btn primary">1</button>
+          <button class="btn" disabled>下一页</button>
+        </div>
+      </section>
+      </div>
+      <div id="summaryInventoryPage" class="page-panel" style="display: none;">
+        <div class="search-bar">
+          <select class="control">
+            <option>仓库名称</option>
+            <option>万邑通澳洲仓</option>
+            <option>万邑通德国仓</option>
+            <option>筋斗云DWA仓</option>
+            <option>筋斗云GLC仓</option>
+          </select>
+          <select class="control short">
+            <option>SKU</option>
+          </select>
+          <select class="control short">
+            <option>精确</option>
+            <option>模糊</option>
+          </select>
+          <input class="input-control" placeholder="双击批量查询，默认查全部 SKU" />
+          <button class="btn primary" onclick="showHint('汇总库存查询完成')">搜索</button>
+          <button class="btn">重置</button>
+        </div>
+
+        <section class="table-shell">
+          <div class="table-toolbar">
+            <div class="toolbar-left">
+              <button class="btn light" onclick="showHint('汇总库存导出任务已创建')">导出</button>
+              <button class="btn light" onclick="showHint('平台库存同步任务已提交')">平台库存同步</button>
+            </div>
+            <div class="toolbar-right">
+              <span class="tool-icon">R</span>
+              <span class="tool-icon">S</span>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table style="min-width: 1120px;">
+              <thead>
+                <tr>
+                  <th style="width: 180px;">仓库名称</th>
+                  <th style="width: 210px;">SKU</th>
+                  <th style="width: 320px;">产品名称</th>
+                  <th class="num help-th" style="width: 110px;">
+                    <span class="header-help">总库存<span class="help-icon" data-tip="总库存=可用+锁定">?</span></span>
+                  </th>
+                  <th class="num" style="width: 90px;">可用</th>
+                  <th class="num" style="width: 90px;">锁定</th>
+                  <th class="num" style="width: 110px;">调拨在途</th>
+                  <th style="width: 160px;">备注</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>万邑通澳洲仓</td>
+                  <td>POP-C822-0E9EN1-AU</td>
+                  <td>30cm桌面POP3.0(Shokz)(T520+展示卡)...</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num"><a class="link">1</a></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>万邑通澳洲仓</td>
+                  <td>POP-C822-0E9EN1-AU</td>
+                  <td>30cm桌面POP3.0(Shokz)(S610+Mini试...)</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num"><a class="link">2</a></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>万邑通德国仓</td>
+                  <td>2080000584</td>
+                  <td>Being POP展示耳机-白色-立讯</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num"><a class="link">2</a></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>筋斗云DWA仓</td>
+                  <td>8020901010</td>
+                  <td>Shokz_日本官网Tokyo Mer活动一次性赠...</td>
+                  <td class="num">15</td>
+                  <td class="num">15</td>
+                  <td class="num">0</td>
+                  <td class="num"><a class="link">0</a></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>筋斗云DWA仓</td>
+                  <td>C120-AX-BK-JP-333</td>
+                  <td>Shokz_OpenComm2 2025 Upgrade Tok...</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num"><a class="link">2032</a></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>筋斗云GLC仓</td>
+                  <td>C120-AX-BK-JP-264</td>
+                  <td>Shokz_OpenComm2 2025 Upgrade Tok...</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num"><a class="link">3040</a></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>法国谷仓售后仓</td>
+                  <td>T921-ST-GY-EU-000-AZB</td>
+                  <td>Shokz_OpenFit 2+ 欧洲亚马逊通用搭售...</td>
+                  <td class="num">1</td>
+                  <td class="num">1</td>
+                  <td class="num">0</td>
+                  <td class="num"><a class="link">0</a></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>新加坡待维修仓</td>
+                  <td>C610-AC-BK-EN</td>
+                  <td>Shokz_OpenMeet UC (USB-C) 国际通用...</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num"><a class="link">14</a></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>新加坡待维修仓</td>
+                  <td>C610-AN-BK-EN</td>
+                  <td>Shokz_OpenMeet 国际通用包装 BK</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num"><a class="link">102</a></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>新加坡待维修仓</td>
+                  <td>C610-AA-BK-EN</td>
+                  <td>Shokz_OpenMeet UC (USB-A) 国际通用...</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num">0</td>
+                  <td class="num"><a class="link">71</a></td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="onroadDialog" class="overlay">
+    <div class="dialog onroad">
+      <div class="dialog-header">
+        <span>调拨在途明细</span>
+        <button class="close" onclick="closeDialog('onroadDialog')">×</button>
+      </div>
+      <div class="dialog-body">
+        <div class="onroad-search">
+          <input class="input-control" placeholder="业务单据号" />
+          <button class="btn purple" onclick="showHint('调拨在途明细查询完成')">搜索</button>
+          <button class="btn">重置</button>
+        </div>
+        <table style="min-width: 980px;">
+          <thead>
+            <tr>
+              <th style="width: 240px;">SKU</th>
+              <th style="width: 260px;">产品名称</th>
+              <th style="width: 150px;">业务类型</th>
+              <th style="width: 150px;">业务单据号</th>
+              <th class="num" style="width: 100px;">更新数量</th>
+              <th style="width: 180px;">操作时间</th>
+            </tr>
+          </thead>
+          <tbody id="onroadBody"></tbody>
+        </table>
+        <div class="table-pagination">
+          <span>共 4 条</span>
+          <select class="page-size">
+            <option>10条/页</option>
+          </select>
+          <button class="btn" disabled>‹</button>
+          <span class="page-no">1</span>
+          <button class="btn" disabled>›</button>
+          <span>前往</span>
+          <input class="page-jump" value="1" style="width: 54px;" />
+          <span>页</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="detailDialog" class="overlay">
+    <div class="dialog wide">
+      <div class="dialog-header">
+        <span id="detailTitle">库存水位详情</span>
+        <button class="close" onclick="closeDialog('detailDialog')">×</button>
+      </div>
+      <div class="dialog-body">
+        <div id="detailAlert" class="alert warning"></div>
+        <div class="section-title">库存组成</div>
+        <table class="mini-table">
+          <thead>
+            <tr>
+              <th>字段</th>
+              <th class="num">数量</th>
+              <th>口径说明</th>
+            </tr>
+          </thead>
+          <tbody id="compositionBody"></tbody>
+        </table>
+        <div class="section-title">备货计划已下单未发货明细</div>
+        <table class="mini-table">
+          <thead>
+            <tr>
+              <th>计划单号</th>
+              <th>目的仓</th>
+              <th>SKU</th>
+              <th class="num">已下单未发货</th>
+              <th>预计发货日期</th>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody id="planBody"></tbody>
+        </table>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn" onclick="closeDialog('detailDialog')">关闭</button>
+        <button class="btn primary" onclick="switchDialog('detailDialog', 'thresholdDialog')">调整阈值</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="thresholdDialog" class="overlay">
+    <div class="dialog">
+      <div class="dialog-header">
+        <span>维护水位阈值</span>
+        <button class="close" onclick="closeDialog('thresholdDialog')">×</button>
+      </div>
+      <div class="dialog-body">
+        <div class="alert warning">阈值按“仓库 + 整机 SKU”维护。低水位阈值用于提示补货风险，高水位阈值用于控制补货与调拨。</div>
+        <div class="form-grid">
+          <div class="form-item">
+            <label>仓库</label>
+            <input id="thresholdWh" disabled />
+          </div>
+          <div class="form-item">
+            <label>SKU</label>
+            <input id="thresholdSku" disabled />
+          </div>
+          <div class="form-item">
+            <label>总库存</label>
+            <input id="thresholdTotal" disabled />
+          </div>
+          <div class="form-item">
+            <label>原低水位阈值</label>
+            <input id="thresholdOldLow" disabled />
+          </div>
+          <div class="form-item">
+            <label>新低水位阈值</label>
+            <input id="thresholdLow" />
+          </div>
+          <div class="form-item">
+            <label>新高水位阈值</label>
+            <input id="thresholdHigh" />
+          </div>
+          <div class="form-item" style="grid-column: 1 / 4;">
+            <label>调整原因</label>
+            <textarea id="thresholdReason">根据仓库周转和近期备货计划调整整机 SKU 水位阈值。</textarea>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn" onclick="closeDialog('thresholdDialog')">取消</button>
+        <button class="btn primary" onclick="saveThreshold()">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="importDialog" class="overlay">
+    <div class="dialog">
+      <div class="dialog-header">
+        <span>导入整机 SKU 水位阈值</span>
+        <button class="close" onclick="closeDialog('importDialog')">×</button>
+      </div>
+      <div class="dialog-body">
+        <div class="alert warning">模板字段：仓库、SKU、产品分类、低水位阈值、高水位阈值、备注。导入时仅允许产品分类为“整机”的 SKU。</div>
+        <button class="btn light" onclick="showHint('整机水位阈值模板已下载')">下载模板</button>
+        <button class="btn" onclick="showHint('当前无失败数据')">下载失败数据</button>
+        <div class="upload">
+          <strong>点击或拖拽 Excel 文件上传</strong>
+          <span style="margin-top: 6px;">系统按仓库 + SKU 覆盖最新阈值，并记录导入批次</span>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn" onclick="closeDialog('importDialog')">取消</button>
+        <button class="btn primary" onclick="finishImport()">确认导入</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="stockupDialog" class="overlay">
+    <div class="dialog stockup">
+      <div class="dialog-header">
+        <span>备货计划明细</span>
+        <button class="close" onclick="closeDialog('stockupDialog')">×</button>
+      </div>
+      <div class="dialog-body">
+        <table>
+          <thead>
+            <tr>
+              <th>计划单号</th>
+              <th>状态</th>
+              <th>始发仓</th>
+              <th>目的仓</th>
+              <th>SKU</th>
+              <th>SKU下单数量</th>
+            </tr>
+          </thead>
+          <tbody id="stockupSummaryBody"></tbody>
+        </table>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn primary" onclick="closeDialog('stockupDialog')">知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="ruleDialog" class="overlay">
+    <div class="dialog wide">
+      <div class="dialog-header">
+        <span>页面口径说明</span>
+        <button class="close" onclick="closeDialog('ruleDialog')">×</button>
+      </div>
+      <div class="dialog-body">
+        <table class="mini-table">
+          <thead>
+            <tr>
+              <th>字段</th>
+              <th>计算口径</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>产品分类</td>
+              <td>来自 PMS SKU 产品分类，下拉取值与 SKU 列表保持一致</td>
+              <td>支持按整机、配件类、POP 等分类快速筛选库存水位</td>
+            </tr>
+            <tr>
+              <td>在库库存</td>
+              <td>可用库存 + 锁定库存</td>
+              <td>对应汇总库存现有“总库存”口径，用于研发识别历史字段</td>
+            </tr>
+            <tr>
+              <td>总库存</td>
+              <td>在库库存 + 调拨在途</td>
+              <td>本新页面新增综合水位字段，用于高低水位阈值判断</td>
+            </tr>
+            <tr>
+              <td>备货已下单未发货</td>
+              <td>备货计划中已下单但尚未发货的目的仓 SKU 数量</td>
+              <td>用于判断未来水位，辅助控制继续补货</td>
+            </tr>
+            <tr>
+              <td>预计水位</td>
+              <td>总库存 + 备货已下单未发货</td>
+              <td>用于观察备货计划待发货后预计库存，不参与水位状态标签判断</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn primary" onclick="closeDialog('ruleDialog')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="floatingTooltip" class="floating-tooltip"></div>
+
+  <script>
+    const inventoryRows = [
+      {
+        warehouseName: "万邑通澳洲仓",
+        sku: "S810-ST-PK-UK-170-N",
+        skuName: "Shokz OpenRun Pro 英国170客户包装 BK",
+        productType: "整机",
+        availableQty: 3000,
+        lockedQty: 120,
+        onroadQty: 5000,
+        orderedUnshippedQty: 600,
+        lowThreshold: 2500,
+        highThreshold: 7000,
+        updateTime: "2026-07-09 10:40",
+        plans: [
+          { planNo: "SP202607090018", warehouseName: "万邑通澳洲仓", sku: "S810-ST-PK-UK-170-N", qty: 600, etd: "2026-07-18", status: "待提交调拨发货" }
+        ]
+      },
+      {
+        warehouseName: "万邑通德国仓",
+        sku: "S820BK",
+        skuName: "Shokz OpenFit 2 德国通用包装 BK",
+        productType: "整机",
+        availableQty: 1500,
+        lockedQty: 200,
+        onroadQty: 900,
+        orderedUnshippedQty: 900,
+        lowThreshold: 1000,
+        highThreshold: 3200,
+        updateTime: "2026-07-09 10:35",
+        plans: [
+          { planNo: "SP202607080026", warehouseName: "万邑通德国仓", sku: "S820BK", qty: 900, etd: "2026-07-20", status: "待提交调拨发货" }
+        ]
+      },
+      {
+        warehouseName: "筋斗云DWA仓",
+        sku: "C610-AN-BK-KR-000",
+        skuName: "Shokz OpenMeet 韩国通用包装 BK",
+        productType: "整机",
+        availableQty: 80,
+        lockedQty: 3,
+        onroadQty: 20,
+        orderedUnshippedQty: 0,
+        lowThreshold: 120,
+        highThreshold: 600,
+        updateTime: "2026-07-09 10:30",
+        plans: []
+      },
+      {
+        warehouseName: "筋斗云GLC仓",
+        sku: "S611BK",
+        skuName: "Shokz OpenSwim Pro 日本包装 BK",
+        productType: "整机",
+        availableQty: 1220,
+        lockedQty: 0,
+        onroadQty: 480,
+        orderedUnshippedQty: 0,
+        lowThreshold: 800,
+        highThreshold: 3000,
+        updateTime: "2026-07-09 10:28",
+        plans: []
+      },
+      {
+        warehouseName: "法国谷仓售后仓",
+        sku: "S900GY",
+        skuName: "Shokz OpenDots ONE 澳洲包装 GY",
+        productType: "整机",
+        availableQty: 530,
+        lockedQty: 20,
+        onroadQty: 210,
+        orderedUnshippedQty: 500,
+        lowThreshold: null,
+        highThreshold: null,
+        updateTime: "2026-07-09 10:21",
+        plans: [
+          { planNo: "SP202607060011", warehouseName: "法国谷仓售后仓", sku: "S900GY", qty: 500, etd: "2026-07-16", status: "待提交调拨发货" }
+        ]
+      },
+      {
+        warehouseName: "新加坡待维修仓",
+        sku: "T910-ST-BK-UK",
+        skuName: "Shokz OpenComm 2 英国包装 BK",
+        productType: "整机",
+        availableQty: 320,
+        lockedQty: 40,
+        onroadQty: 120,
+        orderedUnshippedQty: 0,
+        lowThreshold: 300,
+        highThreshold: 900,
+        updateTime: "2026-07-09 10:16",
+        plans: []
+      }
+    ];
+
+    let currentRows = [];
+    let selectedRow = null;
+
+    function numberText(value) {
+      if (value === null || value === undefined) return "-";
+      return Number(value).toLocaleString("zh-CN");
+    }
+
+    function getInStock(row) {
+      return row.availableQty + row.lockedQty;
+    }
+
+    function getTotalStock(row) {
+      return row.availableQty + row.lockedQty + row.onroadQty;
+    }
+
+    function getExpectedStock(row) {
+      return getTotalStock(row) + row.orderedUnshippedQty;
+    }
+
+    function getStatus(row) {
+      const total = getTotalStock(row);
+      if (row.lowThreshold === null || row.highThreshold === null) return "NO_THRESHOLD";
+      if (total > row.highThreshold) return "HIGH";
+      if (total < row.lowThreshold) return "LOW";
+      return "NORMAL";
+    }
+
+    function statusMeta(status) {
+      const meta = {
+        HIGH: { label: "库存过高", cls: "danger", rowCls: "risk-high" },
+        LOW: { label: "库存偏低", cls: "warning", rowCls: "risk-low" },
+        NORMAL: { label: "正常", cls: "success", rowCls: "" },
+        NO_THRESHOLD: { label: "未维护阈值", cls: "info", rowCls: "" }
+      };
+      return meta[status] || meta.NORMAL;
+    }
+
+    function getDeviation(row) {
+      const status = getStatus(row);
+      const total = getTotalStock(row);
+      if (status === "HIGH") return total - row.highThreshold;
+      if (status === "LOW") return row.lowThreshold - total;
+      return 0;
+    }
+
+    function getSelectedStatuses() {
+      return Array.from(document.querySelectorAll("#statusFilterPanel input:checked")).map(item => item.value);
+    }
+
+    function syncStatusFilterLabel() {
+      const statuses = getSelectedStatuses();
+      const label = statuses.length ? statuses.map(status => statusMeta(status).label).join("、") : "水位状态";
+      const trigger = document.getElementById("statusFilterLabel");
+      trigger.innerText = label;
+      trigger.title = label;
+    }
+
+    function toggleStatusPanel(event) {
+      event.stopPropagation();
+      document.getElementById("statusMultiSelect").classList.toggle("open");
+    }
+
+    function handleStatusChange() {
+      syncStatusFilterLabel();
+      renderTable();
+    }
+
+    document.addEventListener("click", event => {
+      if (!event.target.closest("#statusMultiSelect")) {
+        document.getElementById("statusMultiSelect").classList.remove("open");
+      }
+    });
+
+    function filterRows() {
+      const warehouse = document.getElementById("warehouseFilter").value;
+      const productType = document.getElementById("productTypeFilter").value;
+      const skuInput = document.getElementById("skuInput").value.trim();
+      const codeMode = document.getElementById("codeMode").value;
+      const statuses = getSelectedStatuses();
+
+      return inventoryRows.filter(row => {
+        const matchWarehouse = !warehouse || row.warehouseName === warehouse;
+        const matchProductType = !productType || row.productType === productType;
+        const matchSku = !skuInput || (codeMode === "exact" ? row.sku === skuInput : row.sku.includes(skuInput));
+        const matchStatus = statuses.length === 0 || statuses.includes(getStatus(row));
+        return matchWarehouse && matchProductType && matchSku && matchStatus;
+      });
+    }
+
+    function renderTable() {
+      currentRows = filterRows();
+      const body = document.getElementById("inventoryBody");
+      if (currentRows.length === 0) {
+        body.innerHTML = '<tr><td colspan="16"><div class="empty">暂无符合条件的 SKU 库存水位数据</div></td></tr>';
+      } else {
+        body.innerHTML = currentRows.map((row, index) => {
+          const status = getStatus(row);
+          const meta = statusMeta(status);
+          const deviation = getDeviation(row);
+          const deviationClass = status === "HIGH" ? "danger" : status === "LOW" ? "warning" : "";
+          return `
+            <tr class="${meta.rowCls}">
+              <td>${row.warehouseName}</td>
+              <td>${row.sku}</td>
+              <td>${row.skuName}</td>
+              <td>${row.productType}</td>
+              <td class="num">${numberText(row.availableQty)}</td>
+              <td class="num">${numberText(row.lockedQty)}</td>
+              <td class="num"><a class="link" onclick="openOnroadDialog(${index})">${numberText(row.onroadQty)}</a></td>
+              <td class="num">${numberText(getInStock(row))}</td>
+              <td class="num">${numberText(getTotalStock(row))}</td>
+              <td class="num"><a class="link" onclick="openStockupForRow(${index})">${numberText(row.orderedUnshippedQty)}</a></td>
+              <td class="num">${numberText(getExpectedStock(row))}</td>
+              <td class="num">${numberText(row.lowThreshold)}</td>
+              <td class="num">${numberText(row.highThreshold)}</td>
+              <td class="num"><span class="link ${deviationClass}">${deviation ? numberText(deviation) : "0"}</span></td>
+              <td><span class="tag ${meta.cls}">${meta.label}</span></td>
+              <td><a class="link" onclick="openThreshold(${index})">编辑</a></td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      document.getElementById("pagerInfo").innerText = `共 ${currentRows.length} 条`;
+      renderSummary(currentRows);
+      renderStockupSummary(inventoryRows);
+    }
+
+    function renderSummary(rows) {
+      document.getElementById("summaryHigh").innerText = rows.filter(row => getStatus(row) === "HIGH").length;
+      document.getElementById("summaryLow").innerText = rows.filter(row => getStatus(row) === "LOW").length;
+      document.getElementById("summaryNoThreshold").innerText = rows.filter(row => getStatus(row) === "NO_THRESHOLD").length;
+    }
+
+    function searchTable() {
+      renderTable();
+      showHint("查询完成，已按仓库、产品分类、SKU 和水位状态刷新列表");
+    }
+
+    function resetSearch() {
+      document.getElementById("warehouseFilter").value = "";
+      document.getElementById("productTypeFilter").value = "";
+      document.getElementById("codeMode").value = "exact";
+      document.getElementById("skuInput").value = "";
+      document.querySelectorAll("#statusFilterPanel input:checked").forEach(item => (item.checked = false));
+      syncStatusFilterLabel();
+      renderTable();
+      showHint("查询条件已重置");
+    }
+
+    function getRowByIndex(index, manual) {
+      return manual ? currentRows[index] : currentRows[index];
+    }
+
+    function openOnroadDialog(index, manual) {
+      selectedRow = getRowByIndex(index, manual);
+      const qtyList = getOnroadQtyList(selectedRow.onroadQty);
+      document.getElementById("onroadBody").innerHTML = qtyList.map(qty => `
+        <tr>
+          <td>${selectedRow.sku}</td>
+          <td>${selectedRow.skuName}</td>
+          <td>调拨出库</td>
+          <td>AS26072700...</td>
+          <td class="num">${numberText(qty)}</td>
+          <td>2026-07-29 20:40:24</td>
+        </tr>
+      `).join("");
+      openDialog("onroadDialog");
+    }
+
+    function getOnroadQtyList(totalQty) {
+      if (totalQty >= 2000) return [32, 112, 1488, 400];
+      if (totalQty >= 900) return [120, 180, 300, 300];
+      if (totalQty >= 480) return [120, 160, 100, 100];
+      if (totalQty >= 210) return [60, 50, 50, 50];
+      if (totalQty >= 120) return [30, 30, 30, 30];
+      if (totalQty > 0) return [totalQty, 0, 0, 0];
+      return [0, 0, 0, 0];
+    }
+
+    function openDetail(index, manual) {
+      selectedRow = getRowByIndex(index, manual);
+      const status = getStatus(selectedRow);
+      const meta = statusMeta(status);
+      document.getElementById("detailTitle").innerText = `库存水位详情 - ${selectedRow.warehouseName} / ${selectedRow.sku}`;
+      document.getElementById("detailAlert").className = status === "HIGH" ? "alert danger" : "alert warning";
+      document.getElementById("detailAlert").innerText = getDetailMessage(selectedRow);
+      document.getElementById("compositionBody").innerHTML = `
+        <tr><td>可用库存</td><td class="num">${numberText(selectedRow.availableQty)} pcs</td><td>EVA 库存数据中的当前可用数量</td></tr>
+        <tr><td>锁定库存</td><td class="num">${numberText(selectedRow.lockedQty)} pcs</td><td>订单或业务占用库存</td></tr>
+        <tr><td>调拨在途</td><td class="num">${numberText(selectedRow.onroadQty)} pcs</td><td>调拨在途数量</td></tr>
+        <tr><td>在库库存</td><td class="num">${numberText(getInStock(selectedRow))} pcs</td><td>可用库存 + 锁定库存，对应汇总库存原总库存口径</td></tr>
+        <tr><td>总库存</td><td class="num">${numberText(getTotalStock(selectedRow))} pcs</td><td>在库库存 + 调拨在途</td></tr>
+        <tr><td>备货已下单未发货</td><td class="num">${numberText(selectedRow.orderedUnshippedQty)} pcs</td><td>备货计划已下单但未发货数量</td></tr>
+        <tr><td>预计水位</td><td class="num">${numberText(getExpectedStock(selectedRow))} pcs</td><td>总库存 + 备货已下单未发货</td></tr>
+        <tr><td>低/高水位阈值</td><td class="num">${numberText(selectedRow.lowThreshold)} / ${numberText(selectedRow.highThreshold)} pcs</td><td>按仓库 + 整机 SKU 维护</td></tr>
+      `;
+      renderPlanBody(selectedRow.plans, "planBody");
+      openDialog("detailDialog");
+    }
+
+    function getDetailMessage(row) {
+      const status = getStatus(row);
+      if (status === "HIGH") return "库存水位过高，请控制补货。当前总库存已超过高水位阈值。";
+      if (status === "LOW") return "当前总库存低于低水位阈值，建议关注补货计划。";
+      if (status === "NO_THRESHOLD") return "该仓库整机 SKU 尚未维护低水位或高水位阈值。";
+      return "当前整机 SKU 库存水位正常。";
+    }
+
+    function renderPlanBody(plans, targetId) {
+      const body = document.getElementById(targetId);
+      if (!plans || plans.length === 0) {
+        body.innerHTML = '<tr><td colspan="6"><div class="empty">暂无备货计划已下单未发货数据</div></td></tr>';
+        return;
+      }
+      body.innerHTML = plans.map(plan => `
+        <tr>
+          <td>${plan.planNo}</td>
+          <td>${plan.warehouseName}</td>
+          <td>${plan.sku}</td>
+          <td class="num">${numberText(plan.qty)}</td>
+          <td>${plan.etd}</td>
+          <td><span class="tag warning">${plan.status}</span></td>
+        </tr>
+      `).join("");
+    }
+
+    function openThreshold(index, manual) {
+      selectedRow = getRowByIndex(index, manual);
+      fillThresholdForm(selectedRow);
+      openDialog("thresholdDialog");
+    }
+
+    function fillThresholdForm(row) {
+      document.getElementById("thresholdWh").value = row.warehouseName;
+      document.getElementById("thresholdSku").value = row.sku;
+      document.getElementById("thresholdTotal").value = getTotalStock(row);
+      document.getElementById("thresholdOldLow").value = row.lowThreshold === null ? "" : row.lowThreshold;
+      document.getElementById("thresholdLow").value = row.lowThreshold === null ? "" : row.lowThreshold;
+      document.getElementById("thresholdHigh").value = row.highThreshold === null ? "" : row.highThreshold;
+    }
+
+    function saveThreshold() {
+      const lowValue = Number(document.getElementById("thresholdLow").value);
+      const highValue = Number(document.getElementById("thresholdHigh").value);
+      if (!selectedRow) return;
+      if (!lowValue || !highValue || lowValue <= 0 || highValue <= 0 || lowValue >= highValue) {
+        showHint("保存失败：低水位阈值和高水位阈值必须为正整数，且低水位阈值小于高水位阈值");
+        return;
+      }
+      selectedRow.lowThreshold = lowValue;
+      selectedRow.highThreshold = highValue;
+      closeDialog("thresholdDialog");
+      renderTable();
+      showHint("阈值已更新，水位状态已重新计算");
+    }
+
+    function renderStockupSummary(rows) {
+      renderStockupBody([]);
+    }
+
+    function openStockupForRow(index, manual) {
+      selectedRow = getRowByIndex(index, manual);
+      renderStockupBody(getStockupRowsByInventoryRow(selectedRow));
+      openDialog("stockupDialog");
+    }
+
+    function getStockupRowsByInventoryRow(row) {
+      if (!row || !row.orderedUnshippedQty) return [];
+      const plan = row.plans && row.plans.length ? row.plans[0] : {};
+      return [
+        {
+          planNo: plan.planNo || "-",
+          status: plan.status || "-",
+          fromWarehouse: "立讯发货仓",
+          toWarehouse: row.warehouseName,
+          sku: row.sku,
+          skuOrderQty: row.orderedUnshippedQty
+        }
+      ];
+    }
+
+    function renderStockupBody(rows) {
+      const body = document.getElementById("stockupSummaryBody");
+      if (!rows.length) {
+        body.innerHTML = '<tr><td colspan="6"><div class="empty">暂无该 SKU 的备货计划明细</div></td></tr>';
+        return;
+      }
+      body.innerHTML = rows.map(plan => `
+        <tr>
+          <td>${plan.planNo}</td>
+          <td><span class="tag blue">${plan.status}</span></td>
+          <td>${plan.fromWarehouse}</td>
+          <td>${plan.toWarehouse}</td>
+          <td>${plan.sku}</td>
+          <td>${numberText(plan.skuOrderQty)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function refreshData() {
+      renderTable();
+      showHint("已刷新库存、在途和备货未发货数据");
+    }
+
+    function finishImport() {
+      closeDialog("importDialog");
+      showHint("导入完成：已更新 12 条整机 SKU 水位阈值，0 条失败");
+    }
+
+    function openDialog(id) {
+      document.getElementById(id).classList.add("open");
+    }
+
+    function closeDialog(id) {
+      document.getElementById(id).classList.remove("open");
+    }
+
+    function switchDialog(from, to) {
+      closeDialog(from);
+      if (selectedRow) fillThresholdForm(selectedRow);
+      openDialog(to);
+    }
+
+    function showHint(message) {
+      // Prototype keeps click handlers for review, but no longer renders inline success hints.
+    }
+
+    function initHeaderTooltips() {
+      const tooltip = document.getElementById("floatingTooltip");
+      document.querySelectorAll(".help-icon[data-tip]").forEach(icon => {
+        icon.addEventListener("mouseenter", () => {
+          const rect = icon.getBoundingClientRect();
+          tooltip.innerText = icon.dataset.tip;
+          tooltip.style.display = "block";
+          const tooltipRect = tooltip.getBoundingClientRect();
+          const left = Math.min(Math.max(rect.left + rect.width / 2 - tooltipRect.width / 2, 8), window.innerWidth - tooltipRect.width - 8);
+          const top = rect.top - tooltipRect.height - 8 > 8 ? rect.top - tooltipRect.height - 8 : rect.bottom + 8;
+          tooltip.style.left = `${left}px`;
+          tooltip.style.top = `${top}px`;
+        });
+        icon.addEventListener("mouseleave", () => {
+          tooltip.style.display = "none";
+        });
+      });
+      window.addEventListener("scroll", () => {
+        tooltip.style.display = "none";
+      }, true);
+    }
+
+    function showPrototypePage(page) {
+      document.querySelectorAll(".el-menu-item[data-menu]").forEach(item => {
+        item.classList.toggle("is-active", item.dataset.menu === page);
+      });
+      document.getElementById("waterLevelPage").style.display = page === "water" ? "block" : "none";
+      document.getElementById("summaryInventoryPage").style.display = page === "summary" ? "block" : "none";
+      document.getElementById("floatingTooltip").style.display = "none";
+    }
+
+    initHeaderTooltips();
+    renderTable();
+  </script>
+</body>
+</html>
