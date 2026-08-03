@@ -1,0 +1,1177 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>分销区域库存层级映射配置原型 - 临时客户</title>
+  <style>
+    :root {
+      --primary: #ff5b9a;
+      --primary-light: #fff0f6;
+      --line: #e5e7eb;
+      --head: #f7f8fb;
+      --text: #333b4a;
+      --muted: #8a93a3;
+      --bg: #f6f7fb;
+      --danger: #ff4d6d;
+      --success: #18a058;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      font-size: 12px;
+    }
+
+    button, input, select, textarea { font: inherit; }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: 44px 1fr;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .nav {
+      display: flex;
+      gap: 24px;
+      color: #4b5563;
+      font-weight: 400;
+    }
+
+    .nav span.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .right-icons {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: #6b7280;
+    }
+
+    .page {
+      padding: 10px 12px 18px;
+    }
+
+    .search-bar,
+    .toolbar,
+    .table-card {
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .search-bar {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
+    }
+
+    .toolbar {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      border-bottom: none;
+    }
+
+    .table-card {
+      overflow: auto;
+    }
+
+    input,
+    select,
+    textarea {
+      height: 28px;
+      min-width: 160px;
+      padding: 0 10px;
+      border: 1px solid #d9dfe8;
+      border-radius: 3px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      min-width: 0;
+      padding: 0;
+      margin: 0 7px 0 0;
+      vertical-align: -2px;
+      box-shadow: none;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #ff9ec4;
+      box-shadow: 0 0 0 2px rgba(255, 91, 154, 0.12);
+    }
+
+    input:disabled,
+    select:disabled,
+    textarea:disabled {
+      color: #9ca3af;
+      background: #f3f5f9;
+      cursor: not-allowed;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 46px;
+      padding-top: 7px;
+      resize: none;
+    }
+
+    .btn {
+      height: 28px;
+      padding: 0 14px;
+      border: 1px solid #d9dfe8;
+      border-radius: 3px;
+      color: #4b5563;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      color: #fff;
+      border-color: var(--primary);
+      background: var(--primary);
+    }
+
+    .btn.ghost {
+      color: var(--primary);
+      border-color: #ffd1e3;
+      background: var(--primary-light);
+    }
+
+    .btn.link {
+      height: auto;
+      padding: 0;
+      border: none;
+      color: var(--primary);
+      background: transparent;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    th,
+    td {
+      height: 38px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: var(--head);
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .tag {
+      display: inline-block;
+      max-width: 94px;
+      margin: 1px 4px 1px 0;
+      padding: 2px 7px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--primary);
+      background: var(--primary-light);
+      border-radius: 3px;
+      vertical-align: middle;
+    }
+
+    .tag.temp {
+      color: #8b5cf6;
+      background: #f3e8ff;
+    }
+
+    .op a {
+      margin-right: 12px;
+      color: var(--primary);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .pager {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 12px;
+      color: var(--muted);
+      background: #fff;
+    }
+
+    .toast {
+      position: fixed;
+      top: 58px;
+      left: 50%;
+      z-index: 40;
+      display: none;
+      min-width: 220px;
+      padding: 9px 16px;
+      color: var(--success);
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 4px;
+      transform: translateX(-50%);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+    }
+
+    .toast.error {
+      color: #b91c1c;
+      background: #fef2f2;
+      border-color: #fecaca;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    .mask {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      justify-content: flex-end;
+      background: rgba(15, 23, 42, 0.18);
+    }
+
+    .mask.open {
+      display: flex;
+    }
+
+    .dialog {
+      width: 960px;
+      max-width: calc(100vw - 40px);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      box-shadow: -6px 0 26px rgba(15, 23, 42, 0.18);
+    }
+
+    .dialog-head {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .close {
+      font-size: 24px;
+      color: #9ca3af;
+      cursor: pointer;
+    }
+
+    .dialog-body {
+      flex: 1;
+      padding: 36px 14px 18px;
+      overflow: auto;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      align-items: start;
+      margin-bottom: 16px;
+    }
+
+    .form-row label {
+      padding-top: 7px;
+      text-align: right;
+      padding-right: 12px;
+      color: #4b5563;
+    }
+
+    .required::before {
+      content: "*";
+      color: var(--danger);
+      margin-right: 4px;
+    }
+
+    .form-row .wide {
+      width: 620px;
+      max-width: 100%;
+    }
+
+    .transfer-wrap {
+      display: grid;
+      grid-template-columns: 308px 88px 308px;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .transfer-panel {
+      height: 320px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .transfer-title {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      background: var(--head);
+      border-bottom: 1px solid var(--line);
+      color: #111827;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .transfer-title small {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .transfer-title span {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .transfer-search {
+      padding: 10px 12px 8px;
+    }
+
+    .transfer-search input {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .transfer-list {
+      height: 240px;
+      padding: 2px 12px 8px;
+      overflow: auto;
+      text-align: left;
+    }
+
+    .transfer-list label {
+      display: flex;
+      align-items: center;
+      height: 24px;
+      line-height: 24px;
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #6b7280;
+    }
+
+    .transfer-list label input {
+      flex: 0 0 auto;
+    }
+
+    .customer-text {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .transfer-list .tag {
+      max-width: 52px;
+      margin: 0 0 0 3px;
+      padding: 1px 4px;
+      font-size: 10px;
+      line-height: 14px;
+    }
+
+    .transfer-list label.disabled {
+      color: #b4bbc8;
+      cursor: not-allowed;
+    }
+
+    .transfer-list label.selected {
+      color: #374151;
+      font-weight: 600;
+    }
+
+    .empty {
+      padding-top: 28px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .transfer-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      padding-top: 2px;
+    }
+
+    .mini {
+      width: 38px;
+      height: 28px;
+      border: none;
+      color: #fff;
+      background: #ff9ec4;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .rule-tip {
+      margin-top: 8px;
+      color: #8a93a3;
+      line-height: 1.7;
+    }
+
+    .divider {
+      height: 1px;
+      margin: 18px 0 14px;
+      background: var(--line);
+      position: relative;
+    }
+
+    .divider span {
+      position: absolute;
+      top: -9px;
+      left: 0;
+      padding-right: 10px;
+      background: #fff;
+      color: #333b4a;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .bind-toolbar {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+    }
+
+    .bind-table th,
+    .bind-table td {
+      padding: 7px 8px;
+      border: 1px solid var(--line);
+    }
+
+    .bind-table select,
+    .bind-table input {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .dialog-footer {
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 0 16px;
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .confirm-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.28);
+    }
+
+    .confirm-mask.open {
+      display: flex;
+    }
+
+    .confirm-box {
+      width: 320px;
+      padding: 18px;
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 12px 36px rgba(15, 23, 42, 0.18);
+    }
+
+    .confirm-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .confirm-body {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+      color: #4b5563;
+    }
+
+    .warn-icon {
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: #f59e0b;
+      border-radius: 50%;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span>EVA</span>
+        <nav class="nav">
+          <span>首页</span>
+          <span>分销订单列表</span>
+          <span>仓库管理</span>
+          <span class="active">库存层级映射</span>
+          <span>库存明细</span>
+        </nav>
+      </div>
+      <div class="right-icons"><span>017014</span><span>⟳</span><span>⚙</span></div>
+    </header>
+
+    <main class="page">
+      <div class="search-bar">
+        <select id="searchRegion">
+          <option value="">三级区域</option>
+        </select>
+        <input id="searchCustomer" placeholder="客户ID" />
+        <button id="searchBtn" class="btn primary">查询</button>
+        <button id="resetBtn" class="btn">重置</button>
+      </div>
+
+      <div class="toolbar">
+        <div>
+          <button id="openAdd" class="btn primary">新增</button>
+          <button class="btn ghost">导出</button>
+        </div>
+        <div style="color:#9ca3af;">刷新　密度　设置</div>
+      </div>
+
+      <section class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 150px;">映射名称</th>
+              <th style="width: 110px;">三级区域</th>
+              <th>客户ID</th>
+              <th style="width: 180px;">备注</th>
+              <th style="width: 90px;">创建人</th>
+              <th style="width: 150px;">创建时间</th>
+              <th style="width: 90px;">更新人</th>
+              <th style="width: 150px;">更新时间</th>
+              <th style="width: 130px;">操作</th>
+            </tr>
+          </thead>
+          <tbody id="mappingBody"></tbody>
+        </table>
+        <div id="pager" class="pager"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast">保存成功，映射已更新。</div>
+
+  <div id="modalMask" class="mask">
+    <section class="dialog">
+      <div class="dialog-head">
+        <span id="modalTitle">新增明细</span>
+        <span id="closeModal" class="close">×</span>
+      </div>
+      <div class="dialog-body">
+        <div class="form-row">
+          <label class="required">映射名称</label>
+          <input id="mappingName" class="wide" maxlength="50" placeholder="请输入映射名称" />
+        </div>
+        <div class="form-row">
+          <label class="required">三级区域</label>
+          <select id="regionSelect" class="wide"></select>
+        </div>
+        <div class="form-row">
+          <label class="required">客户ID</label>
+          <div>
+            <div class="transfer-wrap">
+              <div class="transfer-panel">
+                <div class="transfer-title">
+                  <span><input id="checkAllAvailable" type="checkbox" /> 未添加</span>
+                  <small id="availableCount">0/0</small>
+                </div>
+                <div class="transfer-search"><input id="availableSearch" placeholder="请输入客户ID" /></div>
+                <div id="availableList" class="transfer-list"></div>
+              </div>
+              <div class="transfer-actions">
+                <button id="moveLeft" class="mini">‹</button>
+                <button id="moveRight" class="mini">›</button>
+              </div>
+              <div class="transfer-panel">
+                <div class="transfer-title">
+                  <span><input id="checkAllSelected" type="checkbox" /> 已添加</span>
+                  <small id="selectedCount">0/0</small>
+                </div>
+                <div class="transfer-search"><input id="selectedSearch" placeholder="请输入客户ID" /></div>
+                <div id="selectedList" class="transfer-list"></div>
+              </div>
+            </div>
+            <div class="rule-tip">
+              规则：选择三级区域后，未添加客户展示该区域客户，以及三级区域为“公共”的临时客户；同一个临时客户ID在同一个三级区域下只能存在于一条生效映射中，已被占用时置灰不可右移。
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>备注</label>
+          <textarea id="remarkText" placeholder="请输入备注"></textarea>
+        </div>
+
+        <div class="divider"><span>绑定库存层级</span></div>
+        <div class="bind-toolbar">
+          <button id="addBindRow" class="btn link">添加子层级</button>
+        </div>
+        <table class="bind-table">
+          <thead>
+            <tr>
+              <th style="width: 70px;">操作</th>
+              <th style="width: 180px;"><span style="color:#ff4d6d;">*</span> 发货仓库</th>
+              <th><span style="color:#ff4d6d;">*</span> 绑定库存层级</th>
+              <th style="width: 140px;"><span style="color:#ff4d6d;">*</span> 扣减顺序</th>
+              <th style="width: 290px;">备注</th>
+            </tr>
+          </thead>
+          <tbody id="bindBody"></tbody>
+        </table>
+        <div class="rule-tip">
+          规则：发货仓库只允许选择非自有仓（t_wms_warehouse.wh_type!=1）。先选发货仓库时，库存层级只展示该仓库下且未在本映射使用的层级；先选库存层级时，可先选择全部层级，再选仓库，如仓库与层级不匹配则保留仓库并清空库存层级。
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button id="cancelModal" class="btn">取消</button>
+        <button id="saveModal" class="btn primary">确定</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="confirmMask" class="confirm-mask">
+    <div class="confirm-box">
+      <div class="confirm-head"><span>提示</span><span id="closeConfirm" class="close">×</span></div>
+      <div class="confirm-body"><span class="warn-icon">!</span><span>删除后数据将不可找回，确认是否删除？</span></div>
+      <div style="text-align:right;">
+        <button id="cancelDelete" class="btn">取消</button>
+        <button id="confirmDelete" class="btn primary">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const regions = ["德国", "法国", "奥地利", "西班牙", "意大利", "荷兰", "英国"];
+    const customers = [
+      { code: "10C000", name: "临时客户-国际贸易-阿建", region: "公共", temp: true },
+      { code: "10C002", name: "临时客户-国际贸易-朵市", region: "公共", temp: true },
+      { code: "10C004", name: "临时客户-国际贸易-欧阳", region: "公共", temp: true },
+      { code: "17C271", name: "INNOV8 CONNECT", region: "法国", temp: false },
+      { code: "17C275", name: "ADDONE", region: "法国", temp: false },
+      { code: "22C510", name: "Exertis Connect", region: "法国", temp: false },
+      { code: "26C702", name: "AZENN CONNECT", region: "法国", temp: false },
+      { code: "26C692", name: "UK DISTRIBUTION LTD.", region: "英国", temp: false },
+      { code: "12C170", name: "Bright Supply", region: "英国", temp: false },
+      { code: "25C653", name: "IT CONNECT S.R.L.", region: "意大利", temp: false },
+      { code: "18C298", name: "ES MARKET S.L.", region: "西班牙", temp: false },
+      { code: "22C509", name: "SWISS CONNECT", region: "瑞士", temp: false },
+      { code: "13C203", name: "Czech Distribution", region: "捷克共和国", temp: false }
+    ];
+    const warehouses = [
+      { id: "self-de", name: "德国自有仓", whType: 1 },
+      { id: "spl", name: "SPL仓", whType: 2 },
+      { id: "fr-gc", name: "法国谷仓", whType: 2 },
+      { id: "uk-gc", name: "英国谷仓", whType: 2 },
+      { id: "es-3p", name: "西班牙三方仓", whType: 3 },
+      { id: "it-3p", name: "意大利三方仓", whType: 3 }
+    ];
+    const inventoryLevels = [
+      { id: "2b-de", name: "2B_分销", region: "德国", whId: "spl" },
+      { id: "de-material", name: "DE_物料", region: "德国", whId: "spl" },
+      { id: "fr-dist", name: "分销_FR", region: "法国", whId: "spl" },
+      { id: "fr-tob", name: "TOB_FR", region: "法国", whId: "fr-gc" },
+      { id: "uk-dist", name: "分销_UK", region: "英国", whId: "uk-gc" },
+      { id: "es-dist", name: "分销_ES", region: "西班牙", whId: "es-3p" },
+      { id: "it-dist", name: "分销_IT", region: "意大利", whId: "it-3p" },
+      { id: "public", name: "公共备用层级", region: "公共", whId: "spl" }
+    ];
+    let mappings = [
+      {
+        id: "m-fr-tob",
+        name: "法国TOB",
+        region: "法国",
+        customers: ["26C702", "22C510"],
+        remark: "",
+        levels: [{ whId: "fr-gc", levelId: "fr-tob", sort: 1, remark: "" }],
+        creator: "017014",
+        createTime: "2026-07-24 10:03:51",
+        updater: "015101",
+        updateTime: "2026-07-24 15:47:38",
+        active: true
+      },
+      {
+        id: "m-fr-dist",
+        name: "法国分销",
+        region: "法国",
+        customers: ["17C271", "17C275", "10C004"],
+        remark: "临时客户10C004已占用法国区域",
+        levels: [{ whId: "spl", levelId: "fr-dist", sort: 1, remark: "" }],
+        creator: "017014",
+        createTime: "2026-07-24 10:04:44",
+        updater: "015101",
+        updateTime: "2026-07-24 15:46:58",
+        active: true
+      },
+      {
+        id: "m-uk-dist",
+        name: "英国分销",
+        region: "英国",
+        customers: ["26C692", "12C170", "10C004"],
+        remark: "同一临时客户可维护到不同三级区域",
+        levels: [{ whId: "uk-gc", levelId: "uk-dist", sort: 1, remark: "" }],
+        creator: "017014",
+        createTime: "2026-07-24 09:47:22",
+        updater: "017014",
+        updateTime: "2026-07-24 12:14:38",
+        active: true
+      }
+    ];
+
+    let currentMode = "add";
+    let currentMappingId = null;
+    let selectedCustomerCodes = [];
+    let bindRows = [{ whId: "", levelId: "", sort: "", remark: "" }];
+    let pendingDeleteId = null;
+
+    const mappingBody = document.getElementById("mappingBody");
+    const pager = document.getElementById("pager");
+    const searchRegion = document.getElementById("searchRegion");
+    const searchCustomer = document.getElementById("searchCustomer");
+    const modalMask = document.getElementById("modalMask");
+    const modalTitle = document.getElementById("modalTitle");
+    const mappingName = document.getElementById("mappingName");
+    const regionSelect = document.getElementById("regionSelect");
+    const remarkText = document.getElementById("remarkText");
+    const availableList = document.getElementById("availableList");
+    const selectedList = document.getElementById("selectedList");
+    const availableCount = document.getElementById("availableCount");
+    const selectedCount = document.getElementById("selectedCount");
+    const availableSearch = document.getElementById("availableSearch");
+    const selectedSearch = document.getElementById("selectedSearch");
+    const checkAllAvailable = document.getElementById("checkAllAvailable");
+    const checkAllSelected = document.getElementById("checkAllSelected");
+    const bindBody = document.getElementById("bindBody");
+    const toast = document.getElementById("toast");
+    const confirmMask = document.getElementById("confirmMask");
+
+    function initSelects() {
+      searchRegion.innerHTML += regions.map(region => `<option value="${region}">${region}</option>`).join("");
+      regionSelect.innerHTML = `<option value="">请选择三级区域</option>${regions.map(region => `<option value="${region}">${region}</option>`).join("")}`;
+    }
+
+    function customerName(code) {
+      const customer = customers.find(item => item.code === code);
+      return customer ? customer.name : "";
+    }
+
+    function customerTags(codes) {
+      return codes.map(code => {
+        const customer = customers.find(item => item.code === code);
+        const cls = customer?.temp ? "tag temp" : "tag";
+        return `<span class="${cls}" title="${code} - ${customerName(code)}">${code}</span>`;
+      }).join("");
+    }
+
+    function warehouseName(id) {
+      const warehouse = warehouses.find(item => item.id === id);
+      return warehouse ? warehouse.name : "";
+    }
+
+    function renderTable() {
+      const region = searchRegion.value;
+      const keyword = searchCustomer.value.trim().toLowerCase();
+      const filtered = mappings.filter(item => {
+        const hitRegion = !region || item.region === region;
+        const hitCustomer = !keyword || item.customers.some(code => code.toLowerCase().includes(keyword));
+        return hitRegion && hitCustomer;
+      });
+      mappingBody.innerHTML = filtered.map(item => `
+        <tr>
+          <td>${item.name}</td>
+          <td>${item.region}</td>
+          <td>${customerTags(item.customers)}</td>
+          <td>${item.remark || ""}</td>
+          <td>${item.creator}</td>
+          <td>${item.createTime}</td>
+          <td>${item.updater}</td>
+          <td>${item.updateTime}</td>
+          <td class="op">
+            <a data-action="view" data-id="${item.id}">查看</a>
+            <a data-action="edit" data-id="${item.id}">编辑</a>
+            <a data-action="log" data-id="${item.id}">日志</a>
+          </td>
+        </tr>
+      `).join("");
+      pager.textContent = `共 ${filtered.length} 条　10条/页　1　前往 1 页`;
+    }
+
+    function candidates() {
+      const region = regionSelect.value;
+      if (!region) return [];
+      return customers.filter(item => item.region === region || (item.temp && item.region === "公共"));
+    }
+
+    function isTempOccupiedInRegion(customer) {
+      if (!customer.temp || !regionSelect.value) return false;
+      return mappings.some(mapping =>
+        mapping.active &&
+        mapping.region === regionSelect.value &&
+        mapping.id !== currentMappingId &&
+        mapping.customers.includes(customer.code)
+      );
+    }
+
+    function renderCustomerLine(customer, side) {
+      const disabled = currentMode === "view" || (side === "available" && isTempOccupiedInRegion(customer));
+      const checkedDisabled = disabled ? "disabled" : "";
+      const reason = disabled && customer.temp ? "（同区域已存在生效映射）" : "";
+      const cls = `${side === "selected" ? "selected" : ""} ${disabled ? "disabled" : ""}`;
+      const tempTag = customer.temp ? '<span class="tag temp">公共临时</span>' : "";
+      return `<label class="${cls}" title="${customer.code} - ${customer.name}${reason}">
+        <input type="checkbox" data-code="${customer.code}" ${checkedDisabled} />
+        <span class="customer-text">${customer.code} - ${customer.name} ${tempTag}${reason}</span>
+      </label>`;
+    }
+
+    function renderTransfer() {
+      const candidateList = candidates();
+      const selectedSet = new Set(selectedCustomerCodes);
+      const availableKeyword = availableSearch.value.trim().toLowerCase();
+      const selectedKeyword = selectedSearch.value.trim().toLowerCase();
+      const available = candidateList
+        .filter(item => !selectedSet.has(item.code))
+        .filter(item => !availableKeyword || `${item.code}${item.name}`.toLowerCase().includes(availableKeyword));
+      const selected = customers
+        .filter(item => selectedSet.has(item.code))
+        .filter(item => !selectedKeyword || `${item.code}${item.name}`.toLowerCase().includes(selectedKeyword));
+      availableCount.textContent = `${available.length}/${candidateList.length}`;
+      selectedCount.textContent = `${selected.length}/${candidateList.length}`;
+      availableList.innerHTML = available.length ? available.map(item => renderCustomerLine(item, "available")).join("") : '<div class="empty">无数据</div>';
+      selectedList.innerHTML = selected.length ? selected.map(item => renderCustomerLine(item, "selected")).join("") : '<div class="empty">无数据</div>';
+      checkAllAvailable.checked = false;
+      checkAllSelected.checked = false;
+      checkAllAvailable.disabled = currentMode === "view";
+      checkAllSelected.disabled = currentMode === "view";
+    }
+
+    function isLevelUsed(levelId, currentIndex) {
+      return bindRows.some((row, index) => index !== currentIndex && row.levelId === levelId);
+    }
+
+    function warehouseOptions(row) {
+      return warehouses
+        .filter(item => item.whType !== 1)
+        .map(item => `<option value="${item.id}" ${row.whId === item.id ? "selected" : ""}>${item.name}</option>`)
+        .join("");
+    }
+
+    function levelOptions(row, index) {
+      const options = inventoryLevels.filter(item => {
+        const hitWarehouse = !row.whId || item.whId === row.whId;
+        return hitWarehouse;
+      });
+      return options.map(item => {
+        const used = isLevelUsed(item.id, index);
+        const selected = row.levelId === item.id ? "selected" : "";
+        const disabled = used ? "disabled" : "";
+        const suffix = used ? "（已使用）" : "";
+        const label = row.whId ? item.name : `${item.name}（${warehouseName(item.whId)}）`;
+        return `<option value="${item.id}" ${selected} ${disabled}>${label}${suffix}</option>`;
+      }).join("");
+    }
+
+    function renderBindRows() {
+      const readonly = currentMode === "view";
+      document.getElementById("addBindRow").style.display = readonly ? "none" : "inline-block";
+      bindBody.innerHTML = bindRows.map((row, index) => `
+        <tr>
+          <td style="text-align:center;">${readonly ? "-" : `<button class="btn link" data-bind-delete="${index}">删</button>`}</td>
+          <td>
+            <select data-bind-field="whId" data-index="${index}" ${readonly ? "disabled" : ""}>
+              <option value="">请选择</option>
+              ${warehouseOptions(row)}
+            </select>
+          </td>
+          <td>
+            <select data-bind-field="levelId" data-index="${index}" ${readonly ? "disabled" : ""}>
+              <option value="">请选择</option>
+              ${levelOptions(row, index)}
+            </select>
+          </td>
+          <td><input data-bind-field="sort" data-index="${index}" value="${row.sort || ""}" placeholder="请输入" ${readonly ? "disabled" : ""} /></td>
+          <td><input data-bind-field="remark" data-index="${index}" value="${row.remark || ""}" placeholder="备注" ${readonly ? "disabled" : ""} /></td>
+        </tr>
+      `).join("");
+    }
+
+    function renderModal() {
+      const readonly = currentMode === "view";
+      mappingName.disabled = readonly || currentMode === "edit";
+      regionSelect.disabled = readonly || currentMode === "edit";
+      remarkText.disabled = readonly;
+      document.getElementById("saveModal").style.display = readonly ? "none" : "inline-block";
+      renderTransfer();
+      renderBindRows();
+    }
+
+    function openModal(mode, id = null) {
+      currentMode = mode;
+      currentMappingId = id;
+      modalTitle.textContent = mode === "add" ? "新增明细" : mode === "edit" ? "编辑明细" : "查看明细";
+      if (mode === "add") {
+        mappingName.value = "";
+        regionSelect.value = "";
+        remarkText.value = "";
+        selectedCustomerCodes = [];
+        bindRows = [{ whId: "", levelId: "", sort: "", remark: "" }];
+      } else {
+        const mapping = mappings.find(item => item.id === id);
+        mappingName.value = mapping.name;
+        regionSelect.value = mapping.region;
+        remarkText.value = mapping.remark || "";
+        selectedCustomerCodes = [...mapping.customers];
+        bindRows = mapping.levels.map(item => ({ ...item }));
+      }
+      availableSearch.value = "";
+      selectedSearch.value = "";
+      modalMask.classList.add("open");
+      renderModal();
+    }
+
+    function closeModal() {
+      modalMask.classList.remove("open");
+    }
+
+    function showToast(message, isError = false) {
+      toast.textContent = message;
+      toast.classList.toggle("error", isError);
+      toast.classList.add("show");
+      window.setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function validBindRows() {
+      return bindRows
+        .filter(row => row.whId && row.levelId && row.sort)
+        .map(row => ({ whId: row.whId, levelId: row.levelId, sort: row.sort, remark: row.remark || "" }));
+    }
+
+    function saveMapping() {
+      const name = mappingName.value.trim();
+      const region = regionSelect.value;
+      if (!name || !region || !selectedCustomerCodes.length) {
+        showToast("请维护映射名称、三级区域和客户ID", true);
+        return;
+      }
+      const levels = validBindRows();
+      if (!levels.length) {
+        showToast("请至少维护一条有效的发货仓库和库存层级", true);
+        return;
+      }
+      const conflict = selectedCustomerCodes.some(code => {
+        const customer = customers.find(item => item.code === code);
+        return customer && isTempOccupiedInRegion(customer);
+      });
+      if (conflict) {
+        showToast("存在同区域已被占用的临时客户ID，请调整后保存", true);
+        return;
+      }
+      const now = "2026-07-29 14:32:00";
+      if (currentMode === "add") {
+        mappings.unshift({
+          id: `m-${Date.now()}`,
+          name,
+          region,
+          customers: [...selectedCustomerCodes],
+          remark: remarkText.value.trim(),
+          levels,
+          creator: "017014",
+          createTime: now,
+          updater: "017014",
+          updateTime: now,
+          active: true
+        });
+      } else if (currentMode === "edit") {
+        const mapping = mappings.find(item => item.id === currentMappingId);
+        mapping.customers = [...selectedCustomerCodes];
+        mapping.remark = remarkText.value.trim();
+        mapping.levels = levels;
+        mapping.updater = "017014";
+        mapping.updateTime = now;
+      }
+      closeModal();
+      renderTable();
+      showToast("保存成功，映射已更新。");
+    }
+
+    function removeSelected(side) {
+      const container = side === "available" ? availableList : selectedList;
+      return Array.from(container.querySelectorAll("input[type='checkbox']:checked:not(:disabled)")).map(item => item.dataset.code);
+    }
+
+    function handleRegionChange() {
+      const candidateCodes = new Set(candidates().map(item => item.code));
+      selectedCustomerCodes = selectedCustomerCodes.filter(code => {
+        const customer = customers.find(item => item.code === code);
+        return candidateCodes.has(code) && !isTempOccupiedInRegion(customer);
+      });
+      bindRows = [{ whId: "", levelId: "", sort: "", remark: "" }];
+      renderModal();
+    }
+
+    function openDelete(id) {
+      pendingDeleteId = id;
+      confirmMask.classList.add("open");
+    }
+
+    function closeDelete() {
+      pendingDeleteId = null;
+      confirmMask.classList.remove("open");
+    }
+
+    initSelects();
+    renderTable();
+
+    document.getElementById("openAdd").addEventListener("click", () => openModal("add"));
+    document.getElementById("searchBtn").addEventListener("click", renderTable);
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      searchRegion.value = "";
+      searchCustomer.value = "";
+      renderTable();
+    });
+    mappingBody.addEventListener("click", event => {
+      const target = event.target.closest("[data-action]");
+      if (!target) return;
+      const id = target.dataset.id;
+      if (target.dataset.action === "view") openModal("view", id);
+      if (target.dataset.action === "edit") openModal("edit", id);
+      if (target.dataset.action === "delete") openDelete(id);
+      if (target.dataset.action === "log") showToast("日志为原型占位入口");
+    });
+    document.getElementById("closeModal").addEventListener("click", closeModal);
+    document.getElementById("cancelModal").addEventListener("click", closeModal);
+    document.getElementById("saveModal").addEventListener("click", saveMapping);
+    modalMask.addEventListener("click", event => {
+      if (event.target === modalMask) closeModal();
+    });
+    regionSelect.addEventListener("change", handleRegionChange);
+    availableSearch.addEventListener("input", renderTransfer);
+    selectedSearch.addEventListener("input", renderTransfer);
+    document.getElementById("moveRight").addEventListener("click", () => {
+      selectedCustomerCodes = Array.from(new Set([...selectedCustomerCodes, ...removeSelected("available")]));
+      renderTransfer();
+    });
+    document.getElementById("moveLeft").addEventListener("click", () => {
+      const removeCodes = new Set(removeSelected("selected"));
+      selectedCustomerCodes = selectedCustomerCodes.filter(code => !removeCodes.has(code));
+      renderTransfer();
+    });
+    checkAllAvailable.addEventListener("change", () => {
+      availableList.querySelectorAll("input[type='checkbox']:not(:disabled)").forEach(item => {
+        item.checked = checkAllAvailable.checked;
+      });
+    });
+    checkAllSelected.addEventListener("change", () => {
+      selectedList.querySelectorAll("input[type='checkbox']:not(:disabled)").forEach(item => {
+        item.checked = checkAllSelected.checked;
+      });
+    });
+    document.getElementById("addBindRow").addEventListener("click", () => {
+      bindRows.push({ whId: "", levelId: "", sort: bindRows.length + 1, remark: "" });
+      renderBindRows();
+    });
+    bindBody.addEventListener("click", event => {
+      const target = event.target.closest("[data-bind-delete]");
+      if (!target) return;
+      bindRows.splice(Number(target.dataset.bindDelete), 1);
+      if (!bindRows.length) bindRows.push({ whId: "", levelId: "", sort: "", remark: "" });
+      renderBindRows();
+    });
+    bindBody.addEventListener("change", event => {
+      const target = event.target;
+      if (!target.dataset.bindField) return;
+      const row = bindRows[Number(target.dataset.index)];
+      if (target.dataset.bindField === "whId") {
+        row.whId = target.value;
+        const selectedLevel = inventoryLevels.find(item => item.id === row.levelId);
+        if (selectedLevel && selectedLevel.whId !== row.whId) {
+          row.levelId = "";
+        }
+      } else {
+        row[target.dataset.bindField] = target.value;
+      }
+      renderBindRows();
+    });
+    bindBody.addEventListener("input", event => {
+      const target = event.target;
+      if (!target.dataset.bindField) return;
+      const row = bindRows[Number(target.dataset.index)];
+      row[target.dataset.bindField] = target.value;
+    });
+    document.getElementById("closeConfirm").addEventListener("click", closeDelete);
+    document.getElementById("cancelDelete").addEventListener("click", closeDelete);
+    document.getElementById("confirmDelete").addEventListener("click", () => {
+      mappings = mappings.filter(item => item.id !== pendingDeleteId);
+      closeDelete();
+      renderTable();
+      showToast("删除成功");
+    });
+  </script>
+</body>
+</html>
