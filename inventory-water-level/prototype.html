@@ -741,6 +741,14 @@
       align-items: start;
     }
 
+    .water-level-workspace.level-collapsed {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .water-level-workspace.level-collapsed .level-panel {
+      display: none;
+    }
+
     .level-panel {
       min-height: calc(100vh - 34px);
       padding: 12px;
@@ -887,7 +895,7 @@
           <div class="el-menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M4 2.5h7.5L13 4v9.5H4z" /><path d="M11.5 2.5V4H13" /><path d="M6 7h4" /><path d="M6 9.5h4" /></svg></span><span class="sle">库存日志</span></div>
           <div class="el-menu-item" data-menu="summary" onclick="showPrototypePage('summary')"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="m8 2.5 5 2.8-5 2.8-5-2.8z" /><path d="M3 5.3v5.4l5 2.8 5-2.8V5.3" /><path d="M8 8.1v5.4" /></svg></span><span class="sle">汇总库存</span></div>
           <div class="el-menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="m8 2.5 5 2.6-5 2.6-5-2.6z" /><path d="m3 8 5 2.6L13 8" /><path d="m3 10.8 5 2.7 5-2.7" /></svg></span><span class="sle">层级库存</span></div>
-          <div class="el-menu-item is-active" data-menu="water" onclick="showPrototypePage('water')"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M3.5 3.5h9v9h-9z" /><path d="M6 6h4" /><path d="M6 8h4" /><path d="M6 10h2" /></svg></span><span class="sle">库存阈值</span></div>
+          <div class="el-menu-item is-active" data-menu="water" onclick="showPrototypePage('water')"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M3.5 3.5h9v9h-9z" /><path d="M6 6h4" /><path d="M6 8h4" /><path d="M6 10h2" /></svg></span><span class="sle">库存水位</span></div>
           <div class="el-menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M4 3.5h8v10H4z" /><path d="M6 2.5h4" /><path d="M6 6h4" /><path d="M6 8.5h4" /><path d="M6 11h2" /></svg></span><span class="sle">盘点单</span></div>
           <div class="el-menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M5 2.5h6v11H5z" /><path d="M3.5 5h9" /><path d="M6.5 7.5h3" /><path d="M6.5 10h3" /></svg></span><span class="sle">加工单</span></div>
           <div class="el-sub-menu__title">
@@ -916,7 +924,7 @@
 
     <main class="main">
       <div id="waterLevelPage" class="page-panel">
-        <div class="water-level-workspace">
+        <div id="waterLevelWorkspace" class="water-level-workspace level-collapsed">
           <aside class="level-panel">
             <div class="level-panel-title">库存层级</div>
             <input id="levelTreeSearch" class="level-search" placeholder="输入关键字进行过滤" oninput="renderLevelTree()" />
@@ -925,6 +933,7 @@
 
           <div class="level-content">
       <div class="search-bar">
+        <button id="levelToggleBtn" class="btn light" onclick="toggleLevelPanel()">显示层级</button>
         <select id="productTypeFilter" class="control" onchange="renderTable()">
           <option value="">产品分类</option>
           <option value="整机">整机</option>
@@ -975,7 +984,7 @@
       <section class="table-shell">
         <div class="table-toolbar">
           <div class="toolbar-left">
-            <button class="btn light" onclick="showHint('整机库存阈值导出任务已创建')">导出</button>
+            <button class="btn light" onclick="showHint('整机库存水位导出任务已创建')">导出</button>
             <button class="btn light" onclick="openDialog('importDialog')">导入阈值</button>
           </div>
           <div class="toolbar-right">
@@ -1527,6 +1536,7 @@
     let currentRows = [];
     let selectedRow = null;
     let selectedLevelNodeId = "all";
+    let isLevelPanelVisible = false;
 
     const levelNodes = [
       { id: "all", label: "全部", type: "all", depth: 0 },
@@ -1596,6 +1606,7 @@
     }
 
     function rowMatchesLevel(row, node = getActiveLevelNode()) {
+      if (!isLevelPanelVisible) return true;
       if (node.type === "all" || node.type === "group") return true;
       if (node.type === "warehouse") return row.warehouseName === node.warehouseName;
       return row.warehouseName === node.warehouseName && row.levelName === node.levelName;
@@ -1633,6 +1644,17 @@
       selectedLevelNodeId = id;
       renderLevelTree();
       updateCurrentScope();
+      renderTable();
+    }
+
+    function toggleLevelPanel() {
+      isLevelPanelVisible = !isLevelPanelVisible;
+      document.getElementById("waterLevelWorkspace").classList.toggle("level-collapsed", !isLevelPanelVisible);
+      document.getElementById("levelToggleBtn").innerText = isLevelPanelVisible ? "隐藏层级" : "显示层级";
+      if (!isLevelPanelVisible) {
+        selectedLevelNodeId = "all";
+      }
+      renderLevelTree();
       renderTable();
     }
 
