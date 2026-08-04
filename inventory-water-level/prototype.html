@@ -934,6 +934,15 @@
           <div class="level-content">
       <div class="search-bar">
         <button id="levelToggleBtn" class="btn light" onclick="toggleLevelPanel()">显示层级</button>
+        <select id="warehouseFilter" class="control" onchange="renderTable()">
+          <option value="">仓库名称</option>
+          <option value="万邑通澳洲仓">万邑通澳洲仓</option>
+          <option value="万邑通德国仓">万邑通德国仓</option>
+          <option value="筋斗云DWA仓">筋斗云DWA仓</option>
+          <option value="筋斗云GLC仓">筋斗云GLC仓</option>
+          <option value="法国谷仓售后仓">法国谷仓售后仓</option>
+          <option value="新加坡待维修仓">新加坡待维修仓</option>
+        </select>
         <select id="productTypeFilter" class="control" onchange="renderTable()">
           <option value="">产品分类</option>
           <option value="整机">整机</option>
@@ -998,7 +1007,6 @@
             <thead>
               <tr>
                 <th style="width: 150px;">仓库名称</th>
-                <th style="width: 150px;">库存层级</th>
                 <th style="width: 170px;">SKU</th>
                 <th style="width: 230px;">产品名称</th>
                 <th style="width: 70px;">产品分类</th>
@@ -1021,7 +1029,9 @@
                   <span class="header-help">偏差<span class="help-icon" data-tip="偏差=总库存-水位阈值">?</span></span>
                 </th>
                 <th style="width: 120px;">水位状态</th>
-                <th style="width: 130px;">操作</th>
+                <th style="width: 100px;">更新人</th>
+                <th style="width: 160px;">更新时间</th>
+                <th style="width: 80px;">操作</th>
               </tr>
             </thead>
             <tbody id="inventoryBody"></tbody>
@@ -1279,19 +1289,14 @@
   <div id="thresholdDialog" class="overlay">
     <div class="dialog">
       <div class="dialog-header">
-        <span>维护水位阈值</span>
+        <span>编辑水位阈值</span>
         <button class="close" onclick="closeDialog('thresholdDialog')">×</button>
       </div>
       <div class="dialog-body">
-        <div class="alert warning">阈值按“仓库 + 库存层级 + 整机 SKU”维护。低水位阈值用于提示补货风险，高水位阈值用于控制补货与调拨。</div>
         <div class="form-grid">
           <div class="form-item">
             <label>仓库</label>
             <input id="thresholdWh" disabled />
-          </div>
-          <div class="form-item">
-            <label>库存层级</label>
-            <input id="thresholdLevel" disabled />
           </div>
           <div class="form-item">
             <label>SKU</label>
@@ -1306,16 +1311,16 @@
             <input id="thresholdOldLow" disabled />
           </div>
           <div class="form-item">
+            <label>原高水位阈值</label>
+            <input id="thresholdOldHigh" disabled />
+          </div>
+          <div class="form-item">
             <label>新低水位阈值</label>
             <input id="thresholdLow" />
           </div>
           <div class="form-item">
             <label>新高水位阈值</label>
             <input id="thresholdHigh" />
-          </div>
-          <div class="form-item" style="grid-column: 1 / 4;">
-            <label>调整原因</label>
-            <textarea id="thresholdReason">根据仓库周转和近期备货计划调整整机 SKU 水位阈值。</textarea>
           </div>
         </div>
       </div>
@@ -1442,7 +1447,8 @@
         orderedUnshippedQty: 600,
         lowThreshold: 2500,
         highThreshold: 7000,
-        updateTime: "2026-07-09 10:40",
+        updateBy: "system",
+        updateTime: "2026-07-09 10:40:00",
         plans: [
           { planNo: "SP202607090018", warehouseName: "万邑通澳洲仓", sku: "S810-ST-PK-UK-170-N", qty: 600, etd: "2026-07-18", status: "待提交调拨发货" }
         ]
@@ -1460,7 +1466,8 @@
         orderedUnshippedQty: 900,
         lowThreshold: 1000,
         highThreshold: 3200,
-        updateTime: "2026-07-09 10:35",
+        updateBy: "system",
+        updateTime: "2026-07-09 10:35:00",
         plans: [
           { planNo: "SP202607080026", warehouseName: "万邑通德国仓", sku: "S820BK", qty: 900, etd: "2026-07-20", status: "待提交调拨发货" }
         ]
@@ -1478,7 +1485,8 @@
         orderedUnshippedQty: 0,
         lowThreshold: 120,
         highThreshold: 600,
-        updateTime: "2026-07-09 10:30",
+        updateBy: "system",
+        updateTime: "2026-07-09 10:30:00",
         plans: []
       },
       {
@@ -1494,7 +1502,8 @@
         orderedUnshippedQty: 0,
         lowThreshold: 800,
         highThreshold: 3000,
-        updateTime: "2026-07-09 10:28",
+        updateBy: "system",
+        updateTime: "2026-07-09 10:28:00",
         plans: []
       },
       {
@@ -1510,7 +1519,8 @@
         orderedUnshippedQty: 500,
         lowThreshold: null,
         highThreshold: null,
-        updateTime: "2026-07-09 10:21",
+        updateBy: "system",
+        updateTime: "2026-07-09 10:21:00",
         plans: [
           { planNo: "SP202607060011", warehouseName: "法国谷仓售后仓", sku: "S900GY", qty: 500, etd: "2026-07-16", status: "待提交调拨发货" }
         ]
@@ -1528,7 +1538,8 @@
         orderedUnshippedQty: 0,
         lowThreshold: 300,
         highThreshold: 900,
-        updateTime: "2026-07-09 10:16",
+        updateBy: "system",
+        updateTime: "2026-07-09 10:16:00",
         plans: []
       }
     ];
@@ -1687,6 +1698,7 @@
     });
 
     function filterRows() {
+      const warehouse = document.getElementById("warehouseFilter").value;
       const productType = document.getElementById("productTypeFilter").value;
       const skuInput = document.getElementById("skuInput").value.trim();
       const codeMode = document.getElementById("codeMode").value;
@@ -1694,10 +1706,11 @@
 
       return inventoryRows.filter(row => {
         const matchLevel = rowMatchesLevel(row);
+        const matchWarehouse = !warehouse || row.warehouseName === warehouse;
         const matchProductType = !productType || row.productType === productType;
         const matchSku = !skuInput || (codeMode === "exact" ? row.sku === skuInput : row.sku.includes(skuInput));
         const matchStatus = statuses.length === 0 || statuses.includes(getStatus(row));
-        return matchLevel && matchProductType && matchSku && matchStatus;
+        return matchLevel && matchWarehouse && matchProductType && matchSku && matchStatus;
       });
     }
 
@@ -1705,7 +1718,7 @@
       currentRows = filterRows();
       const body = document.getElementById("inventoryBody");
       if (currentRows.length === 0) {
-        body.innerHTML = '<tr><td colspan="17"><div class="empty">暂无符合条件的 SKU 库存水位数据</div></td></tr>';
+        body.innerHTML = '<tr><td colspan="18"><div class="empty">暂无符合条件的 SKU 库存水位数据</div></td></tr>';
       } else {
         body.innerHTML = currentRows.map((row, index) => {
           const status = getStatus(row);
@@ -1715,7 +1728,6 @@
           return `
             <tr class="${meta.rowCls}">
               <td>${row.warehouseName}</td>
-              <td>${row.levelName}</td>
               <td>${row.sku}</td>
               <td>${row.skuName}</td>
               <td>${row.productType}</td>
@@ -1730,6 +1742,8 @@
               <td class="num">${numberText(row.highThreshold)}</td>
               <td class="num"><span class="link ${deviationClass}">${deviation ? numberText(deviation) : "0"}</span></td>
               <td><span class="tag ${meta.cls}">${meta.label}</span></td>
+              <td>${row.updateBy || "-"}</td>
+              <td>${row.updateTime || "-"}</td>
               <td><a class="link" onclick="openThreshold(${index})">编辑</a></td>
             </tr>
           `;
@@ -1753,6 +1767,7 @@
     }
 
     function resetSearch() {
+      document.getElementById("warehouseFilter").value = "";
       document.getElementById("productTypeFilter").value = "";
       document.getElementById("codeMode").value = "exact";
       document.getElementById("skuInput").value = "";
@@ -1847,10 +1862,10 @@
 
     function fillThresholdForm(row) {
       document.getElementById("thresholdWh").value = row.warehouseName;
-      document.getElementById("thresholdLevel").value = row.levelName;
       document.getElementById("thresholdSku").value = row.sku;
       document.getElementById("thresholdTotal").value = getTotalStock(row);
       document.getElementById("thresholdOldLow").value = row.lowThreshold === null ? "" : row.lowThreshold;
+      document.getElementById("thresholdOldHigh").value = row.highThreshold === null ? "" : row.highThreshold;
       document.getElementById("thresholdLow").value = row.lowThreshold === null ? "" : row.lowThreshold;
       document.getElementById("thresholdHigh").value = row.highThreshold === null ? "" : row.highThreshold;
     }
