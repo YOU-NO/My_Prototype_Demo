@@ -1,6 +1,6 @@
 {
   "featureName": "inventory-water-level",
-  "pageTitle": "库存水位",
+  "pageTitle": "库存阈值",
   "summary": {
     "totalWholeMachineSku": 6,
     "highWater": 1,
@@ -8,6 +8,18 @@
     "noThreshold": 1,
     "lastInventorySyncTime": "2026-07-09 10:40:00"
   },
+  "inventoryLevelTree": [
+    { "id": "all", "label": "全部", "type": "all" },
+    { "id": "public", "label": "公共", "type": "group" },
+    { "id": "au", "label": "万邑通澳洲仓", "type": "warehouse", "warehouseName": "万邑通澳洲仓" },
+    { "id": "au-distribution", "label": "分销_AU", "type": "level", "warehouseName": "万邑通澳洲仓", "levelName": "分销_AU" },
+    { "id": "de", "label": "万邑通德国仓", "type": "warehouse", "warehouseName": "万邑通德国仓" },
+    { "id": "de-shopify", "label": "Shopify_DE", "type": "level", "warehouseName": "万邑通德国仓", "levelName": "Shopify_DE" },
+    { "id": "kr", "label": "筋斗云DWA仓", "type": "warehouse", "warehouseName": "筋斗云DWA仓" },
+    { "id": "jp", "label": "筋斗云GLC仓", "type": "warehouse", "warehouseName": "筋斗云GLC仓" },
+    { "id": "fr", "label": "法国谷仓售后仓", "type": "warehouse", "warehouseName": "法国谷仓售后仓" },
+    { "id": "sg", "label": "新加坡待维修仓", "type": "warehouse", "warehouseName": "新加坡待维修仓" }
+  ],
   "fieldRules": {
     "productType": "产品分类，取值与 SKU 列表产品分类保持一致",
     "inStockQty": "可用库存 + 锁定库存，对应汇总库存现有总库存口径",
@@ -19,6 +31,8 @@
   "inventoryRows": [
     {
       "warehouseName": "万邑通澳洲仓",
+      "levelName": "分销_AU",
+      "levelPath": "公共 / 万邑通澳洲仓 / 分销_AU",
       "sku": "S810-ST-PK-UK-170-N",
       "skuName": "Shokz OpenRun Pro 英国170客户包装 BK",
       "productType": "整机",
@@ -38,6 +52,8 @@
     },
     {
       "warehouseName": "万邑通德国仓",
+      "levelName": "Shopify_DE",
+      "levelPath": "公共 / 万邑通德国仓 / Shopify_DE",
       "sku": "S820BK",
       "skuName": "Shokz OpenFit 2 德国通用包装 BK",
       "productType": "整机",
@@ -57,6 +73,8 @@
     },
     {
       "warehouseName": "筋斗云DWA仓",
+      "levelName": "韩国直营网店",
+      "levelPath": "公共 / 筋斗云DWA仓 / 韩国直营网店",
       "sku": "C610-AN-BK-KR-000",
       "skuName": "Shokz OpenMeet 韩国通用包装 BK",
       "productType": "整机",
@@ -76,6 +94,8 @@
     },
     {
       "warehouseName": "筋斗云GLC仓",
+      "levelName": "日本直营网店",
+      "levelPath": "公共 / 筋斗云GLC仓 / 日本直营网店",
       "sku": "S611BK",
       "skuName": "Shokz OpenSwim Pro 日本包装 BK",
       "productType": "整机",
@@ -95,6 +115,8 @@
     },
     {
       "warehouseName": "法国谷仓售后仓",
+      "levelName": "售后_FR",
+      "levelPath": "公共 / 法国谷仓售后仓 / 售后_FR",
       "sku": "S900GY",
       "skuName": "Shokz OpenDots ONE 澳洲包装 GY",
       "productType": "整机",
@@ -114,6 +136,8 @@
     },
     {
       "warehouseName": "新加坡待维修仓",
+      "levelName": "售后_SG",
+      "levelPath": "公共 / 新加坡待维修仓 / 售后_SG",
       "sku": "T910-ST-BK-UK",
       "skuName": "Shokz OpenComm 2 英国包装 BK",
       "productType": "整机",
