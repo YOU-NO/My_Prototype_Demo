@@ -734,6 +734,112 @@
       color: var(--text);
     }
 
+    .water-level-workspace {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      gap: 8px;
+      align-items: start;
+    }
+
+    .level-panel {
+      min-height: calc(100vh - 34px);
+      padding: 12px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+    }
+
+    .level-panel-title {
+      margin-bottom: 10px;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .level-search {
+      width: 100%;
+      height: 26px;
+      padding: 0 8px;
+      color: var(--regular);
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      outline: none;
+    }
+
+    .level-tree {
+      margin-top: 12px;
+      color: var(--regular);
+    }
+
+    .tree-row {
+      height: 30px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 8px;
+      border-radius: 2px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tree-row:hover {
+      background: #f5f7fa;
+    }
+
+    .tree-row.active {
+      color: #fff;
+      background: #9b59b6;
+    }
+
+    .tree-row.level-1 {
+      padding-left: 20px;
+    }
+
+    .tree-row.level-2 {
+      padding-left: 36px;
+    }
+
+    .tree-row.level-3 {
+      padding-left: 52px;
+    }
+
+    .tree-caret {
+      width: 12px;
+      color: var(--secondary);
+      flex: none;
+      font-size: 10px;
+    }
+
+    .tree-row.active .tree-caret {
+      color: #fff;
+    }
+
+    .tree-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tree-badge {
+      min-width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      padding: 0 5px;
+      color: var(--secondary);
+      background: #f5f7fa;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-size: 11px;
+    }
+
+    .tree-row.active .tree-badge {
+      color: #9b59b6;
+      background: #fff;
+      border-color: #fff;
+    }
+
     .mini-table {
       min-width: 680px;
     }
@@ -781,7 +887,7 @@
           <div class="el-menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M4 2.5h7.5L13 4v9.5H4z" /><path d="M11.5 2.5V4H13" /><path d="M6 7h4" /><path d="M6 9.5h4" /></svg></span><span class="sle">库存日志</span></div>
           <div class="el-menu-item" data-menu="summary" onclick="showPrototypePage('summary')"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="m8 2.5 5 2.8-5 2.8-5-2.8z" /><path d="M3 5.3v5.4l5 2.8 5-2.8V5.3" /><path d="M8 8.1v5.4" /></svg></span><span class="sle">汇总库存</span></div>
           <div class="el-menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="m8 2.5 5 2.6-5 2.6-5-2.6z" /><path d="m3 8 5 2.6L13 8" /><path d="m3 10.8 5 2.7 5-2.7" /></svg></span><span class="sle">层级库存</span></div>
-          <div class="el-menu-item is-active" data-menu="water" onclick="showPrototypePage('water')"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M3.5 3.5h9v9h-9z" /><path d="M6 6h4" /><path d="M6 8h4" /><path d="M6 10h2" /></svg></span><span class="sle">库存水位</span></div>
+          <div class="el-menu-item is-active" data-menu="water" onclick="showPrototypePage('water')"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M3.5 3.5h9v9h-9z" /><path d="M6 6h4" /><path d="M6 8h4" /><path d="M6 10h2" /></svg></span><span class="sle">库存阈值</span></div>
           <div class="el-menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M4 3.5h8v10H4z" /><path d="M6 2.5h4" /><path d="M6 6h4" /><path d="M6 8.5h4" /><path d="M6 11h2" /></svg></span><span class="sle">盘点单</span></div>
           <div class="el-menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16"><path d="M5 2.5h6v11H5z" /><path d="M3.5 5h9" /><path d="M6.5 7.5h3" /><path d="M6.5 10h3" /></svg></span><span class="sle">加工单</span></div>
           <div class="el-sub-menu__title">
@@ -810,16 +916,15 @@
 
     <main class="main">
       <div id="waterLevelPage" class="page-panel">
+        <div class="water-level-workspace">
+          <aside class="level-panel">
+            <div class="level-panel-title">库存层级</div>
+            <input id="levelTreeSearch" class="level-search" placeholder="输入关键字进行过滤" oninput="renderLevelTree()" />
+            <div id="levelTree" class="level-tree"></div>
+          </aside>
+
+          <div class="level-content">
       <div class="search-bar">
-        <select id="warehouseFilter" class="control" onchange="renderTable()">
-          <option value="">仓库名称</option>
-          <option value="万邑通澳洲仓">万邑通澳洲仓</option>
-          <option value="万邑通德国仓">万邑通德国仓</option>
-          <option value="筋斗云DWA仓">筋斗云DWA仓</option>
-          <option value="筋斗云GLC仓">筋斗云GLC仓</option>
-          <option value="法国谷仓售后仓">法国谷仓售后仓</option>
-          <option value="新加坡待维修仓">新加坡待维修仓</option>
-        </select>
         <select id="productTypeFilter" class="control" onchange="renderTable()">
           <option value="">产品分类</option>
           <option value="整机">整机</option>
@@ -870,7 +975,7 @@
       <section class="table-shell">
         <div class="table-toolbar">
           <div class="toolbar-left">
-            <button class="btn light" onclick="showHint('整机库存水位导出任务已创建')">导出</button>
+            <button class="btn light" onclick="showHint('整机库存阈值导出任务已创建')">导出</button>
             <button class="btn light" onclick="openDialog('importDialog')">导入阈值</button>
           </div>
           <div class="toolbar-right">
@@ -884,6 +989,7 @@
             <thead>
               <tr>
                 <th style="width: 150px;">仓库名称</th>
+                <th style="width: 150px;">库存层级</th>
                 <th style="width: 170px;">SKU</th>
                 <th style="width: 230px;">产品名称</th>
                 <th style="width: 70px;">产品分类</th>
@@ -919,6 +1025,8 @@
           <button class="btn" disabled>下一页</button>
         </div>
       </section>
+          </div>
+        </div>
       </div>
       <div id="summaryInventoryPage" class="page-panel" style="display: none;">
         <div class="search-bar">
@@ -1166,11 +1274,15 @@
         <button class="close" onclick="closeDialog('thresholdDialog')">×</button>
       </div>
       <div class="dialog-body">
-        <div class="alert warning">阈值按“仓库 + 整机 SKU”维护。低水位阈值用于提示补货风险，高水位阈值用于控制补货与调拨。</div>
+        <div class="alert warning">阈值按“仓库 + 库存层级 + 整机 SKU”维护。低水位阈值用于提示补货风险，高水位阈值用于控制补货与调拨。</div>
         <div class="form-grid">
           <div class="form-item">
             <label>仓库</label>
             <input id="thresholdWh" disabled />
+          </div>
+          <div class="form-item">
+            <label>库存层级</label>
+            <input id="thresholdLevel" disabled />
           </div>
           <div class="form-item">
             <label>SKU</label>
@@ -1212,12 +1324,12 @@
         <button class="close" onclick="closeDialog('importDialog')">×</button>
       </div>
       <div class="dialog-body">
-        <div class="alert warning">模板字段：仓库、SKU、产品分类、低水位阈值、高水位阈值、备注。导入时仅允许产品分类为“整机”的 SKU。</div>
+        <div class="alert warning">模板字段：仓库、库存层级、SKU、产品分类、低水位阈值、高水位阈值、备注。导入时仅允许产品分类为“整机”的 SKU。</div>
         <button class="btn light" onclick="showHint('整机水位阈值模板已下载')">下载模板</button>
         <button class="btn" onclick="showHint('当前无失败数据')">下载失败数据</button>
         <div class="upload">
           <strong>点击或拖拽 Excel 文件上传</strong>
-          <span style="margin-top: 6px;">系统按仓库 + SKU 覆盖最新阈值，并记录导入批次</span>
+          <span style="margin-top: 6px;">系统按仓库 + 库存层级 + SKU 覆盖最新阈值，并记录导入批次</span>
         </div>
       </div>
       <div class="dialog-footer">
@@ -1310,6 +1422,8 @@
     const inventoryRows = [
       {
         warehouseName: "万邑通澳洲仓",
+        levelName: "分销_AU",
+        levelPath: "公共 / 万邑通澳洲仓 / 分销_AU",
         sku: "S810-ST-PK-UK-170-N",
         skuName: "Shokz OpenRun Pro 英国170客户包装 BK",
         productType: "整机",
@@ -1326,6 +1440,8 @@
       },
       {
         warehouseName: "万邑通德国仓",
+        levelName: "Shopify_DE",
+        levelPath: "公共 / 万邑通德国仓 / Shopify_DE",
         sku: "S820BK",
         skuName: "Shokz OpenFit 2 德国通用包装 BK",
         productType: "整机",
@@ -1342,6 +1458,8 @@
       },
       {
         warehouseName: "筋斗云DWA仓",
+        levelName: "韩国直营网店",
+        levelPath: "公共 / 筋斗云DWA仓 / 韩国直营网店",
         sku: "C610-AN-BK-KR-000",
         skuName: "Shokz OpenMeet 韩国通用包装 BK",
         productType: "整机",
@@ -1356,6 +1474,8 @@
       },
       {
         warehouseName: "筋斗云GLC仓",
+        levelName: "日本直营网店",
+        levelPath: "公共 / 筋斗云GLC仓 / 日本直营网店",
         sku: "S611BK",
         skuName: "Shokz OpenSwim Pro 日本包装 BK",
         productType: "整机",
@@ -1370,6 +1490,8 @@
       },
       {
         warehouseName: "法国谷仓售后仓",
+        levelName: "售后_FR",
+        levelPath: "公共 / 法国谷仓售后仓 / 售后_FR",
         sku: "S900GY",
         skuName: "Shokz OpenDots ONE 澳洲包装 GY",
         productType: "整机",
@@ -1386,6 +1508,8 @@
       },
       {
         warehouseName: "新加坡待维修仓",
+        levelName: "售后_SG",
+        levelPath: "公共 / 新加坡待维修仓 / 售后_SG",
         sku: "T910-ST-BK-UK",
         skuName: "Shokz OpenComm 2 英国包装 BK",
         productType: "整机",
@@ -1402,6 +1526,27 @@
 
     let currentRows = [];
     let selectedRow = null;
+    let selectedLevelNodeId = "all";
+
+    const levelNodes = [
+      { id: "all", label: "全部", type: "all", depth: 0 },
+      { id: "public", label: "公共", type: "group", depth: 0 },
+      { id: "au", label: "万邑通澳洲仓", type: "warehouse", depth: 1, warehouseName: "万邑通澳洲仓" },
+      { id: "au-public", label: "万邑通澳洲仓_公共", type: "level", depth: 2, warehouseName: "万邑通澳洲仓", levelName: "万邑通澳洲仓_公共" },
+      { id: "au-distribution", label: "分销_AU", type: "level", depth: 2, warehouseName: "万邑通澳洲仓", levelName: "分销_AU" },
+      { id: "au-after", label: "售后_AU", type: "level", depth: 2, warehouseName: "万邑通澳洲仓", levelName: "售后_AU" },
+      { id: "de", label: "万邑通德国仓", type: "warehouse", depth: 1, warehouseName: "万邑通德国仓" },
+      { id: "de-public", label: "万邑通德国仓_公共", type: "level", depth: 2, warehouseName: "万邑通德国仓", levelName: "万邑通德国仓_公共" },
+      { id: "de-shopify", label: "Shopify_DE", type: "level", depth: 2, warehouseName: "万邑通德国仓", levelName: "Shopify_DE" },
+      { id: "kr", label: "筋斗云DWA仓", type: "warehouse", depth: 1, warehouseName: "筋斗云DWA仓" },
+      { id: "kr-direct", label: "韩国直营网店", type: "level", depth: 2, warehouseName: "筋斗云DWA仓", levelName: "韩国直营网店" },
+      { id: "jp", label: "筋斗云GLC仓", type: "warehouse", depth: 1, warehouseName: "筋斗云GLC仓" },
+      { id: "jp-direct", label: "日本直营网店", type: "level", depth: 2, warehouseName: "筋斗云GLC仓", levelName: "日本直营网店" },
+      { id: "fr", label: "法国谷仓售后仓", type: "warehouse", depth: 1, warehouseName: "法国谷仓售后仓" },
+      { id: "fr-after", label: "售后_FR", type: "level", depth: 2, warehouseName: "法国谷仓售后仓", levelName: "售后_FR" },
+      { id: "sg", label: "新加坡待维修仓", type: "warehouse", depth: 1, warehouseName: "新加坡待维修仓" },
+      { id: "sg-after", label: "售后_SG", type: "level", depth: 2, warehouseName: "新加坡待维修仓", levelName: "售后_SG" }
+    ];
 
     function numberText(value) {
       if (value === null || value === undefined) return "-";
@@ -1446,6 +1591,51 @@
       return 0;
     }
 
+    function getActiveLevelNode() {
+      return levelNodes.find(node => node.id === selectedLevelNodeId) || levelNodes[0];
+    }
+
+    function rowMatchesLevel(row, node = getActiveLevelNode()) {
+      if (node.type === "all" || node.type === "group") return true;
+      if (node.type === "warehouse") return row.warehouseName === node.warehouseName;
+      return row.warehouseName === node.warehouseName && row.levelName === node.levelName;
+    }
+
+    function getLevelRiskCount(node) {
+      return inventoryRows.filter(row => rowMatchesLevel(row, node) && ["HIGH", "LOW", "NO_THRESHOLD"].includes(getStatus(row))).length;
+    }
+
+    function renderLevelTree() {
+      const keyword = document.getElementById("levelTreeSearch").value.trim().toLowerCase();
+      const tree = document.getElementById("levelTree");
+      tree.innerHTML = levelNodes
+        .filter(node => !keyword || node.label.toLowerCase().includes(keyword) || (node.warehouseName || "").toLowerCase().includes(keyword))
+        .map(node => {
+          const riskCount = getLevelRiskCount(node);
+          const activeClass = node.id === selectedLevelNodeId ? " active" : "";
+          const caret = node.type === "level" ? "" : "▾";
+          return `
+            <div class="tree-row level-${node.depth}${activeClass}" onclick="selectLevelNode('${node.id}')">
+              <span class="tree-caret">${caret}</span>
+              <span class="tree-label">${node.label}</span>
+              ${riskCount ? `<span class="tree-badge">${riskCount}</span>` : ""}
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function updateCurrentScope() {
+      // Scope is expressed by the active tree node; no inline scope banner is rendered.
+    }
+
+    function selectLevelNode(id) {
+      selectedLevelNodeId = id;
+      renderLevelTree();
+      updateCurrentScope();
+      renderTable();
+    }
+
     function getSelectedStatuses() {
       return Array.from(document.querySelectorAll("#statusFilterPanel input:checked")).map(item => item.value);
     }
@@ -1475,18 +1665,17 @@
     });
 
     function filterRows() {
-      const warehouse = document.getElementById("warehouseFilter").value;
       const productType = document.getElementById("productTypeFilter").value;
       const skuInput = document.getElementById("skuInput").value.trim();
       const codeMode = document.getElementById("codeMode").value;
       const statuses = getSelectedStatuses();
 
       return inventoryRows.filter(row => {
-        const matchWarehouse = !warehouse || row.warehouseName === warehouse;
+        const matchLevel = rowMatchesLevel(row);
         const matchProductType = !productType || row.productType === productType;
         const matchSku = !skuInput || (codeMode === "exact" ? row.sku === skuInput : row.sku.includes(skuInput));
         const matchStatus = statuses.length === 0 || statuses.includes(getStatus(row));
-        return matchWarehouse && matchProductType && matchSku && matchStatus;
+        return matchLevel && matchProductType && matchSku && matchStatus;
       });
     }
 
@@ -1494,7 +1683,7 @@
       currentRows = filterRows();
       const body = document.getElementById("inventoryBody");
       if (currentRows.length === 0) {
-        body.innerHTML = '<tr><td colspan="16"><div class="empty">暂无符合条件的 SKU 库存水位数据</div></td></tr>';
+        body.innerHTML = '<tr><td colspan="17"><div class="empty">暂无符合条件的 SKU 库存水位数据</div></td></tr>';
       } else {
         body.innerHTML = currentRows.map((row, index) => {
           const status = getStatus(row);
@@ -1504,6 +1693,7 @@
           return `
             <tr class="${meta.rowCls}">
               <td>${row.warehouseName}</td>
+              <td>${row.levelName}</td>
               <td>${row.sku}</td>
               <td>${row.skuName}</td>
               <td>${row.productType}</td>
@@ -1541,7 +1731,6 @@
     }
 
     function resetSearch() {
-      document.getElementById("warehouseFilter").value = "";
       document.getElementById("productTypeFilter").value = "";
       document.getElementById("codeMode").value = "exact";
       document.getElementById("skuInput").value = "";
@@ -1636,6 +1825,7 @@
 
     function fillThresholdForm(row) {
       document.getElementById("thresholdWh").value = row.warehouseName;
+      document.getElementById("thresholdLevel").value = row.levelName;
       document.getElementById("thresholdSku").value = row.sku;
       document.getElementById("thresholdTotal").value = getTotalStock(row);
       document.getElementById("thresholdOldLow").value = row.lowThreshold === null ? "" : row.lowThreshold;
@@ -1654,6 +1844,7 @@
       selectedRow.lowThreshold = lowValue;
       selectedRow.highThreshold = highValue;
       closeDialog("thresholdDialog");
+      renderLevelTree();
       renderTable();
       showHint("阈值已更新，水位状态已重新计算");
     }
@@ -1761,6 +1952,8 @@
     }
 
     initHeaderTooltips();
+    renderLevelTree();
+    updateCurrentScope();
     renderTable();
   </script>
 </body>
