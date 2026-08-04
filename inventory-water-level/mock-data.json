@@ -1,6 +1,6 @@
 {
   "featureName": "inventory-water-level",
-  "pageTitle": "库存阈值",
+  "pageTitle": "库存水位",
   "summary": {
     "totalWholeMachineSku": 6,
     "highWater": 1,
