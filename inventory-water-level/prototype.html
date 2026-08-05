@@ -186,7 +186,7 @@
     }
 
     .control.status {
-      width: 128px;
+      width: 168px;
     }
 
     .input-control {
@@ -196,45 +196,116 @@
 
     .multi-select {
       position: relative;
-      width: 128px;
+      width: 168px;
     }
 
     .multi-select-trigger {
       position: relative;
       width: 100%;
-      display: block;
-      overflow: hidden;
-      padding-right: 20px;
-      text-align: left;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      min-height: 28px;
+      height: auto;
+      display: flex;
+      align-items: center;
+      padding: 2px 24px 2px 4px;
       cursor: pointer;
+    }
+
+    .multi-select.open .multi-select-trigger,
+    .multi-select-trigger:hover {
+      border-color: var(--primary);
     }
 
     .multi-select-trigger::after {
       position: absolute;
-      top: 8px;
+      top: 50%;
       right: 8px;
       width: 0;
       height: 0;
       content: "";
-      border-top: 4px solid var(--secondary);
+      border-top: 5px solid var(--secondary);
       border-right: 4px solid transparent;
       border-left: 4px solid transparent;
+      transform: translateY(-35%);
+    }
+
+    .multi-select.open .multi-select-trigger::after {
+      border-top: 0;
+      border-bottom: 5px solid var(--secondary);
+      transform: translateY(-65%);
+    }
+
+    .multi-select-tags {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .multi-select-placeholder {
+      padding-left: 4px;
+      color: var(--placeholder);
+      line-height: 22px;
+      white-space: nowrap;
+    }
+
+    .multi-select-tag {
+      max-width: 92px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 0 4px 0 6px;
+      color: var(--primary);
+      background: var(--primary-weak);
+      border: 1px solid var(--primary-border);
+      border-radius: 3px;
+      line-height: 18px;
+      white-space: nowrap;
+    }
+
+    .multi-select-tag.count {
+      max-width: none;
+      padding: 0 6px;
+      font-weight: 600;
+    }
+
+    .multi-select-tag-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .multi-select-tag-close {
+      width: 14px;
+      height: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      border-radius: 50%;
+      font-size: 12px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .multi-select-tag-close:hover {
+      color: #fff;
+      background: var(--primary);
     }
 
     .multi-select-panel {
       position: absolute;
-      top: 26px;
+      top: calc(100% + 4px);
       left: 0;
       z-index: 20;
       display: none;
-      min-width: 150px;
-      padding: 6px 0;
+      min-width: 100%;
+      padding: 4px 0;
       background: #fff;
       border: 1px solid var(--border-dark);
-      border-radius: 3px;
-      box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
     }
 
     .multi-select.open .multi-select-panel {
@@ -242,11 +313,12 @@
     }
 
     .multi-option {
-      height: 26px;
+      min-height: 32px;
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 0 10px;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 12px;
       color: var(--regular);
       white-space: nowrap;
       cursor: pointer;
@@ -254,6 +326,19 @@
 
     .multi-option:hover {
       background: #f5f7fa;
+    }
+
+    .multi-option.selected {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .multi-option-check {
+      width: 14px;
+      color: var(--primary);
+      font-size: 14px;
+      line-height: 1;
+      text-align: center;
     }
 
     .btn {
@@ -1080,13 +1165,12 @@
         </select>
         <input id="skuInput" class="input-control" placeholder="双击批量查询，默认查全部 SKU" ondblclick="showHint('已打开批量 SKU 查询输入框，此处为原型提示')" />
         <div id="statusMultiSelect" class="multi-select">
-          <button id="statusFilterLabel" type="button" class="control status multi-select-trigger" onclick="toggleStatusPanel(event)">水位状态</button>
-          <div id="statusFilterPanel" class="multi-select-panel">
-            <label class="multi-option"><input type="checkbox" value="HIGH" onchange="handleStatusChange()" />库存过高</label>
-            <label class="multi-option"><input type="checkbox" value="LOW" onchange="handleStatusChange()" />库存偏低</label>
-            <label class="multi-option"><input type="checkbox" value="NORMAL" onchange="handleStatusChange()" />正常</label>
-            <label class="multi-option"><input type="checkbox" value="NO_THRESHOLD" onchange="handleStatusChange()" />未维护阈值</label>
+          <div class="control status multi-select-trigger" onclick="toggleStatusPanel(event)">
+            <div id="statusTags" class="multi-select-tags">
+              <span class="multi-select-placeholder">水位状态</span>
+            </div>
           </div>
+          <div id="statusFilterPanel" class="multi-select-panel"></div>
         </div>
         <button class="btn primary" onclick="searchTable()">搜索</button>
         <button class="btn" onclick="resetSearch()">重置</button>
@@ -1791,16 +1875,48 @@
       renderTable();
     }
 
+    const STATUS_OPTIONS = [
+      { value: "HIGH", label: "库存过高" },
+      { value: "LOW", label: "库存偏低" },
+      { value: "NORMAL", label: "正常" },
+      { value: "NO_THRESHOLD", label: "未维护阈值" }
+    ];
+    let selectedStatuses = [];
+
     function getSelectedStatuses() {
-      return Array.from(document.querySelectorAll("#statusFilterPanel input:checked")).map(item => item.value);
+      return selectedStatuses.slice();
+    }
+
+    function renderStatusOptions() {
+      document.getElementById("statusFilterPanel").innerHTML = STATUS_OPTIONS.map(option => {
+        const selected = selectedStatuses.includes(option.value);
+        return `
+          <div class="multi-option ${selected ? "selected" : ""}" onclick="toggleStatusOption('${option.value}', event)">
+            <span>${option.label}</span>
+            <span class="multi-option-check">${selected ? "✓" : ""}</span>
+          </div>
+        `;
+      }).join("");
     }
 
     function syncStatusFilterLabel() {
-      const statuses = getSelectedStatuses();
-      const label = statuses.length ? statuses.map(status => statusMeta(status).label).join("、") : "水位状态";
-      const trigger = document.getElementById("statusFilterLabel");
-      trigger.innerText = label;
-      trigger.title = label;
+      const tags = document.getElementById("statusTags");
+      if (!selectedStatuses.length) {
+        tags.innerHTML = '<span class="multi-select-placeholder">水位状态</span>';
+        return;
+      }
+      const first = statusMeta(selectedStatuses[0]);
+      const rest = selectedStatuses.length - 1;
+      let html = `
+        <span class="multi-select-tag">
+          <span class="multi-select-tag-text">${first.label}</span>
+          <span class="multi-select-tag-close" onclick="removeStatus('${selectedStatuses[0]}', event)">×</span>
+        </span>
+      `;
+      if (rest > 0) {
+        html += `<span class="multi-select-tag count">+${rest}</span>`;
+      }
+      tags.innerHTML = html;
     }
 
     function toggleStatusPanel(event) {
@@ -1808,7 +1924,20 @@
       document.getElementById("statusMultiSelect").classList.toggle("open");
     }
 
-    function handleStatusChange() {
+    function toggleStatusOption(value, event) {
+      event.stopPropagation();
+      const index = selectedStatuses.indexOf(value);
+      if (index >= 0) selectedStatuses.splice(index, 1);
+      else selectedStatuses.push(value);
+      renderStatusOptions();
+      syncStatusFilterLabel();
+      renderTable();
+    }
+
+    function removeStatus(value, event) {
+      event.stopPropagation();
+      selectedStatuses = selectedStatuses.filter(status => status !== value);
+      renderStatusOptions();
       syncStatusFilterLabel();
       renderTable();
     }
@@ -1893,7 +2022,8 @@
       document.getElementById("productTypeFilter").value = "";
       document.getElementById("codeMode").value = "exact";
       document.getElementById("skuInput").value = "";
-      document.querySelectorAll("#statusFilterPanel input:checked").forEach(item => (item.checked = false));
+      selectedStatuses = [];
+      renderStatusOptions();
       syncStatusFilterLabel();
       renderTable();
       showHint("查询条件已重置");
@@ -2129,6 +2259,8 @@
     }
 
     initHeaderTooltips();
+    renderStatusOptions();
+    syncStatusFilterLabel();
     renderLevelTree();
     updateCurrentScope();
     renderTable();
