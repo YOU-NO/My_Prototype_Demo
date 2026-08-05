@@ -887,6 +887,101 @@
       border-radius: 3px;
     }
 
+    .dialog.import {
+      width: 600px;
+    }
+
+    .import-form {
+      padding: 8px 8px 4px;
+    }
+
+    .import-form-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .import-label {
+      width: 100px;
+      flex-shrink: 0;
+      padding-top: 2px;
+      color: var(--text);
+      line-height: 22px;
+      text-align: right;
+    }
+
+    .import-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .import-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--primary);
+      line-height: 22px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .import-link svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    .import-upload {
+      width: 80%;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--regular);
+      background: #fff;
+      border: 1px dashed #dcdfe6;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .import-upload:hover {
+      border-color: var(--primary);
+    }
+
+    .import-upload-icon {
+      width: 67px;
+      height: 50px;
+      margin-bottom: 12px;
+      color: #c0c4cc;
+    }
+
+    .import-upload-icon svg {
+      width: 67px;
+      height: 50px;
+      fill: currentColor;
+    }
+
+    .import-upload-text {
+      color: var(--regular);
+      font-size: 14px;
+      line-height: 22px;
+    }
+
+    .import-upload-text em {
+      color: var(--primary);
+      font-style: normal;
+    }
+
+    .import-tip {
+      margin-top: 8px;
+      color: var(--secondary);
+      font-size: 12px;
+      line-height: 18px;
+    }
+
     .empty {
       padding: 18px 0;
       color: var(--secondary);
@@ -1346,23 +1441,35 @@
   </div>
 
   <div id="importDialog" class="overlay">
-    <div class="dialog">
+    <div class="dialog import">
       <div class="dialog-header">
-        <span>导入整机 SKU 水位阈值</span>
+        <span>导入阈值</span>
         <button class="close" onclick="closeDialog('importDialog')">×</button>
       </div>
       <div class="dialog-body">
-        <div class="alert warning">模板字段：仓库、库存层级、SKU、产品分类、低水位阈值、高水位阈值、备注。导入时仅允许产品分类为“整机”的 SKU。</div>
-        <button class="btn light" onclick="showHint('整机水位阈值模板已下载')">下载模板</button>
-        <button class="btn" onclick="showHint('当前无失败数据')">下载失败数据</button>
-        <div class="upload">
-          <strong>点击或拖拽 Excel 文件上传</strong>
-          <span style="margin-top: 6px;">系统按仓库 + 库存层级 + SKU 覆盖最新阈值，并记录导入批次</span>
+        <div class="import-form">
+          <div class="import-form-item">
+            <div class="import-label">模板下载 :</div>
+            <div class="import-content">
+              <a class="import-link" onclick="downloadImportTemplate()">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20h14v-2H5v2zm7-2l5-5h-3V4h-4v9H7l5 5z" /></svg>
+                点击下载
+              </a>
+            </div>
+          </div>
+          <div class="import-form-item">
+            <div class="import-label">文件上传 :</div>
+            <div class="import-content">
+              <div class="import-upload" onclick="finishImport()">
+                <div class="import-upload-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" /></svg>
+                </div>
+                <div class="import-upload-text">将文件拖到此处，或<em>点击上传</em></div>
+              </div>
+              <div class="import-tip">请上传 .xls , .xlsx 标准格式文件，文件最大为 5M</div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="dialog-footer">
-        <button class="btn" onclick="closeDialog('importDialog')">取消</button>
-        <button class="btn primary" onclick="finishImport()">确认导入</button>
       </div>
     </div>
   </div>
@@ -1950,9 +2057,13 @@
       showHint("已刷新库存、在途和备货未发货数据");
     }
 
+    function downloadImportTemplate() {
+      showToast("水位阈值模板已下载");
+    }
+
     function finishImport() {
       closeDialog("importDialog");
-      showHint("导入完成：已更新 12 条整机 SKU 水位阈值，0 条失败");
+      showToast("导入阈值成功！");
     }
 
     function openDialog(id) {
