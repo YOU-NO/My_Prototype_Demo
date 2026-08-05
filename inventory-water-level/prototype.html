@@ -450,6 +450,28 @@
       pointer-events: none;
     }
 
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      z-index: 2000;
+      display: none;
+      transform: translateX(-50%);
+      padding: 10px 16px;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 4px;
+      font-size: 13px;
+      line-height: 18px;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+      pointer-events: none;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
     tbody tr:hover {
       background: #f9fbff;
     }
@@ -1367,7 +1389,7 @@
         </table>
       </div>
       <div class="dialog-footer">
-        <button class="btn primary" onclick="closeDialog('stockupDialog')">知道了</button>
+        <button class="btn primary" onclick="closeDialog('stockupDialog')">确定</button>
       </div>
     </div>
   </div>
@@ -1423,6 +1445,7 @@
   </div>
 
   <div id="floatingTooltip" class="floating-tooltip"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
     const inventoryRows = [
@@ -1864,8 +1887,11 @@
       const lowValue = Number(document.getElementById("thresholdLow").value);
       const highValue = Number(document.getElementById("thresholdHigh").value);
       if (!selectedRow) return;
+      if (lowValue > highValue) {
+        showToast("低水位阈值应小于高水位阈值");
+        return;
+      }
       if (!lowValue || !highValue || lowValue <= 0 || highValue <= 0 || lowValue >= highValue) {
-        showHint("保存失败：低水位阈值和高水位阈值必须为正整数，且低水位阈值小于高水位阈值");
         return;
       }
       selectedRow.lowThreshold = lowValue;
@@ -1941,6 +1967,19 @@
       closeDialog(from);
       if (selectedRow) fillThresholdForm(selectedRow);
       openDialog(to);
+    }
+
+    let toastTimer = null;
+
+    function showToast(message, duration = 2000) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+        toastTimer = null;
+      }, duration);
     }
 
     function showHint(message) {
