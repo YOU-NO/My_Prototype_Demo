@@ -1,0 +1,426 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>方案整体设计</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet"/>
+    <link href="data/styles.css" type="text/css" rel="stylesheet"/>
+    <link href="files/方案整体设计/styles.css" type="text/css" rel="stylesheet"/>
+    <script src="resources/scripts/jquery-3.2.1.min.js"></script>
+    <script src="resources/scripts/axure/axQuery.js"></script>
+    <script src="resources/scripts/axure/globals.js"></script>
+    <script src="resources/scripts/axutils.js"></script>
+    <script src="resources/scripts/axure/annotation.js"></script>
+    <script src="resources/scripts/axure/axQuery.std.js"></script>
+    <script src="resources/scripts/axure/doc.js"></script>
+    <script src="resources/scripts/messagecenter.js"></script>
+    <script src="resources/scripts/axure/events.js"></script>
+    <script src="resources/scripts/axure/recording.js"></script>
+    <script src="resources/scripts/axure/action.js"></script>
+    <script src="resources/scripts/axure/expr.js"></script>
+    <script src="resources/scripts/axure/geometry.js"></script>
+    <script src="resources/scripts/axure/flyout.js"></script>
+    <script src="resources/scripts/axure/model.js"></script>
+    <script src="resources/scripts/axure/repeater.js"></script>
+    <script src="resources/scripts/axure/sto.js"></script>
+    <script src="resources/scripts/axure/utils.temp.js"></script>
+    <script src="resources/scripts/axure/variables.js"></script>
+    <script src="resources/scripts/axure/drag.js"></script>
+    <script src="resources/scripts/axure/move.js"></script>
+    <script src="resources/scripts/axure/visibility.js"></script>
+    <script src="resources/scripts/axure/style.js"></script>
+    <script src="resources/scripts/axure/adaptive.js"></script>
+    <script src="resources/scripts/axure/tree.js"></script>
+    <script src="resources/scripts/axure/init.temp.js"></script>
+    <script src="resources/scripts/axure/legacy.js"></script>
+    <script src="resources/scripts/axure/viewer.js"></script>
+    <script src="resources/scripts/axure/math.js"></script>
+    <script src="resources/scripts/axure/jquery.nicescroll.min.js"></script>
+    <script src="data/document.js"></script>
+    <script src="files/方案整体设计/data.js"></script>
+    <script type="text/javascript">
+      $axure.utils.getTransparentGifPath = function() { return 'resources/images/transparent.gif'; };
+      $axure.utils.getOtherPath = function() { return 'resources/Other.html'; };
+      $axure.utils.getReloadPath = function() { return 'resources/reload.html'; };
+    </script>
+  </head>
+  <body>
+    <div id="base" class="">
+
+      <!-- Unnamed (矩形) -->
+      <div id="u2" class="ax_default _文本">
+        <div id="u2_div" class=""></div>
+        <div id="u2_text" class="text ">
+          <p><span>围绕多平台仓场景，在 OMS 中建设统一的平台仓管理能力，形成“报告接入—规则解析—数据标准化—单据生成—库存盘点—差异识别—结果沉淀—单据生成”的完整业务闭环。</span></p><p><span>方案设计兼顾当前业务落地与后续扩展性，既满足 Amazon 等已明确平台仓场景的快速接入，也为 Lazada、Shopee、Naver 及后续新增平台预留统一能力框架。</span></p><p><span><br></span></p><p><span>本方案整体设计目标包括：</span></p><p><span>a. 平台报告接入能力</span></p><p><span>&nbsp;&nbsp;&nbsp; 支持多平台仓报告的接入与展示。</span></p><p><span>b. 统一解析能力</span></p><p><span>&nbsp;&nbsp;&nbsp; 通过配置化方式实现字段映射、站点识别、场景分类、业务类归类及单据生成规则维护。</span></p><p><span>c. 统一盘点能力</span></p><p><span>&nbsp;&nbsp;&nbsp; 支持系统库存与平台流水盘点、月度货品数量盘点等场景，提升库存核对效率与准确率。</span></p><p><span>d. 统一结果管理能力</span></p><p><span>&nbsp;&nbsp;&nbsp; 将盘点结果沉淀为可查询、可追踪、可关闭、可生成单据的结果表，形成后续业务处理闭环。</span></p><p><span>e. 统一扩展能力</span></p><p><span>&nbsp;&nbsp;&nbsp; 为新平台、新站点、新仓库及新业务规则的接入提供标准化扩展基础，减少重复开发。</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u3" class="ax_default _标题_1">
+        <div id="u3_div" class=""></div>
+        <div id="u3_text" class="text ">
+          <p><span>1. 设计目标</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u4" class="ax_default _标题_1">
+        <div id="u4_div" class=""></div>
+        <div id="u4_text" class="text ">
+          <p><span>2. 整体功能架构</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u5" class="ax_default _文本">
+        <div id="u5_div" class=""></div>
+        <div id="u5_text" class="text ">
+          <p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">本方案整体划分为 报告解析侧能力 与 仓储侧能力 两大部分。</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;"><br></span></p><p><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;">2.1. 报告拉取及解析侧能力</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">财务侧主要面向平台仓报告管理与解析规则配置，包括：</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;"><br></span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">1）仓库报告管理</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">用于展示各平台仓报告、解析结果、单据生成情况等信息，每个平台仓报告一份数据，支持查看平台仓报告明细、筛选异常记录、识别系统货品匹配情况、查看业务分类结果及单据生成情况。</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">2）报告解析配置</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">用于维护各平台仓报告的解析规则，包括站点匹配逻辑、平台货品字段、平台日期字段、平台数量字段、状态字段、分类规则、原始表主键、汇总方式及单据生成规则等内容。</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">该模块是整套方案的规则基础，也是后续平台扩展的核心支撑能力。<br>3)&nbsp; 仓库报告单据生成</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">用于将解析后的仓库报告按照配置表中配置的规则进行单据生成，并将生成后的单据单号回写到仓库报告中</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;"><br></span></p><p><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;">2.2.&nbsp; 仓储侧能力</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">仓储侧主要面向库存盘点与结果处理，包括：</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;"><br></span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">1）系统库存与流水盘点</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">用于按平台、仓库、月份及盘点维度，对平台流水数据与系统库存数据进行自动对比，识别差异并输出盘点明细。</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">2）月度货品数量盘点</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">用于按月对平台仓货品数量进行汇总盘点，当前优先支持亚马逊平台仓，后续其他平台的月度货品数量盘点需单独开发。</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">3）盘点结果表管理</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">用于统一沉淀各类盘点任务生成的结果数据，支持按平台、仓库、月份、类型和状态进行查询，并执行查看、关闭、单据生成等操作。</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">4）盘点结果表单据生成</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">用于查看盘点结果明细，并根据结果生成业务单据。支持按天或按月等条件生成单据，同时支持删除单据和关闭盘点结果。</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u6" class="ax_default _标题_1">
+        <div id="u6_div" class=""></div>
+        <div id="u6_text" class="text ">
+          <p><span>3. 整体业务流程设计</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u7" class="ax_default flow_shape">
+        <div id="u7_div" class=""></div>
+        <div id="u7_text" class="text ">
+          <p><span>平台</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u8" class="ax_default flow_shape">
+        <div id="u8_div" class=""></div>
+        <div id="u8_text" class="text ">
+          <p><span>报告拉取及解析</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u9" class="ax_default flow_shape">
+        <div id="u9_div" class=""></div>
+        <div id="u9_text" class="text ">
+          <p><span>EVA单据</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u10" class="ax_default flow_shape">
+        <div id="u10_div" class=""></div>
+        <div id="u10_text" class="text ">
+          <p><span>盘点</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u11" class="ax_default box_1">
+        <div id="u11_div" class=""></div>
+        <div id="u11_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u12" class="ax_default box_1">
+        <div id="u12_div" class=""></div>
+        <div id="u12_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u13" class="ax_default box_1">
+        <div id="u13_div" class=""></div>
+        <div id="u13_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u14" class="ax_default box_1">
+        <div id="u14_div" class=""></div>
+        <div id="u14_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u15" class="ax_default flow_shape">
+        <div id="u15_div" class=""></div>
+        <div id="u15_text" class="text ">
+          <p><span>Amazon</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u16" class="ax_default flow_shape">
+        <div id="u16_div" class=""></div>
+        <div id="u16_text" class="text ">
+          <p><span>Coupong</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u17" class="ax_default flow_shape">
+        <div id="u17_div" class=""></div>
+        <div id="u17_text" class="text ">
+          <p><span>Naver</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u18" class="ax_default flow_shape">
+        <div id="u18_div" class=""></div>
+        <div id="u18_text" class="text ">
+          <p><span>Lazada</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u19" class="ax_default flow_shape">
+        <div id="u19_div" class=""></div>
+        <div id="u19_text" class="text ">
+          <p><span>Shopee</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u20" class="ax_default flow_shape">
+        <div id="u20_div" class=""></div>
+        <div id="u20_text" class="text ">
+          <p><span>库存明细报告</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u21" class="ax_default flow_shape">
+        <div id="u21_div" class=""></div>
+        <div id="u21_text" class="text ">
+          <p><span>库存汇总报告</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (形状) -->
+      <div id="u22" class="ax_default flow_shape">
+        <img id="u22_img" class="img " src="images/方案整体设计/u22.svg"/>
+        <div id="u22_text" class="text ">
+          <p><span>规则匹配</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (连接符) -->
+      <div id="u23" class="ax_default _连接符">
+        <img id="u23_seg0" class="img " src="images/方案整体设计/u23_seg0.svg" alt="u23_seg0"/>
+        <img id="u23_seg1" class="img " src="images/方案整体设计/u23_seg1.svg" alt="u23_seg1"/>
+        <img id="u23_seg2" class="img " src="images/方案整体设计/u23_seg2.svg" alt="u23_seg2"/>
+        <div id="u23_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (连接符) -->
+      <div id="u24" class="ax_default _连接符">
+        <img id="u24_seg0" class="img " src="images/方案整体设计/u24_seg0.svg" alt="u24_seg0"/>
+        <img id="u24_seg1" class="img " src="images/方案整体设计/u24_seg1.svg" alt="u24_seg1"/>
+        <img id="u24_seg2" class="img " src="images/方案整体设计/u24_seg2.svg" alt="u24_seg2"/>
+        <div id="u24_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u25" class="ax_default flow_shape">
+        <div id="u25_div" class=""></div>
+        <div id="u25_text" class="text ">
+          <p><span>解析后更新报告</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (连接符) -->
+      <div id="u26" class="ax_default _连接符">
+        <img id="u26_seg0" class="img " src="images/方案整体设计/u26_seg0.svg" alt="u26_seg0"/>
+        <img id="u26_seg1" class="img " src="images/方案整体设计/u26_seg1.svg" alt="u26_seg1"/>
+        <div id="u26_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (菱形) -->
+      <div id="u27" class="ax_default flow_shape">
+        <img id="u27_img" class="img " src="images/方案整体设计/u27.svg"/>
+        <div id="u27_text" class="text ">
+          <p><span>场景是否需要生成单据？是否按天汇总生成？</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (连接符) -->
+      <div id="u28" class="ax_default _连接符">
+        <img id="u28_seg0" class="img " src="images/方案整体设计/u28_seg0.svg" alt="u28_seg0"/>
+        <img id="u28_seg1" class="img " src="images/方案整体设计/u28_seg1.svg" alt="u28_seg1"/>
+        <div id="u28_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (连接符) -->
+      <div id="u29" class="ax_default _连接符">
+        <img id="u29_seg0" class="img " src="images/方案整体设计/u29_seg0.svg" alt="u29_seg0"/>
+        <img id="u29_seg1" class="img " src="images/方案整体设计/u29_seg1.svg" alt="u29_seg1"/>
+        <img id="u29_seg2" class="img " src="images/方案整体设计/u29_seg2.svg" alt="u29_seg2"/>
+        <img id="u29_seg3" class="img " src="images/方案整体设计/u29_seg3.svg" alt="u29_seg3"/>
+        <div id="u29_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u30" class="ax_default flow_shape">
+        <div id="u30_div" class=""></div>
+        <div id="u30_text" class="text ">
+          <p><span>销售出库单<br>退货入库单</span></p><p><span>收货列表<br>其他出库单<br>其他入库单</span></p><p><span>...</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u31" class="ax_default flow_shape">
+        <div id="u31_div" class=""></div>
+        <div id="u31_text" class="text ">
+          <p><span>拉取这两部分进行流水对比</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (连接符) -->
+      <div id="u32" class="ax_default _连接符">
+        <img id="u32_seg0" class="img " src="images/方案整体设计/u32_seg0.svg" alt="u32_seg0"/>
+        <img id="u32_seg1" class="img " src="images/方案整体设计/u32_seg1.svg" alt="u32_seg1"/>
+        <img id="u32_seg2" class="img " src="images/方案整体设计/u32_seg2.svg" alt="u32_seg2"/>
+        <img id="u32_seg3" class="img " src="images/方案整体设计/u32_seg3.svg" alt="u32_seg3"/>
+        <div id="u32_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (连接符) -->
+      <div id="u33" class="ax_default _连接符">
+        <img id="u33_seg0" class="img " src="images/方案整体设计/u33_seg0.svg" alt="u33_seg0"/>
+        <img id="u33_seg1" class="img " src="images/方案整体设计/u33_seg1.svg" alt="u33_seg1"/>
+        <img id="u33_seg2" class="img " src="images/方案整体设计/u33_seg2.svg" alt="u33_seg2"/>
+        <div id="u33_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u34" class="ax_default flow_shape">
+        <div id="u34_div" class=""></div>
+        <div id="u34_text" class="text ">
+          <p><span>盘点结果表</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u35" class="ax_default flow_shape">
+        <div id="u35_div" class=""></div>
+        <div id="u35_text" class="text ">
+          <p><span>拉取修正后的这两部分进行月末库存流水对比</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (连接符) -->
+      <div id="u36" class="ax_default _连接符">
+        <img id="u36_seg0" class="img " src="images/方案整体设计/u36_seg0.svg" alt="u36_seg0"/>
+        <img id="u36_seg1" class="img " src="images/方案整体设计/u36_seg1.svg" alt="u36_seg1"/>
+        <img id="u36_seg2" class="img " src="images/方案整体设计/u36_seg2.svg" alt="u36_seg2"/>
+        <img id="u36_seg3" class="img " src="images/方案整体设计/u36_seg3.svg" alt="u36_seg3"/>
+        <div id="u36_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (连接符) -->
+      <div id="u37" class="ax_default _连接符">
+        <img id="u37_seg0" class="img " src="images/方案整体设计/u37_seg0.svg" alt="u37_seg0"/>
+        <img id="u37_seg1" class="img " src="images/方案整体设计/u37_seg1.svg" alt="u37_seg1"/>
+        <img id="u37_seg2" class="img " src="images/方案整体设计/u37_seg2.svg" alt="u37_seg2"/>
+        <div id="u37_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (连接符) -->
+      <div id="u38" class="ax_default _连接符">
+        <img id="u38_seg0" class="img " src="images/方案整体设计/u38_seg0.svg" alt="u38_seg0"/>
+        <img id="u38_seg1" class="img " src="images/方案整体设计/u38_seg1.svg" alt="u38_seg1"/>
+        <img id="u38_seg2" class="img " src="images/方案整体设计/u38_seg2.svg" alt="u38_seg2"/>
+        <img id="u38_seg3" class="img " src="images/方案整体设计/u38_seg3.svg" alt="u38_seg3"/>
+        <div id="u38_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (连接符) -->
+      <div id="u39" class="ax_default _连接符">
+        <img id="u39_seg0" class="img " src="images/方案整体设计/u39_seg0.svg" alt="u39_seg0"/>
+        <img id="u39_seg1" class="img " src="images/方案整体设计/u39_seg1.svg" alt="u39_seg1"/>
+        <img id="u39_seg2" class="img " src="images/方案整体设计/u39_seg2.svg" alt="u39_seg2"/>
+        <img id="u39_seg3" class="img " src="images/方案整体设计/u39_seg3.svg" alt="u39_seg3"/>
+        <img id="u39_seg4" class="img " src="images/方案整体设计/u39_seg4.svg" alt="u39_seg4"/>
+        <div id="u39_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u40" class="ax_default flow_shape">
+        <div id="u40_div" class=""></div>
+        <div id="u40_text" class="text ">
+          <p><span>盘点单</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (连接符) -->
+      <div id="u41" class="ax_default _连接符">
+        <img id="u41_seg0" class="img " src="images/方案整体设计/u41_seg0.svg" alt="u41_seg0"/>
+        <img id="u41_seg1" class="img " src="images/方案整体设计/u41_seg1.svg" alt="u41_seg1"/>
+        <img id="u41_seg2" class="img " src="images/方案整体设计/u41_seg2.svg" alt="u41_seg2"/>
+        <div id="u41_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (连接符) -->
+      <div id="u42" class="ax_default _连接符">
+        <img id="u42_seg0" class="img " src="images/方案整体设计/u42_seg0.svg" alt="u42_seg0"/>
+        <img id="u42_seg1" class="img " src="images/方案整体设计/u42_seg1.svg" alt="u42_seg1"/>
+        <div id="u42_text" class="text " style="display:none; visibility: hidden">
+          <p></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u43" class="ax_default _标题_1">
+        <div id="u43_div" class=""></div>
+        <div id="u43_text" class="text ">
+          <p><span>4. 数据标准化与核对设计</span></p>
+        </div>
+      </div>
+
+      <!-- Unnamed (矩形) -->
+      <div id="u44" class="ax_default _文本">
+        <div id="u44_div" class=""></div>
+        <div id="u44_text" class="text ">
+          <p><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;">4.1. 原始数据层</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">保留平台原始报告字段及原始内容，用于追溯、核查及后续规则调整验证。</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">原始数据字段因平台不同而存在差异，例如 Amazon 可能包含 FNSKU、ASIN、MSKU、EventType、ReferenceID 等字段，其他平台则可能采用不同命名方式。</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;"><br></span></p><p><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;">4.2.&nbsp; 标准数据层</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">在原始数据基础上生成系统统一业务字段，主要包括：</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">平台</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">站点<br>仓库</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">当地日期</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">系统货品 / 系统SKU</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">大场景分类</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">业务类</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">生成单据号</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">生成单据2</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">是否可售</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">是否异常</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">异常原因</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">标准数据层是后续筛选查询、异常识别、库存盘点及单据生成的统一依据。<br><br></span><span style="font-family:'Arial Negreta', 'Arial Normal', 'Arial';font-weight:700;">4.3. 数据核对逻辑</span></p><p><span style="font-family:'Arial Normal', 'Arial';font-weight:400;">数据核对主要包含三个维度：<br><br>a. 系统记录与平台下载记录核对：<br>由于亚马逊报告库存分类明细报告经常发生变动，因此需要针对系统记录的库存分类明细报告进行核对<br>核对时按照一下逻辑进行数据补充：<br>如果当天数据发生变更：更新到平台报告对应的新数量中<br>如果当天数据缺失：直接补充<br><br>b. 系统流水与生成单据核对<br>针对备货接收、库内调整、库存转移等使用流水生成的单据，进行数据核对<br><br>c. 盘点与明细数据核对：主要用作数据复核，不需要制作对比工具。盘点本身就是对比工具<br>需要支持按仓库、当地店铺日期导出流水明细<br>需要支持按仓库、当地店铺日期导出平台仓报告明细</span></p>
+        </div>
+      </div>
+    </div>
+    <script src="resources/scripts/axure/ios.js"></script>
+  </body>
+</html>
