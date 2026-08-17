@@ -24,7 +24,7 @@
     "productType": "产品分类，取值与 SKU 列表产品分类保持一致",
     "inStockQty": "可用库存 + 锁定库存，对应汇总库存现有总库存口径",
     "totalStockQty": "在库库存 + 调拨在途，本新页面新增综合水位字段",
-    "orderedUnshippedQty": "备货计划已下单但尚未发货的目的仓 SKU 数量",
+    "orderedUnshippedQty": "SKU下单数量 - SKU已发货数量，即 plan_qty - submit_qty",
     "expectedStockQty": "总库存 + 备货计划已下单未发货",
     "statusRule": "先判断阈值是否维护，再按总库存与高低水位阈值判断；预计水位仅用于辅助观察，不参与水位状态标签判断"
   },
@@ -167,6 +167,8 @@
       "planNo": "SP202607090018",
       "warehouseName": "万邑通澳洲仓",
       "sku": "S810-ST-PK-UK-170-N",
+      "skuOrderQty": 800,
+      "skuShippedQty": 200,
       "orderedUnshippedQty": 600,
       "estimatedShipDate": "2026-07-18",
       "statusName": "待提交调拨发货"
@@ -175,6 +177,8 @@
       "planNo": "SP202607080026",
       "warehouseName": "万邑通德国仓",
       "sku": "S820BK",
+      "skuOrderQty": 1200,
+      "skuShippedQty": 300,
       "orderedUnshippedQty": 900,
       "estimatedShipDate": "2026-07-20",
       "statusName": "待提交调拨发货"
@@ -183,6 +187,8 @@
       "planNo": "SP202607060011",
       "warehouseName": "法国谷仓售后仓",
       "sku": "S900GY",
+      "skuOrderQty": 500,
+      "skuShippedQty": 0,
       "orderedUnshippedQty": 500,
       "estimatedShipDate": "2026-07-16",
       "statusName": "待提交调拨发货"
