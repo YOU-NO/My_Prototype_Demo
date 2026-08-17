@@ -1504,6 +1504,7 @@
               <th>目的仓</th>
               <th>SKU</th>
               <th>SKU下单数量</th>
+              <th>SKU已发货数量</th>
             </tr>
           </thead>
           <tbody id="stockupSummaryBody"></tbody>
@@ -1548,7 +1549,7 @@
             </tr>
             <tr>
               <td>备货已下单未发货</td>
-              <td>备货计划中已下单但尚未发货的目的仓 SKU 数量</td>
+              <td>SKU下单数量 - SKU已发货数量</td>
               <td>用于判断未来水位，辅助控制继续补货</td>
             </tr>
             <tr>
@@ -1586,7 +1587,7 @@
         updateBy: "system",
         updateTime: "2026-07-09 10:40:00",
         plans: [
-          { planNo: "SP202607090018", warehouseName: "万邑通澳洲仓", sku: "S810-ST-PK-UK-170-N", qty: 600, etd: "2026-07-18", status: "待提交调拨发货" }
+          { planNo: "SP202607090018", warehouseName: "万邑通澳洲仓", sku: "S810-ST-PK-UK-170-N", planQty: 800, shippedQty: 200, etd: "2026-07-18", status: "待提交调拨发货" }
         ]
       },
       {
@@ -1605,7 +1606,7 @@
         updateBy: "system",
         updateTime: "2026-07-09 10:35:00",
         plans: [
-          { planNo: "SP202607080026", warehouseName: "万邑通德国仓", sku: "S820BK", qty: 900, etd: "2026-07-20", status: "待提交调拨发货" }
+          { planNo: "SP202607080026", warehouseName: "万邑通德国仓", sku: "S820BK", planQty: 1200, shippedQty: 300, etd: "2026-07-20", status: "待提交调拨发货" }
         ]
       },
       {
@@ -1658,7 +1659,7 @@
         updateBy: "system",
         updateTime: "2026-07-09 10:21:00",
         plans: [
-          { planNo: "SP202607060011", warehouseName: "法国谷仓售后仓", sku: "S900GY", qty: 500, etd: "2026-07-16", status: "待提交调拨发货" }
+          { planNo: "SP202607060011", warehouseName: "法国谷仓售后仓", sku: "S900GY", planQty: 500, shippedQty: 0, etd: "2026-07-16", status: "待提交调拨发货" }
         ]
       },
       {
@@ -1999,7 +2000,7 @@
         <tr><td>调拨在途</td><td class="num">${numberText(selectedRow.onroadQty)} pcs</td><td>调拨在途数量</td></tr>
         <tr><td>在库库存</td><td class="num">${numberText(getInStock(selectedRow))} pcs</td><td>可用库存 + 锁定库存，对应汇总库存原总库存口径</td></tr>
         <tr><td>总库存</td><td class="num">${numberText(getTotalStock(selectedRow))} pcs</td><td>在库库存 + 调拨在途</td></tr>
-        <tr><td>备货已下单未发货</td><td class="num">${numberText(selectedRow.orderedUnshippedQty)} pcs</td><td>备货计划已下单但未发货数量</td></tr>
+        <tr><td>备货已下单未发货</td><td class="num">${numberText(selectedRow.orderedUnshippedQty)} pcs</td><td>SKU下单数量 - SKU已发货数量</td></tr>
         <tr><td>预计水位</td><td class="num">${numberText(getExpectedStock(selectedRow))} pcs</td><td>总库存 + 备货已下单未发货</td></tr>
         <tr><td>低/高水位阈值</td><td class="num">${numberText(selectedRow.lowThreshold)} / ${numberText(selectedRow.highThreshold)} pcs</td><td>按仓库 + 整机 SKU 维护</td></tr>
       `;
@@ -2079,6 +2080,8 @@
     function getStockupRowsByInventoryRow(row) {
       if (!row || !row.orderedUnshippedQty) return [];
       const plan = row.plans && row.plans.length ? row.plans[0] : {};
+      const skuOrderQty = plan.planQty != null ? plan.planQty : row.orderedUnshippedQty;
+      const skuShippedQty = plan.shippedQty != null ? plan.shippedQty : 0;
       return [
         {
           planNo: plan.planNo || "-",
@@ -2086,7 +2089,8 @@
           fromWarehouse: "立讯发货仓",
           toWarehouse: row.warehouseName,
           sku: row.sku,
-          skuOrderQty: row.orderedUnshippedQty
+          skuOrderQty,
+          skuShippedQty
         }
       ];
     }
@@ -2094,7 +2098,7 @@
     function renderStockupBody(rows) {
       const body = document.getElementById("stockupSummaryBody");
       if (!rows.length) {
-        body.innerHTML = '<tr><td colspan="6"><div class="empty">暂无该 SKU 的备货计划明细</div></td></tr>';
+        body.innerHTML = '<tr><td colspan="7"><div class="empty">暂无该 SKU 的备货计划明细</div></td></tr>';
         return;
       }
       body.innerHTML = rows.map(plan => `
@@ -2105,6 +2109,7 @@
           <td>${plan.toWarehouse}</td>
           <td>${plan.sku}</td>
           <td>${numberText(plan.skuOrderQty)}</td>
+          <td>${numberText(plan.skuShippedQty)}</td>
         </tr>
       `).join("");
     }
