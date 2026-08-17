@@ -551,6 +551,14 @@
       color: var(--warning);
     }
 
+    .deviation-normal {
+      color: var(--text);
+    }
+
+    .deviation-empty {
+      color: var(--secondary);
+    }
+
     .pager {
       height: 42px;
       display: flex;
@@ -1735,9 +1743,22 @@
     function getDeviation(row) {
       const status = getStatus(row);
       const total = getTotalStock(row);
+      if (status === "NO_THRESHOLD") return null;
       if (status === "HIGH") return total - row.highThreshold;
       if (status === "LOW") return row.lowThreshold - total;
       return 0;
+    }
+
+    function formatDeviationCell(row) {
+      const status = getStatus(row);
+      if (status === "NO_THRESHOLD") {
+        return '<span class="deviation-empty">-</span>';
+      }
+      const deviation = getDeviation(row);
+      const text = numberText(deviation || 0);
+      if (status === "HIGH") return `<span class="link danger">${text}</span>`;
+      if (status === "LOW") return `<span class="link warning">${text}</span>`;
+      return `<span class="deviation-normal">${text}</span>`;
     }
 
     function getActiveLevelNode() {
@@ -1882,8 +1903,6 @@
         body.innerHTML = currentRows.map((row, index) => {
           const status = getStatus(row);
           const meta = statusMeta(status);
-          const deviation = getDeviation(row);
-          const deviationClass = status === "HIGH" ? "danger" : status === "LOW" ? "warning" : "";
           return `
             <tr class="${meta.rowCls}">
               <td>${row.warehouseName}</td>
@@ -1899,7 +1918,7 @@
               <td class="num">${numberText(getExpectedStock(row))}</td>
               <td class="num">${numberText(row.lowThreshold)}</td>
               <td class="num">${numberText(row.highThreshold)}</td>
-              <td class="num"><span class="link ${deviationClass}">${deviation ? numberText(deviation) : "0"}</span></td>
+              <td class="num">${formatDeviationCell(row)}</td>
               <td><span class="tag ${meta.cls}">${meta.label}</span></td>
               <td>${row.updateBy || "-"}</td>
               <td>${row.updateTime || "-"}</td>
