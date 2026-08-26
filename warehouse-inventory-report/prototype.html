@@ -1,0 +1,2073 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>亚马逊平台报告 - 高保真原型</title>
+  <style>
+    :root {
+      --primary: #1677ff;
+      --primary-weak: #eaf3ff;
+      --primary-border: #b9d8ff;
+      --danger: #f56c6c;
+      --danger-weak: #fff2f0;
+      --warning: #e6a23c;
+      --warning-weak: #fff7e6;
+      --success: #67c23a;
+      --success-weak: #f0f9eb;
+      --text: #303133;
+      --regular: #606266;
+      --secondary: #909399;
+      --placeholder: #c0c4cc;
+      --border: #ebeef5;
+      --border-dark: #dcdfe6;
+      --table-head: #f5f7fa;
+      --page-bg: #f5f7fb;
+      --sidebar-bg: #fff;
+      --sidebar-width: 210px;
+      --th-platform: rgba(129, 211, 248, 0.35);
+      --th-parsed: rgba(255, 255, 128, 0.45);
+      --th-doc: rgba(149, 242, 4, 0.35);
+      --th-exception: rgba(236, 128, 141, 0.35);
+      --th-common: rgba(128, 255, 255, 0.35);
+      --th-diff: rgba(255, 255, 128, 0.45);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--page-bg);
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+      font-size: 12px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: var(--sidebar-width) 1fr;
+      min-height: 100vh;
+      background: var(--page-bg);
+    }
+
+    .layout.is-resizing {
+      cursor: col-resize;
+      user-select: none;
+    }
+
+    .layout.is-resizing * {
+      cursor: col-resize !important;
+    }
+
+    .sidebar {
+      position: relative;
+      color: var(--text);
+      background: var(--sidebar-bg);
+      border-right: 1px solid #e4e7ed;
+      z-index: 8;
+      overflow: visible;
+    }
+
+    .aside-box {
+      width: 100%;
+      height: 100vh;
+      background: #fff;
+      box-shadow: 0 1px 10px rgb(0 0 0 / 10%);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .sidebar-resizer {
+      position: absolute;
+      top: 0;
+      right: -3px;
+      width: 8px;
+      height: 100%;
+      cursor: col-resize;
+      z-index: 30;
+    }
+
+    .sidebar-resizer:hover,
+    .layout.is-resizing .sidebar-resizer {
+      background: var(--primary);
+      opacity: 0.28;
+    }
+
+    .el-menu-mock {
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      color: #333;
+      background: #fff;
+      border-right: 0;
+      list-style: none;
+    }
+
+    .el-sub-menu__title,
+    .el-menu-item {
+      position: relative;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      color: #333;
+      font-size: 12px;
+      line-height: 50px;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .el-sub-menu__title { padding: 0 28px; }
+    .el-menu-item { padding: 0 20px 0 52px; }
+    .el-menu-item.level-1 { padding: 0 28px; }
+    .el-sub-menu__title.level-2 { padding: 0 16px 0 52px; }
+    .el-menu-item.level-3 { padding: 0 16px 0 72px; }
+    .menu-group { display: none; }
+    .menu-group.is-open { display: block; }
+    .el-sub-menu__title:hover { color: #333; background-color: transparent; }
+    .el-menu-item:hover { color: #333; }
+
+    .el-menu-item.is-active {
+      color: var(--primary);
+      background: var(--primary-weak);
+    }
+
+    .el-menu-item.is-active::before {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 4px;
+      content: "";
+      background-color: var(--primary);
+    }
+
+    .menu-icon {
+      width: 16px;
+      height: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      margin-right: 8px;
+      color: inherit;
+    }
+
+    .menu-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .sle {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .submenu-arrow {
+      margin-left: auto;
+      color: #909399;
+      font-size: 12px;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 10px;
+      overflow: auto;
+    }
+
+    .page-panel { display: none; }
+    .page-panel.active { display: block; }
+
+    .main-box,
+    .table-box {
+      min-width: 0;
+    }
+
+    .legend-bar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--regular);
+      font-size: 12px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-swatch {
+      width: 14px;
+      height: 14px;
+      border: 1px solid var(--border-dark);
+      border-radius: 2px;
+      flex: none;
+    }
+
+    .search-bar {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 10px;
+      padding: 10px 10px 2px;
+      background: #fff;
+      border: 0;
+      border-radius: 0;
+    }
+
+    .control,
+    .input-control {
+      height: 22px;
+      color: var(--regular);
+      background-color: #fff;
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .control {
+      width: 132px;
+      padding: 0 22px 0 8px;
+    }
+
+    select.control {
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23c0c4cc' d='M2.2 4.2a.75.75 0 0 1 1.06 0L6 6.94l2.74-2.74a.75.75 0 1 1 1.06 1.06L6.53 8.53a.75.75 0 0 1-1.06 0L2.2 5.26a.75.75 0 0 1 0-1.06z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 6px center;
+      background-size: 12px 12px;
+    }
+
+    .control.short { width: 100px; }
+    .control.date { width: 120px; padding-right: 8px; }
+
+    .input-control {
+      width: 140px;
+      padding: 0 8px;
+    }
+
+    .input-control.wide { width: 180px; }
+
+    .filter-label {
+      color: var(--secondary);
+      white-space: nowrap;
+    }
+
+    .btn {
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 0 10px;
+      color: var(--regular);
+      background: #fff;
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      font-size: 12px;
+      line-height: 22px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      color: #fff;
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .btn.light {
+      color: #2f73d9;
+      background: var(--primary-weak);
+      border-color: var(--primary-border);
+    }
+
+    .btn.danger {
+      color: #fff;
+      background: var(--danger);
+      border-color: var(--danger);
+    }
+
+    .btn:hover { opacity: 0.92; }
+
+    .table-shell {
+      margin-top: 0;
+      padding: 10px;
+      background: #fff;
+      border: 0;
+      border-radius: 0;
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 0 8px;
+      border-bottom: 0;
+      background: #fff;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      table-layout: fixed;
+      width: auto;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th, td {
+      height: 28px;
+      padding: 0 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      height: 30px;
+      color: var(--regular);
+      background: var(--table-head);
+      font-weight: 600;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      overflow: visible;
+    }
+
+    .th-text {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding-right: 6px;
+    }
+
+    .col-resizer {
+      position: absolute;
+      top: 0;
+      right: -3px;
+      width: 8px;
+      height: 100%;
+      cursor: col-resize;
+      z-index: 4;
+    }
+
+    .col-resizer:hover,
+    body.is-col-resizing .col-resizer.is-active {
+      background: var(--primary);
+      opacity: 0.28;
+    }
+
+    body.is-col-resizing {
+      cursor: col-resize;
+      user-select: none;
+    }
+
+    body.is-col-resizing * {
+      cursor: col-resize !important;
+    }
+
+    td.num, th.num { text-align: right; }
+
+    th.g-platform { background: var(--th-platform); }
+    th.g-parsed { background: var(--th-parsed); }
+    th.g-docNo { background: var(--th-doc); }
+    th.g-exception { background: var(--th-exception); }
+    th.g-common { background: var(--th-common); }
+    th.g-diff { background: var(--th-diff); }
+    th.g-plain { background: var(--table-head); }
+
+    .header-help {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .help-icon {
+      width: 13px;
+      height: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: #303133;
+      border-radius: 50%;
+      font-size: 10px;
+      line-height: 13px;
+      cursor: help;
+      flex: none;
+    }
+
+    .text-danger { color: var(--danger); }
+
+    .link {
+      color: var(--primary);
+      text-decoration: none;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+
+    .link.danger { color: var(--danger); }
+
+    tbody tr:hover { background: #f9fbff; }
+
+    .empty {
+      padding: 36px 0;
+      color: var(--secondary);
+      text-align: center;
+    }
+
+    .pager {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 0 10px;
+      color: var(--regular);
+      background: #fff;
+      border-top: 1px solid var(--border);
+    }
+
+    .pager-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .page-btn {
+      min-width: 28px;
+      height: 28px;
+      padding: 0 8px;
+      color: var(--regular);
+      background: #fff;
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      cursor: default;
+    }
+
+    .page-btn.active {
+      color: #fff;
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .floating-tooltip {
+      position: fixed;
+      z-index: 999;
+      display: none;
+      max-width: 360px;
+      padding: 8px 12px;
+      color: #fff;
+      background: #303133;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 18px;
+      white-space: normal;
+      pointer-events: none;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      z-index: 3000;
+      display: none;
+      transform: translateX(-50%);
+      padding: 10px 16px;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 4px;
+      font-size: 13px;
+      line-height: 18px;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+      pointer-events: none;
+    }
+
+    .toast.show { display: block; }
+
+    .toast.success { background: rgba(103, 194, 58, 0.95); }
+    .toast.warning { background: rgba(230, 162, 60, 0.95); }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 50px;
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .overlay.open { display: flex; }
+
+    .overlay.drawer-mode {
+      justify-content: flex-end;
+      padding-top: 0;
+      align-items: stretch;
+    }
+
+    .dialog {
+      width: 640px;
+      max-height: calc(100vh - 90px);
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 3px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
+    }
+
+    .dialog.narrow { width: 420px; }
+    .dialog.wide { width: 760px; }
+
+    .dialog.drawer {
+      width: 520px;
+      max-height: none;
+      height: 100%;
+      border-radius: 0;
+    }
+
+    .dialog-header {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      font-weight: 600;
+      flex: none;
+    }
+
+    .close {
+      width: 24px;
+      height: 24px;
+      color: var(--secondary);
+      background: transparent;
+      border: 0;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .dialog-body {
+      padding: 14px 16px;
+      overflow: auto;
+      flex: 1;
+    }
+
+    .dialog-footer {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 0 16px;
+      border-top: 1px solid var(--border);
+      background: #fff;
+      flex: none;
+    }
+
+    .import-upload {
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--regular);
+      background: #fff;
+      border: 1px dashed #dcdfe6;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      text-align: center;
+    }
+
+    .import-upload:hover,
+    .import-upload.dragover { border-color: var(--primary); }
+
+    .import-upload-icon {
+      width: 48px;
+      height: 40px;
+      margin-bottom: 10px;
+      color: #c0c4cc;
+    }
+
+    .import-upload-icon svg {
+      width: 48px;
+      height: 40px;
+      fill: currentColor;
+    }
+
+    .import-upload-text {
+      font-size: 14px;
+      line-height: 22px;
+    }
+
+    .import-upload-text em {
+      color: var(--primary);
+      font-style: normal;
+    }
+
+    .import-tip {
+      margin-top: 8px;
+      color: var(--secondary);
+      line-height: 18px;
+    }
+
+    .parse-steps {
+      margin: 0;
+      padding-left: 22px;
+      color: var(--regular);
+      line-height: 24px;
+    }
+
+    .parse-steps li { margin-bottom: 4px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .form-item label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--regular);
+    }
+
+    .form-item label .req { color: var(--danger); margin-right: 2px; }
+
+    .form-item input,
+    .form-item select,
+    .form-item textarea {
+      width: 100%;
+      height: 28px;
+      padding: 0 8px;
+      color: var(--text);
+      border: 1px solid var(--border-dark);
+      border-radius: 3px;
+      outline: none;
+      font-size: 12px;
+      font-family: inherit;
+      background: #fff;
+    }
+
+    .form-item textarea {
+      height: 64px;
+      padding: 6px 8px;
+      resize: vertical;
+    }
+
+    .confirm-msg {
+      color: var(--regular);
+      line-height: 20px;
+      padding: 8px 0;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="aside-box">
+        <nav class="el-menu-mock" id="sideMenu"></nav>
+      </div>
+      <div class="sidebar-resizer" id="sidebarResizer" title="拖动调整侧栏宽度"></div>
+    </aside>
+    <main class="main">
+      <div class="main-box">
+        <div class="table-box">
+          <section id="page-detail" class="page-panel active"></section>
+          <section id="page-summary" class="page-panel"></section>
+          <section id="page-config" class="page-panel"></section>
+          <section id="page-existing" class="page-panel"></section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <div id="tooltip" class="floating-tooltip"></div>
+
+  <div id="overlay" class="overlay">
+    <div id="dialogRoot" class="dialog"></div>
+  </div>
+
+  <script>
+(function () {
+  const MOCK = {
+    "menu": {
+      "coupangPlatformChildren": [
+        { "id": "coupangGlobalOrder", "label": "Coupang海外订单报告", "icon": "leaf" },
+        { "id": "coupangGlobalReturn", "label": "Coupang海外退货报告", "icon": "leaf" },
+        { "id": "coupangGlobalSettle", "label": "Coupang海外结算报告", "icon": "globe" },
+        { "id": "coupangDomesticOrder", "label": "Coupang本土订单报告", "icon": "leaf" },
+        { "id": "coupangDomesticFee", "label": "Coupang本土费用产生报告", "icon": "leaf" }
+      ],
+      "amazonPlatformChildren": [
+        { "id": "amazonShipment", "label": "亚马逊发货运输报告", "icon": "leaf" },
+        { "id": "amazonReturn", "label": "亚马逊客户退货报告", "icon": "leaf" },
+        { "id": "amazonReimburse", "label": "亚马逊赔偿报告", "icon": "leaf" },
+        { "id": "detail", "label": "亚马逊分类明细报告" },
+        { "id": "summary", "label": "亚马逊库存汇总报告" }
+      ]
+    },
+    "filters": {
+      "abnormalOptions": ["全部", "是", "否"],
+      "sellableOptions": ["全部", "是", "否"],
+      "sceneOptions": ["全部", "备货接收", "Unknown Events", "报废", "找回"],
+      "bizOptions": ["全部", "备货接收", "Unknown Events", "报废", "找回", "收货列表"]
+    },
+    "legend": {
+      "report": [
+        { "key": "platform", "label": "平台原始字段", "color": "#81d3f8" },
+        { "key": "parsed", "label": "EVA 解析字段", "color": "#ffff80" },
+        { "key": "docNo", "label": "生成单据号", "color": "#95f204" },
+        { "key": "exception", "label": "更新/异常字段", "color": "#ec808d" }
+      ],
+      "config": [
+        { "key": "common", "label": "通用逻辑字段", "color": "#80ffff" },
+        { "key": "diff", "label": "差异逻辑字段", "color": "#ffff80" }
+      ]
+    },
+    "detailColumns": [
+      { "key": "sellerid", "label": "sellerid", "group": "platform" },
+      { "key": "date", "label": "Date", "group": "platform" },
+      { "key": "fnsku", "label": "FNSKU", "group": "platform" },
+      { "key": "asin", "label": "ASIN", "group": "platform" },
+      { "key": "msku", "label": "MSKU", "group": "platform" },
+      { "key": "eventType", "label": "EventType", "group": "platform" },
+      { "key": "referenceId", "label": "ReferenceID", "group": "platform" },
+      { "key": "quantity", "label": "Quantity", "group": "platform", "align": "right" },
+      { "key": "fulfillmentCenter", "label": "FulfillmentCenter", "group": "platform" },
+      { "key": "reason", "label": "Reason", "group": "platform" },
+      { "key": "country", "label": "Country", "group": "platform" },
+      { "key": "disposition", "label": "Disposition", "group": "platform" },
+      { "key": "dateAndTime", "label": "Date and Time", "group": "platform" },
+      { "key": "newQuantity", "label": "New Quantity", "group": "platform", "align": "right" },
+      { "key": "platform", "label": "平台", "group": "platform" },
+      { "key": "monthEnd", "label": "是否月末报告", "group": "platform" },
+      { "key": "site", "label": "站点", "group": "parsed" },
+      { "key": "localDate", "label": "当地日期", "group": "parsed" },
+      { "key": "systemSku", "label": "系统sku", "group": "parsed" },
+      { "key": "scene", "label": "大场景分类", "group": "parsed" },
+      { "key": "bizType", "label": "业务类", "group": "parsed" },
+      { "key": "warehouse", "label": "仓库", "group": "parsed" },
+      { "key": "sellable", "label": "是否可售", "group": "parsed" },
+      { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
+      { "key": "docType", "label": "生成单据类型", "group": "parsed" },
+      { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
+      { "key": "parsedDone", "label": "是否解析完成", "group": "parsed" },
+      { "key": "docNo", "label": "生成单据号", "group": "docNo" },
+      { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
+      { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
+      { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" },
+      { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
+      { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" }
+    ],
+    "summaryColumns": [
+      { "key": "sellerid", "label": "sellerid", "group": "platform" },
+      { "key": "date", "label": "Date", "group": "platform" },
+      { "key": "fnsku", "label": "FNSKU", "group": "platform" },
+      { "key": "asin", "label": "ASIN", "group": "platform" },
+      { "key": "msku", "label": "MSKU", "group": "platform" },
+      { "key": "disposition", "label": "Disposition", "group": "platform" },
+      { "key": "startingBalance", "label": "Starting Warehouse Balance", "group": "platform", "align": "right" },
+      { "key": "inTransit", "label": "In Transit Between Warehouses", "group": "platform", "align": "right" },
+      { "key": "receipts", "label": "Receipts", "group": "platform", "align": "right" },
+      { "key": "customerShipments", "label": "Customer Shipments", "group": "platform", "align": "right" },
+      { "key": "customerReturns", "label": "Customer Returns", "group": "platform", "align": "right" },
+      { "key": "vendorReturns", "label": "Vendor Returns", "group": "platform", "align": "right" },
+      { "key": "warehouseTransfer", "label": "Warehouse Transfer In/Out", "group": "platform", "align": "right" },
+      { "key": "found", "label": "Found", "group": "platform", "align": "right" },
+      { "key": "lost", "label": "Lost", "group": "platform", "align": "right" },
+      { "key": "damaged", "label": "Damaged", "group": "platform", "align": "right" },
+      { "key": "disposed", "label": "Disposed", "group": "platform", "align": "right" },
+      { "key": "otherEvents", "label": "Other Events", "group": "platform", "align": "right" },
+      { "key": "endingBalance", "label": "Ending Warehouse Balance", "group": "platform", "align": "right" },
+      { "key": "location", "label": "Location", "group": "platform" },
+      { "key": "unknownEvents", "label": "Unknown Events", "group": "platform", "align": "right" },
+      { "key": "newQuantity", "label": "New Quantity", "group": "platform", "align": "right" },
+      { "key": "platform", "label": "平台", "group": "platform" },
+      { "key": "monthEnd", "label": "是否月末报告", "group": "platform" },
+      { "key": "site", "label": "站点", "group": "parsed" },
+      { "key": "localDate", "label": "当地日期", "group": "parsed" },
+      { "key": "systemSku", "label": "系统sku", "group": "parsed" },
+      { "key": "scene", "label": "大场景分类", "group": "parsed" },
+      { "key": "bizType", "label": "业务类", "group": "parsed" },
+      { "key": "warehouse", "label": "仓库", "group": "parsed" },
+      { "key": "sellable", "label": "是否可售", "group": "parsed" },
+      { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
+      { "key": "docType", "label": "生成单据类型", "group": "parsed" },
+      { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
+      { "key": "parsedDone", "label": "是否解析完成", "group": "parsed" },
+      { "key": "docNo", "label": "生成单据号", "group": "docNo" },
+      { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
+      { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
+      { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" },
+      { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
+      { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" }
+    ],
+    "configColumns": [
+      { "key": "platform", "label": "平台", "group": "plain" },
+      { "key": "dbTable", "label": "数据库表名", "group": "common" },
+      { "key": "siteLogic", "label": "站点", "group": "common" },
+      { "key": "statusLogic", "label": "是否可售", "group": "common" },
+      { "key": "skuField", "label": "平台货品", "group": "common" },
+      { "key": "dateField", "label": "平台日期", "group": "common" },
+      { "key": "qtyLogic", "label": "平台数量", "group": "common" },
+      { "key": "inventoryNoField", "label": "库存流水单号", "group": "common" },
+      { "key": "relatedNoField", "label": "关联单号", "group": "common" },
+      { "key": "scene", "label": "大场景分类", "group": "diff" },
+      { "key": "bizType", "label": "业务类", "group": "diff" },
+      { "key": "bizRule", "label": "业务类配置规则", "group": "diff" },
+      { "key": "docType", "label": "生成单据类型", "group": "diff" },
+      { "key": "dailySummary", "label": "单据生成时按天汇总", "group": "diff" },
+      { "key": "summaryCondition", "label": "汇总条件", "group": "diff" },
+      { "key": "actions", "label": "操作", "group": "plain" }
+    ],
+    "detailRows": [
+      {
+        "sellerid": "A3U5E183ODUBBN", "date": "05/31/2026", "fnsku": "B0DSJBWQ3X", "asin": "B0DSJBWQ3X",
+        "msku": "C120BK-JP", "eventType": "Adjustments", "referenceId": "20001907797343", "quantity": -1,
+        "fulfillmentCenter": "KIX5", "reason": "K", "country": "JP", "disposition": "SELLABLE",
+        "dateAndTime": "2026-05-31T00:00:00+0900", "newQuantity": "", "platform": "Amazon", "monthEnd": "否",
+        "site": "Amazon_JP", "localDate": "2026-05-31", "systemSku": "C120-AN-BK-JP-000-AZB", "scene": "报废",
+        "bizType": "报废", "warehouse": "JP-日本亚马逊仓", "sellable": "是", "qty": -1, "docType": "其他出入库",
+        "dailySummary": "否", "parsedDone": "是", "docNo": "IA202601", "hasUpdate": "否",
+        "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+      },
+      {
+        "sellerid": "AHLP03EOC0SXS", "date": "05/31/2026", "fnsku": "X001XVNZQJ", "asin": "B0BYSSD56Y",
+        "msku": "T910BG-SA", "eventType": "Receipts", "referenceId": "FBA15LMGFVMW", "quantity": 10,
+        "fulfillmentCenter": "JED4", "reason": "", "country": "SA", "disposition": "SELLABLE",
+        "dateAndTime": "2026-05-31T01:00:00+0100", "newQuantity": "", "platform": "Amazon", "monthEnd": "否",
+        "site": "Amazon_SA", "localDate": "2026-05-31", "systemSku": "", "scene": "", "bizType": "",
+        "warehouse": "", "sellable": "", "qty": "", "docType": "", "dailySummary": "", "parsedDone": "否",
+        "docNo": "", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "",
+        "parseAbnormal": "是", "parseAbnormalReason": "Amazon_SA站点T910BG-SA未维护货品映射"
+      },
+      {
+        "sellerid": "A2DU2GR8JRRKFW", "date": "05/31/2026", "fnsku": "B0CS3JBP67", "asin": "B0CS3JBP67",
+        "msku": "S710-ST-GY-CA-326-AZB-stickerless", "eventType": "Receipts", "referenceId": "FBA19B6K6ZBQ",
+        "quantity": -2, "fulfillmentCenter": "SMN1", "reason": "", "country": "US", "disposition": "SELLABLE",
+        "dateAndTime": "2026-05-31T00:00:00-0700", "newQuantity": "", "platform": "Amazon", "monthEnd": "否",
+        "site": "Amazon_US", "localDate": "2026-05-31", "systemSku": "S710-ST-GY-US-326-AZB", "scene": "备货接收",
+        "bizType": "备货接收", "warehouse": "ST-Amazon US", "sellable": "是", "qty": -2, "docType": "收货列表",
+        "dailySummary": "否", "parsedDone": "是", "docNo": "IR202601,IA202603,IA202604,IA202605",
+        "hasUpdate": "是", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+      },
+      {
+        "sellerid": "A3U5E183ODUBBN", "date": "05/30/2026", "fnsku": "X002FOUNDJP", "asin": "B0FOUNDJP1",
+        "msku": "C120BK-JP-F", "eventType": "Adjustments", "referenceId": "20001908881221", "quantity": 1,
+        "fulfillmentCenter": "KIX5", "reason": "F", "country": "JP", "disposition": "SELLABLE",
+        "dateAndTime": "2026-05-30T08:00:00+0900", "newQuantity": "", "platform": "Amazon", "monthEnd": "否",
+        "site": "Amazon_JP", "localDate": "2026-05-30", "systemSku": "", "scene": "", "bizType": "",
+        "warehouse": "", "sellable": "", "qty": "", "docType": "", "dailySummary": "", "parsedDone": "否",
+        "docNo": "", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "",
+        "parseAbnormal": "否", "parseAbnormalReason": ""
+      }
+    ],
+    "summaryRows": [
+      {
+        "sellerid": "AHLP03EOC0SXS", "date": "03/2026", "fnsku": "", "asin": "", "msku": "T910BG-SA",
+        "disposition": "SELLABLE", "startingBalance": 35, "inTransit": 0, "receipts": 0, "customerShipments": 0,
+        "customerReturns": 0, "vendorReturns": 0, "warehouseTransfer": 0, "found": 0, "lost": 0, "damaged": 0,
+        "disposed": 0, "otherEvents": 0, "endingBalance": 38, "location": "SA", "unknownEvents": -3,
+        "newQuantity": "", "platform": "Amazon", "monthEnd": "是", "site": "Amazon_SA", "localDate": "2026-03-31",
+        "systemSku": "T910-ST-BG-SA-623-B01", "scene": "Unknown Events", "bizType": "Unknown Events",
+        "warehouse": "SG-沙特亚马逊仓", "sellable": "否", "qty": -3, "docType": "其他出入库", "dailySummary": "是",
+        "parsedDone": "是", "docNo": "IA202601", "hasUpdate": "否", "docAbnormal": "否",
+        "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+      },
+      {
+        "sellerid": "A3U5E183ODUBBN", "date": "03/2026", "fnsku": "", "asin": "", "msku": "C120BK-JP",
+        "disposition": "SELLABLE", "startingBalance": 2448, "inTransit": 0, "receipts": 0, "customerShipments": 0,
+        "customerReturns": 0, "vendorReturns": 0, "warehouseTransfer": 0, "found": 0, "lost": 0, "damaged": 0,
+        "disposed": 0, "otherEvents": 0, "endingBalance": 2448, "location": "JP", "unknownEvents": 0,
+        "newQuantity": "", "platform": "Amazon", "monthEnd": "是", "site": "Amazon_JP", "localDate": "2026-03-31",
+        "systemSku": "C120-AN-BK-JP-000-AZB", "scene": "Unknown Events", "bizType": "Unknown Events",
+        "warehouse": "JP-日本亚马逊仓", "sellable": "是", "qty": 0, "docType": "其他出入库", "dailySummary": "是",
+        "parsedDone": "是", "docNo": "IA202602", "hasUpdate": "否", "docAbnormal": "否",
+        "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+      },
+      {
+        "sellerid": "A2DU2GR8JRRKFW", "date": "03/2026", "fnsku": "", "asin": "",
+        "msku": "S710-ST-GY-CA-326-AZB-stickerless", "disposition": "CUSTOMER_DAMAGED", "startingBalance": 335,
+        "inTransit": 0, "receipts": 0, "customerShipments": 0, "customerReturns": 0, "vendorReturns": 0,
+        "warehouseTransfer": 0, "found": 0, "lost": 0, "damaged": 0, "disposed": 0, "otherEvents": 0,
+        "endingBalance": 336, "location": "US", "unknownEvents": 1, "newQuantity": "", "platform": "Amazon",
+        "monthEnd": "是", "site": "Amazon_US", "localDate": "2026-03-31", "systemSku": "S710-ST-GY-US-326-AZB",
+        "scene": "Unknown Events", "bizType": "Unknown Events", "warehouse": "ST-Returns(Amazon US)",
+        "sellable": "是", "qty": 1, "docType": "其他出入库", "dailySummary": "是", "parsedDone": "是",
+        "docNo": "IA202603,AS202602", "hasUpdate": "是", "docAbnormal": "否",
+        "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+      },
+      {
+        "sellerid": "A2DU2GR8JRRKFW", "date": "03/2026", "fnsku": "", "asin": "", "msku": "S710-PENDING-US",
+        "disposition": "SELLABLE", "startingBalance": 10, "inTransit": 0, "receipts": 0, "customerShipments": 0,
+        "customerReturns": 0, "vendorReturns": 0, "warehouseTransfer": 0, "found": 0, "lost": 0, "damaged": 0,
+        "disposed": 0, "otherEvents": 0, "endingBalance": 12, "location": "US", "unknownEvents": 2,
+        "newQuantity": "", "platform": "Amazon", "monthEnd": "是", "site": "Amazon_US", "localDate": "2026-03-31",
+        "systemSku": "", "scene": "", "bizType": "", "warehouse": "", "sellable": "", "qty": "", "docType": "",
+        "dailySummary": "", "parsedDone": "否", "docNo": "", "hasUpdate": "否", "docAbnormal": "否",
+        "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+      }
+    ],
+    "configRows": [
+      {
+        "id": "c1", "platform": "Amazon", "siteLogic": "统一规则，识别所有的站点",
+        "statusLogic": "统一规则，识别所有的状态", "scene": "备货接收", "bizType": "备货接收",
+        "bizRule": "EventType = 'Receipts'", "skuField": "msku", "dateField": "Date and Time",
+        "qtyLogic": "Quantity", "inventoryNoField": "记录流水 ID，需标记到单据",
+        "relatedNoField": "货件计划、退货 RMA 等上游单号", "docType": "收货列表",
+        "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": ""
+      },
+      {
+        "id": "c2", "platform": "Amazon",
+        "siteLogic": "case when sellerid = 'A3U5E183ODUBBN' and country = 'JP' then Amazon_JP when sellerid = 'AHLP03EOC0SXS' and country = 'SA' then Amazon_SA end",
+        "statusLogic": "case when Disposition = 'sellable' then 'sellerable' else 'unsell' end",
+        "scene": "找回", "bizType": "找回", "bizRule": "EventType = 'Adjustments' and reason in ('F','N')",
+        "skuField": "msku", "dateField": "Date and Time", "qtyLogic": "Quantity",
+        "inventoryNoField": "ReferenceID", "relatedNoField": "ReferenceID", "docType": "其他出入库",
+        "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": ""
+      },
+      {
+        "id": "c3", "platform": "Amazon", "siteLogic": "统一规则，识别所有的站点",
+        "statusLogic": "统一规则，识别所有的状态", "scene": "报废", "bizType": "报废",
+        "bizRule": "EventType = 'Adjustments' and reason in ('6','7','E','H','K','U','G')",
+        "skuField": "msku", "dateField": "Date and Time", "qtyLogic": "Quantity",
+        "inventoryNoField": "ReferenceID", "relatedNoField": "ReferenceID", "docType": "其他出入库",
+        "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": ""
+      },
+      {
+        "id": "c4", "platform": "Amazon", "siteLogic": "统一规则，识别所有的站点",
+        "statusLogic": "统一规则，识别所有的状态", "scene": "Unknown Events", "bizType": "Unknown Events",
+        "bizRule": "StartingWarehouseBalance + ... - EndingWarehouseBalance <> 0",
+        "skuField": "msku", "dateField": "Date", "qtyLogic": "Unknown Events",
+        "inventoryNoField": "", "relatedNoField": "", "docType": "其他出入库",
+        "dbTable": "Inventory Summary", "dailySummary": "是", "summaryCondition": "按站点+MSKU+Disposition 按天汇总"
+      }
+    ],
+    "fieldNotes": {
+      "newQuantity": "更新时数量不一致则写入此字段；未生成单据时可直接改 Quantity。",
+      "monthEnd": "默认为否，解析时自动带出；月末汇总报告通过日期转为当月最后一天。",
+      "docType": "多选；一条明细可对应多个单据类型。",
+      "parseFlow": [
+        "监控缓存是否可解析",
+        "校验数据库表名",
+        "遍历记录做站点/状态/业务类/数量匹配",
+        "校验平台货品、平台日期字段是否存在",
+        "按是否可售匹配仓库（可售→良品仓，不可售→不良品仓）",
+        "站点+msku 匹配货品；仓库时区转当地日期",
+        "失败提醒；存在更新时刷新报告解析是否异常"
+      ]
+    }
+  };
+
+  /* —— state —— */
+  const state = {
+    page: "detail",
+    detailRows: JSON.parse(JSON.stringify(MOCK.detailRows)),
+    summaryRows: JSON.parse(JSON.stringify(MOCK.summaryRows)),
+    configRows: JSON.parse(JSON.stringify(MOCK.configRows)),
+    detailView: [],
+    summaryView: [],
+    configView: [],
+    docSeq: 700,
+    configSeq: 5,
+    editingConfigId: null,
+    deleteConfigId: null,
+    importTarget: "detail",
+    toastTimer: null,
+    menuOpen: { sales: true, coupang: false, amazon: true, finance: false },
+    colWidths: {}
+  };
+
+  const PAGE_META = {
+    detail: {
+      title: "亚马逊分类明细报告",
+      desc: "展示平台库存事件明细及 EVA 解析、单据生成结果；支持筛选、导入更新与单据生成。"
+    },
+    summary: {
+      title: "亚马逊库存汇总报告",
+      desc: "展示平台库存汇总水位差异（Unknown Events 等）及解析、单据结果；支持导入更新、解析与单据生成。"
+    },
+    config: {
+      title: "平台仓库存报告配置",
+      desc: "维护平台仓库存报告的站点/状态匹配、业务类规则、单据类型与汇总逻辑。蓝色底为通用逻辑，黄色底为差异逻辑。"
+    }
+  };
+
+  const ICONS = {
+    report: '<svg viewBox="0 0 16 16"><path d="M4 2.5h6l2 2v9H4z"/><path d="M10 2.5v2h2"/><path d="M6 8h4"/><path d="M6 10.5h3"/></svg>',
+    link: '<svg viewBox="0 0 16 16"><path d="M6.5 8.5a3 3 0 0 0 4.2.2l1.5-1.5a3 3 0 0 0-4.2-4.2L7 4"/><path d="M9.5 7.5a3 3 0 0 0-4.2-.2L3.8 8.8a3 3 0 0 0 4.2 4.2L9 12"/></svg>',
+    warehouse: '<svg viewBox="0 0 16 16"><path d="M2.5 7 8 3l5.5 4"/><path d="M4 6.5v6h8v-6"/><path d="M6.5 9h3"/><path d="M6.5 11h3"/></svg>',
+    leaf: '<svg viewBox="0 0 16 16"><path d="M4 2.5h7.5L13 4v9.5H4z"/><path d="M11.5 2.5V4H13"/><path d="M6 7h4"/><path d="M6 9.5h4"/></svg>',
+    globe: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M2.5 8h11"/><path d="M8 2.5c1.8 1.8 2.7 3.6 2.7 5.5S9.8 11.7 8 13.5C6.2 11.7 5.3 9.9 5.3 8S6.2 4.3 8 2.5z"/></svg>',
+    push: '<svg viewBox="0 0 16 16"><path d="M8 11.5V3"/><path d="m5 5.5 3-3 3 3"/><path d="M3 12.5h10"/></svg>'
+  };
+
+  const EXISTING_REPORTS = {
+    coupangGlobalOrder: {
+      title: "Coupang海外订单报告",
+      filters: ["处理状态", "店铺", "订单编号", "SKU"],
+      columns: ["中台ID", "处理状态", "映射中台单据号", "映射出入库单号", "订单编号", "店铺", "SKU", "订购日", "出库日", "购买数", "支付金额", "报告异常"],
+      rows: [
+        ["12081", "已处理", "SO20260531001", "CK20260531088", "8801234567890", "Coupang_海外", "S710-ST-GY-US-326-AZB", "2026-05-28", "2026-05-30", "1", "32900", ""],
+        ["12082", "待处理", "", "", "8801234567901", "Coupang_海外2店", "T910BG-SA", "2026-05-31", "", "2", "45800", "SKU异常"]
+      ]
+    },
+    coupangGlobalReturn: {
+      title: "Coupang海外退货报告",
+      filters: ["处理状态", "店铺", "订单号", "SKU"],
+      columns: ["中台ID", "处理状态", "映射中台单据号", "映射出入库单号", "店铺", "订单号", "SKU", "接收日期", "数量", "预计退款金额", "退货完毕", "报告异常"],
+      rows: [
+        ["8812", "已处理", "RMA20260528011", "RK20260530021", "Coupang_海外", "8801234567890", "S710-ST-GY-US-326-AZB", "2026-05-28", "1", "32900", "2026-05-31", ""],
+        ["8813", "异常", "", "", "Coupang_海外", "8801234567901", "T910BG-SA", "2026-05-31", "1", "45800", "", "未映射出入库单"]
+      ]
+    },
+    coupangGlobalSettle: {
+      title: "Coupang海外结算报告",
+      filters: ["处理状态", "店铺", "订单号", "SKU"],
+      columns: ["中台ID", "处理状态", "映射中台单据号", "订单号", "店铺", "SKU", "销售数量", "销售额", "结算金额", "付款完成日期", "预定结算日期", "报告异常"],
+      rows: [
+        ["5601", "已处理", "SO20260531001", "8801234567890", "Coupang_海外", "S710-ST-GY-US-326-AZB", "1", "32900", "28500", "2026-05-30", "2026-06-06", ""],
+        ["5602", "待处理", "", "8801234567901", "Coupang_海外2店", "T910BG-SA", "2", "45800", "39600", "2026-05-31", "2026-06-07", ""]
+      ]
+    },
+    coupangDomesticOrder: {
+      title: "Coupang本土订单报告",
+      filters: ["处理状态", "店铺", "订单ID", "SKU"],
+      columns: ["中台ID", "处理状态", "映射中台单据号", "映射出入库单号", "店铺", "订单ID", "SKU", "销售确认日期", "销售数量(B)", "结算金额", "报告异常"],
+      rows: [
+        ["3301", "已处理", "SO20260520088", "CK20260521012", "Coupang_海外", "1029384756", "S710-ST-GY-US-326-AZB", "2026-05-20", "1", "18900", ""],
+        ["3302", "已处理", "SO20260521009", "CK20260522015", "Coupang_海外2店", "1029384801", "T910BG-SA", "2026-05-21", "1", "22100", ""]
+      ]
+    },
+    coupangDomesticFee: {
+      title: "Coupang本土费用产生报告",
+      filters: ["处理状态", "店铺", "订单ID", "SKU"],
+      columns: ["中台ID", "处理状态", "映射中台单号", "店铺", "订单ID", "交易类型", "SKU", "销售数量", "最终费用", "费用产生日期（付款完成日期）", "报告异常"],
+      rows: [
+        ["4108", "已处理", "SO20260520088", "Coupang_海外", "1029384756", "配送费支付", "S710-ST-GY-US-326-AZB", "1", "2500", "2026-05-20", ""],
+        ["4109", "待处理", "", "Coupang_海外", "1029384801", "配送费取消", "T910BG-SA", "1", "-2500", "2026-05-21", ""]
+      ]
+    },
+    amazonShipment: {
+      title: "亚马逊发货运输报告",
+      filters: ["处理状态", "店铺", "amazon-order-id", "SKU"],
+      columns: ["中台ID", "处理状态", "映射中台单据号", "映射出入库单号", "店铺", "发货日期", "amazon-order-id", "seller sku", "SKU", "发货数量", "fulfillment-center-id", "月度校验异常"],
+      rows: [
+        ["90211", "已处理", "SO20260531077", "CK20260531102", "Amazon_US", "2026-05-31", "111-2850196-1841865", "S710-ST-GY-CA-326-AZB-stickerless", "S710-ST-GY-US-326-AZB", "1", "SMN1", ""],
+        ["90212", "待处理", "", "", "Amazon_JP", "2026-05-30", "249-1182034-5520001", "T910BG-SA", "", "2", "NRT1", "月度校验时新增"]
+      ]
+    },
+    amazonReturn: {
+      title: "亚马逊客户退货报告",
+      filters: ["处理状态", "店铺", "order-id", "SKU"],
+      columns: ["中台ID", "处理状态", "映射中台单据号", "映射出入库单号", "店铺", "退货时间（当地时间）", "order-id", "seller sku", "SKU", "quantity", "reason", "报告异常"],
+      rows: [
+        ["77101", "已处理", "RMA20260528022", "RK20260530044", "Amazon_US", "2026-05-28", "111-2850196-1841865", "S710-ST-GY-CA-326-AZB-stickerless", "S710-ST-GY-US-326-AZB", "1", "UNWANTED_ITEM", ""],
+        ["77102", "异常", "", "", "Amazon_SA", "2026-05-31", "407-2291844-1100008", "T910BG-SA", "", "1", "DEFECTIVE", "先退后赔"]
+      ]
+    },
+    amazonReimburse: {
+      title: "亚马逊赔偿报告",
+      filters: ["处理状态", "店铺", "amazon-order-id", "SKU"],
+      columns: ["中台ID", "处理状态", "映射中台单据号", "店铺", "approval-date", "amazon-order-id", "reimbursement-id", "seller sku", "SKU", "quantity-reimbursed-total", "reason", "报告异常"],
+      rows: [
+        ["65021", "已处理", "RMA20260515007", "Amazon_US", "2026-05-18", "111-2850196-1841865", "REI-8A2F91", "S710-ST-GY-CA-326-AZB-stickerless", "S710-ST-GY-US-326-AZB", "1", "CustomerReturn", ""],
+        ["65022", "待处理", "", "Amazon_JP", "2026-05-20", "249-1182034-5520001", "REI-9C11B0", "T910BG-SA", "", "2", "Lost_Warehouse", "先赔后退"]
+      ]
+    }
+  };
+
+  function $(id) { return document.getElementById(id); }
+
+  function esc(v) {
+    return String(v == null ? "" : v)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function showToast(msg, type) {
+    const el = $("toast");
+    el.textContent = msg;
+    el.className = "toast show" + (type ? " " + type : "");
+    clearTimeout(state.toastTimer);
+    state.toastTimer = setTimeout(function () {
+      el.className = "toast";
+    }, 2200);
+  }
+
+  function closeOverlay() {
+    $("overlay").classList.remove("open", "drawer-mode");
+    $("dialogRoot").className = "dialog";
+    $("dialogRoot").innerHTML = "";
+  }
+
+  function openOverlay(html, opts) {
+    opts = opts || {};
+    const overlay = $("overlay");
+    const root = $("dialogRoot");
+    overlay.classList.add("open");
+    if (opts.drawer) overlay.classList.add("drawer-mode");
+    else overlay.classList.remove("drawer-mode");
+    root.className = "dialog" + (opts.cls ? " " + opts.cls : "") + (opts.drawer ? " drawer" : "");
+    root.innerHTML = html;
+  }
+
+  function leafItemsHtml(items) {
+    return items.map(function (item) {
+      const active = state.page === item.id ? " is-active" : "";
+      const icon = ICONS[item.icon] || ICONS.leaf;
+      return (
+        '<div class="el-menu-item level-3' + active + '" data-menu="' + item.id + '">' +
+          '<span class="menu-icon">' + icon + "</span>" +
+          '<span class="sle">' + esc(item.label) + "</span>" +
+        "</div>"
+      );
+    }).join("");
+  }
+
+  function groupOpen(key) {
+    return !!state.menuOpen[key];
+  }
+
+  function renderSideMenu() {
+    const salesOpen = groupOpen("sales");
+    const coupangOpen = groupOpen("coupang");
+    const amazonOpen = groupOpen("amazon");
+    const financeOpen = groupOpen("finance");
+
+    $("sideMenu").innerHTML =
+      '<div class="el-sub-menu__title" data-toggle="sales">' +
+        '<span class="menu-icon">' + ICONS.report + "</span>" +
+        '<span class="sle">销售平台报告</span>' +
+        '<span class="submenu-arrow">' + (salesOpen ? "⌃" : "⌄") + "</span>" +
+      "</div>" +
+      '<div class="menu-group' + (salesOpen ? " is-open" : "") + '">' +
+        '<div class="el-sub-menu__title level-2" data-toggle="coupang">' +
+          '<span class="menu-icon">' + ICONS.globe + "</span>" +
+          '<span class="sle">Coupang平台报告</span>' +
+          '<span class="submenu-arrow">' + (coupangOpen ? "⌃" : "⌄") + "</span>" +
+        "</div>" +
+        '<div class="menu-group' + (coupangOpen ? " is-open" : "") + '">' +
+          leafItemsHtml(MOCK.menu.coupangPlatformChildren) +
+        "</div>" +
+        '<div class="el-sub-menu__title level-2" data-toggle="amazon">' +
+          '<span class="menu-icon">' + ICONS.warehouse + "</span>" +
+          '<span class="sle">亚马逊平台报告</span>' +
+          '<span class="submenu-arrow">' + (amazonOpen ? "⌃" : "⌄") + "</span>" +
+        "</div>" +
+        '<div class="menu-group' + (amazonOpen ? " is-open" : "") + '">' +
+          leafItemsHtml(MOCK.menu.amazonPlatformChildren) +
+        "</div>" +
+      "</div>" +
+      '<div class="el-menu-item level-1' + (state.page === "config" ? " is-active" : "") + '" data-menu="config">' +
+        '<span class="menu-icon">' + ICONS.warehouse + "</span>" +
+        '<span class="sle">平台仓库存报告配置</span>' +
+      "</div>" +
+      '<div class="el-sub-menu__title" data-toggle="finance">' +
+        '<span class="menu-icon">' + ICONS.push + "</span>" +
+        '<span class="sle">财务推送任务</span>' +
+        '<span class="submenu-arrow">' + (financeOpen ? "⌃" : "⌄") + "</span>" +
+      "</div>";
+  }
+
+  function expandMenuForPage(page) {
+    const inAmazon = MOCK.menu.amazonPlatformChildren.some(function (item) { return item.id === page; });
+    const inCoupang = MOCK.menu.coupangPlatformChildren.some(function (item) { return item.id === page; });
+    if (inAmazon || inCoupang) state.menuOpen.sales = true;
+    if (inAmazon) state.menuOpen.amazon = true;
+    if (inCoupang) state.menuOpen.coupang = true;
+  }
+
+  function renderExistingPage(page) {
+    const meta = EXISTING_REPORTS[page];
+    if (!meta) return;
+    const filters = meta.filters.map(function (label, i) {
+      return '<select class="control" id="ex-f' + i + '"><option value="">' + esc(label) + "</option></select>";
+    }).join("");
+    const cols = meta.columns.map(function (label, i) {
+      return { key: "c" + i, label: label };
+    });
+    const thead = cols.map(function (c) { return thHtml(c, page); }).join("");
+    const tbody = meta.rows.map(function (row) {
+      return "<tr>" + row.map(function (cell, idx) {
+        const danger = meta.columns[idx] === "报告异常" && cell ? " text-danger" : "";
+        return '<td class="' + danger + '" title="' + esc(cell) + '">' + esc(cell) + "</td>";
+      }).join("") + "</tr>";
+    }).join("");
+    const total = tablePixelWidth(page, cols);
+    $("page-existing").innerHTML =
+      '<div class="search-bar">' +
+        filters +
+        '<button class="btn primary" type="button" data-act="existing-search">搜索</button>' +
+        '<button class="btn" type="button" data-act="existing-reset">重置</button>' +
+      "</div>" +
+      '<section class="table-shell">' +
+        '<div class="table-toolbar">' +
+          '<div class="toolbar-left">' +
+            '<button class="btn light" type="button" data-act="existing-export">导出</button>' +
+          "</div>" +
+        "</div>" +
+        '<div class="table-wrap" id="existingTableWrap">' +
+          '<table style="width:' + total + "px;min-width:" + total + 'px;">' +
+            colgroupHtml(page, cols) +
+            "<thead><tr>" + thead + "</tr></thead><tbody>" + tbody + "</tbody></table>" +
+        "</div>" +
+        pagerHtml(meta.rows.length) +
+      "</section>";
+  }
+
+  function optionsHtml(list, selected) {
+    return list.map(function (v) {
+      const sel = v === selected ? " selected" : "";
+      return '<option value="' + esc(v) + '"' + sel + ">" + esc(v) + "</option>";
+    }).join("");
+  }
+
+  function sitesFromRows(rows) {
+    const set = {};
+    rows.forEach(function (r) {
+      if (r.site) set[r.site] = true;
+    });
+    return ["全部"].concat(Object.keys(set).sort());
+  }
+
+  function legendHtml(kind) {
+    const items = MOCK.legend[kind] || [];
+    return (
+      '<div class="legend-bar">' +
+        items.map(function (it) {
+          return (
+            '<span class="legend-item">' +
+              '<span class="legend-swatch" style="background:' + it.color + ';"></span>' +
+              esc(it.label) +
+            "</span>"
+          );
+        }).join("") +
+      "</div>"
+    );
+  }
+
+  function tipIcon(key) {
+    const tip = MOCK.fieldNotes[key];
+    if (!tip) return "";
+    return '<span class="help-icon" data-tip="' + esc(tip) + '">?</span>';
+  }
+
+  const COL_MIN = 72;
+  const COL_MAX_AUTO = 200;
+  const COL_MAX_DRAG = 560;
+
+  function textWidthPx(text) {
+    const s = String(text == null ? "" : text);
+    let w = 0;
+    for (let i = 0; i < s.length; i++) {
+      w += s.charCodeAt(i) > 255 ? 12 : 7.2;
+    }
+    return w + 28;
+  }
+
+  function autoColWidth(label, key) {
+    if (key === "actions") return 100;
+    let w = textWidthPx(label);
+    if (key === "dbTable") {
+      (state.configRows || []).forEach(function (row) {
+        w = Math.max(w, textWidthPx(row.dbTable));
+      });
+      return Math.min(COL_MAX_DRAG, Math.max(COL_MIN, Math.round(w)));
+    }
+    return Math.min(COL_MAX_AUTO, Math.max(COL_MIN, Math.round(w)));
+  }
+
+  function getColWidth(tableKey, colKey, label) {
+    const saved = state.colWidths[tableKey] && state.colWidths[tableKey][colKey];
+    if (saved) return saved;
+    return autoColWidth(label, colKey);
+  }
+
+  function setColWidth(tableKey, colKey, width) {
+    if (!state.colWidths[tableKey]) state.colWidths[tableKey] = {};
+    state.colWidths[tableKey][colKey] = width;
+  }
+
+  function tablePixelWidth(tableKey, cols) {
+    return cols.reduce(function (sum, col) {
+      return sum + getColWidth(tableKey, col.key, col.label);
+    }, 0);
+  }
+
+  function colgroupHtml(tableKey, cols) {
+    return "<colgroup>" + cols.map(function (col) {
+      const w = getColWidth(tableKey, col.key, col.label);
+      return '<col data-col="' + esc(col.key) + '" style="width:' + w + 'px;">';
+    }).join("") + "</colgroup>";
+  }
+
+  function applyTableWidth(table, tableKey, cols) {
+    const total = tablePixelWidth(tableKey, cols);
+    table.style.width = total + "px";
+    table.style.minWidth = total + "px";
+  }
+
+  function thHtml(col, tableKey) {
+    const num = col.align === "right" ? " num" : "";
+    const help = (col.key === "newQuantity" || col.key === "monthEnd") ? " help-th" : "";
+    const group = col.group || "plain";
+    const w = getColWidth(tableKey, col.key, col.label);
+    let label = esc(col.label);
+    if (col.key === "newQuantity" || col.key === "monthEnd") {
+      label = '<span class="header-help">' + label + tipIcon(col.key) + "</span>";
+    }
+    return (
+      '<th class="g-' + group + num + help + '" style="width:' + w + 'px;" title="' + esc(col.label) + '" data-col="' + esc(col.key) + '">' +
+        '<span class="th-text">' + label + "</span>" +
+        '<span class="col-resizer" data-resize-table="' + esc(tableKey) + '" data-resize-col="' + esc(col.key) + '"></span>' +
+      "</th>"
+    );
+  }
+
+  function cellHtml(col, row) {
+    const num = col.align === "right" ? " num" : "";
+    let val = row[col.key];
+    if (val == null) val = "";
+    const isReason = col.key === "parseAbnormalReason" || col.key === "docAbnormalReason";
+    const cls = isReason && val ? " text-danger" : "";
+    return '<td class="' + num + cls + '" title="' + esc(val) + '">' + esc(val) + "</td>";
+  }
+
+  function pagerHtml(n) {
+    return (
+      '<div class="pager">' +
+        '<span>共 ' + n + " 条</span>" +
+        '<div class="pager-right">' +
+          '<button class="page-btn" type="button">‹</button>' +
+          '<button class="page-btn active" type="button">1</button>' +
+          '<button class="page-btn" type="button">›</button>' +
+          '<select class="control short" style="width:90px;"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>' +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function matchYesNo(filterVal, rowVal) {
+    if (!filterVal || filterVal === "全部") return true;
+    return String(rowVal || "") === filterVal;
+  }
+
+  function matchText(filterVal, rowVal) {
+    if (!filterVal) return true;
+    return String(rowVal || "").toLowerCase().indexOf(String(filterVal).toLowerCase()) >= 0;
+  }
+
+  function isAbnormalRow(row) {
+    return row.parseAbnormal === "是" || row.docAbnormal === "是";
+  }
+
+  /* —— detail page —— */
+  function getDetailFilters() {
+    function norm(v, fallback) {
+      return (!v || v === "全部") ? (fallback || "全部") : v;
+    }
+    return {
+      abnormal: norm(($("d-abnormal") || {}).value),
+      sellable: norm(($("d-sellable") || {}).value),
+      site: norm(($("d-site") || {}).value),
+      docNo: ($("d-docNo") || {}).value || "",
+      msku: ($("d-msku") || {}).value || "",
+      systemSku: ($("d-systemSku") || {}).value || "",
+      scene: norm(($("d-scene") || {}).value),
+      bizType: norm(($("d-biz") || {}).value),
+      dateFrom: ($("d-dateFrom") || {}).value || "",
+      dateTo: ($("d-dateTo") || {}).value || ""
+    };
+  }
+
+  function filterDetailRows() {
+    const f = getDetailFilters();
+    return state.detailRows.filter(function (r) {
+      if (!matchYesNo(f.abnormal, isAbnormalRow(r) ? "是" : "否")) return false;
+      if (!matchYesNo(f.sellable, r.sellable)) return false;
+      if (f.site !== "全部" && r.site !== f.site) return false;
+      if (!matchText(f.docNo, r.docNo)) return false;
+      if (!matchText(f.msku, r.msku)) return false;
+      if (!matchText(f.systemSku, r.systemSku)) return false;
+      if (f.scene !== "全部" && r.scene !== f.scene) return false;
+      if (f.bizType !== "全部" && r.bizType !== f.bizType) return false;
+      if (f.dateFrom && String(r.localDate || "") < f.dateFrom) return false;
+      if (f.dateTo && String(r.localDate || "") > f.dateTo) return false;
+      return true;
+    });
+  }
+
+  function renderDetailPage(keepFilters) {
+    const f = keepFilters ? getDetailFilters() : {
+      abnormal: "全部", sellable: "全部", site: "全部", docNo: "",
+      msku: "", systemSku: "", scene: "全部", bizType: "全部", dateFrom: "", dateTo: ""
+    };
+    const sites = sitesFromRows(state.detailRows);
+    const html =
+      '<div class="search-bar" id="detailFilters">' +
+        '<select id="d-abnormal" class="control short">' +
+          '<option value="">是否异常</option>' +
+          optionsHtml(["是", "否"], f.abnormal === "全部" ? "" : f.abnormal) +
+        "</select>" +
+        '<select id="d-sellable" class="control short">' +
+          '<option value="">是否可售</option>' +
+          optionsHtml(["是", "否"], f.sellable === "全部" ? "" : f.sellable) +
+        "</select>" +
+        '<select id="d-site" class="control">' +
+          '<option value="">站点</option>' +
+          optionsHtml(sites.filter(function (v) { return v !== "全部"; }), f.site === "全部" ? "" : f.site) +
+        "</select>" +
+        '<input id="d-docNo" class="input-control" placeholder="生成单据号" value="' + esc(f.docNo) + '" />' +
+        '<input id="d-msku" class="input-control" placeholder="平台SKU" value="' + esc(f.msku) + '" />' +
+        '<input id="d-systemSku" class="input-control wide" placeholder="系统SKU" value="' + esc(f.systemSku) + '" />' +
+        '<select id="d-scene" class="control">' +
+          '<option value="">大场景分类</option>' +
+          optionsHtml(MOCK.filters.sceneOptions.filter(function (v) { return v !== "全部"; }), f.scene === "全部" ? "" : f.scene) +
+        "</select>" +
+        '<select id="d-biz" class="control">' +
+          '<option value="">业务类</option>' +
+          optionsHtml(MOCK.filters.bizOptions.filter(function (v) { return v !== "全部"; }), f.bizType === "全部" ? "" : f.bizType) +
+        "</select>" +
+        '<input id="d-dateFrom" class="control date" type="date" value="' + esc(f.dateFrom) + '" title="当地日期起" />' +
+        '<input id="d-dateTo" class="control date" type="date" value="' + esc(f.dateTo) + '" title="当地日期止" />' +
+        '<button class="btn primary" type="button" data-act="detail-search">搜索</button>' +
+        '<button class="btn" type="button" data-act="detail-reset">重置</button>' +
+      "</div>" +
+      '<section class="table-shell">' +
+        '<div class="table-toolbar">' +
+          '<div class="toolbar-left">' +
+            '<button class="btn light" type="button" data-act="detail-export">导出</button>' +
+            '<button class="btn light" type="button" data-act="detail-import">批量导入更新</button>' +
+            '<button class="btn light" type="button" data-act="detail-gen-doc">更新后报告生成单据</button>' +
+          "</div>" +
+          '<div class="toolbar-right">' + legendHtml("report") + "</div>" +
+        "</div>" +
+        '<div class="table-wrap" id="detailTableWrap"></div>' +
+        '<div id="detailPager"></div>' +
+      "</section>";
+    $("page-detail").innerHTML = html;
+    renderDetailTable();
+  }
+
+  function renderDetailTable() {
+    state.detailView = filterDetailRows();
+    const cols = MOCK.detailColumns;
+    const rows = state.detailView;
+    let body;
+    if (!rows.length) {
+      body = '<tr><td colspan="' + cols.length + '"><div class="empty">暂无数据</div></td></tr>';
+    } else {
+      body = rows.map(function (r) {
+        return "<tr>" + cols.map(function (c) { return cellHtml(c, r); }).join("") + "</tr>";
+      }).join("");
+    }
+    const total = tablePixelWidth("detail", cols);
+    $("detailTableWrap").innerHTML =
+      '<table style="width:' + total + "px;min-width:" + total + 'px;">' +
+        colgroupHtml("detail", cols) +
+        "<thead><tr>" + cols.map(function (c) { return thHtml(c, "detail"); }).join("") + "</tr></thead>" +
+        "<tbody>" + body + "</tbody>" +
+      "</table>";
+    $("detailPager").innerHTML = pagerHtml(rows.length);
+    bindTips();
+  }
+
+  /* —— summary page —— */
+  function getSummaryFilters() {
+    function norm(v) {
+      return (!v || v === "全部") ? "全部" : v;
+    }
+    return {
+      abnormal: norm(($("s-abnormal") || {}).value),
+      sellable: norm(($("s-sellable") || {}).value),
+      site: norm(($("s-site") || {}).value),
+      docNo: ($("s-docNo") || {}).value || "",
+      msku: ($("s-msku") || {}).value || "",
+      systemSku: ($("s-systemSku") || {}).value || "",
+      scene: norm(($("s-scene") || {}).value),
+      bizType: norm(($("s-biz") || {}).value),
+      dateFrom: ($("s-dateFrom") || {}).value || "",
+      dateTo: ($("s-dateTo") || {}).value || ""
+    };
+  }
+
+  function filterSummaryRows() {
+    const f = getSummaryFilters();
+    return state.summaryRows.filter(function (r) {
+      if (!matchYesNo(f.abnormal, isAbnormalRow(r) ? "是" : "否")) return false;
+      if (!matchYesNo(f.sellable, r.sellable)) return false;
+      if (f.site !== "全部" && r.site !== f.site) return false;
+      if (!matchText(f.docNo, r.docNo)) return false;
+      if (!matchText(f.msku, r.msku)) return false;
+      if (!matchText(f.systemSku, r.systemSku)) return false;
+      if (f.scene !== "全部" && r.scene !== f.scene) return false;
+      if (f.bizType !== "全部" && r.bizType !== f.bizType) return false;
+      if (f.dateFrom && String(r.localDate || "") < f.dateFrom) return false;
+      if (f.dateTo && String(r.localDate || "") > f.dateTo) return false;
+      return true;
+    });
+  }
+
+  function renderSummaryPage(keepFilters) {
+    const f = keepFilters ? getSummaryFilters() : {
+      abnormal: "全部", sellable: "全部", site: "全部", docNo: "",
+      msku: "", systemSku: "", scene: "全部", bizType: "全部", dateFrom: "", dateTo: ""
+    };
+    const sites = sitesFromRows(state.summaryRows);
+    $("page-summary").innerHTML =
+      '<div class="search-bar">' +
+        '<select id="s-abnormal" class="control short">' +
+          '<option value="">是否异常</option>' +
+          optionsHtml(["是", "否"], f.abnormal === "全部" ? "" : f.abnormal) +
+        "</select>" +
+        '<select id="s-sellable" class="control short">' +
+          '<option value="">是否可售</option>' +
+          optionsHtml(["是", "否"], f.sellable === "全部" ? "" : f.sellable) +
+        "</select>" +
+        '<select id="s-site" class="control">' +
+          '<option value="">站点</option>' +
+          optionsHtml(sites.filter(function (v) { return v !== "全部"; }), f.site === "全部" ? "" : f.site) +
+        "</select>" +
+        '<input id="s-docNo" class="input-control" placeholder="生成单据号" value="' + esc(f.docNo) + '" />' +
+        '<input id="s-msku" class="input-control" placeholder="平台SKU" value="' + esc(f.msku) + '" />' +
+        '<input id="s-systemSku" class="input-control wide" placeholder="系统SKU" value="' + esc(f.systemSku) + '" />' +
+        '<select id="s-scene" class="control">' +
+          '<option value="">大场景分类</option>' +
+          optionsHtml(MOCK.filters.sceneOptions.filter(function (v) { return v !== "全部"; }), f.scene === "全部" ? "" : f.scene) +
+        "</select>" +
+        '<select id="s-biz" class="control">' +
+          '<option value="">业务类</option>' +
+          optionsHtml(MOCK.filters.bizOptions.filter(function (v) { return v !== "全部"; }), f.bizType === "全部" ? "" : f.bizType) +
+        "</select>" +
+        '<input id="s-dateFrom" class="control date" type="date" value="' + esc(f.dateFrom) + '" title="当地日期起" />' +
+        '<input id="s-dateTo" class="control date" type="date" value="' + esc(f.dateTo) + '" title="当地日期止" />' +
+        '<button class="btn primary" type="button" data-act="summary-search">搜索</button>' +
+        '<button class="btn" type="button" data-act="summary-reset">重置</button>' +
+      "</div>" +
+      '<section class="table-shell">' +
+        '<div class="table-toolbar">' +
+          '<div class="toolbar-left">' +
+            '<button class="btn light" type="button" data-act="summary-export">导出</button>' +
+            '<button class="btn light" type="button" data-act="summary-import">批量导入更新</button>' +
+            '<button class="btn light" type="button" data-act="summary-gen-doc">更新单据生成</button>' +
+          "</div>" +
+          '<div class="toolbar-right">' + legendHtml("report") + "</div>" +
+        "</div>" +
+        '<div class="table-wrap" id="summaryTableWrap"></div>' +
+        '<div id="summaryPager"></div>' +
+      "</section>";
+    renderSummaryTable();
+  }
+
+  function renderSummaryTable() {
+    state.summaryView = filterSummaryRows();
+    const cols = MOCK.summaryColumns;
+    const rows = state.summaryView;
+    let body;
+    if (!rows.length) {
+      body = '<tr><td colspan="' + cols.length + '"><div class="empty">暂无数据</div></td></tr>';
+    } else {
+      body = rows.map(function (r) {
+        return "<tr>" + cols.map(function (c) { return cellHtml(c, r); }).join("") + "</tr>";
+      }).join("");
+    }
+    const total = tablePixelWidth("summary", cols);
+    $("summaryTableWrap").innerHTML =
+      '<table style="width:' + total + "px;min-width:" + total + 'px;">' +
+        colgroupHtml("summary", cols) +
+        "<thead><tr>" + cols.map(function (c) { return thHtml(c, "summary"); }).join("") + "</tr></thead>" +
+        "<tbody>" + body + "</tbody>" +
+      "</table>";
+    $("summaryPager").innerHTML = pagerHtml(rows.length);
+    bindTips();
+  }
+
+  /* —— config page —— */
+  function getConfigFilters() {
+    function norm(v) {
+      return (!v || v === "全部") ? "全部" : v;
+    }
+    return {
+      site: ($("c-site") || {}).value || "",
+      scene: norm(($("c-scene") || {}).value),
+      bizType: norm(($("c-biz") || {}).value)
+    };
+  }
+
+  function filterConfigRows() {
+    const f = getConfigFilters();
+    return state.configRows.filter(function (r) {
+      if (f.site) {
+        const hay = (String(r.siteLogic || "") + " " + String(r.platform || "")).toLowerCase();
+        if (hay.indexOf(String(f.site).toLowerCase()) < 0) return false;
+      }
+      if (f.scene !== "全部" && r.scene !== f.scene) return false;
+      if (f.bizType !== "全部" && r.bizType !== f.bizType) return false;
+      return true;
+    });
+  }
+
+  function renderConfigPage(keepFilters) {
+    const f = keepFilters ? getConfigFilters() : { site: "", scene: "全部", bizType: "全部" };
+    $("page-config").innerHTML =
+      '<div class="search-bar">' +
+        '<input id="c-site" class="input-control" placeholder="站点关键字" value="' + esc(f.site) + '" />' +
+        '<select id="c-scene" class="control">' +
+          '<option value="">大场景分类</option>' +
+          optionsHtml(MOCK.filters.sceneOptions.filter(function (v) { return v !== "全部"; }), f.scene === "全部" ? "" : f.scene) +
+        "</select>" +
+        '<select id="c-biz" class="control">' +
+          '<option value="">业务类</option>' +
+          optionsHtml(MOCK.filters.bizOptions.filter(function (v) { return v !== "全部"; }), f.bizType === "全部" ? "" : f.bizType) +
+        "</select>" +
+        '<button class="btn primary" type="button" data-act="config-search">搜索</button>' +
+        '<button class="btn" type="button" data-act="config-reset">重置</button>' +
+      "</div>" +
+      '<section class="table-shell">' +
+        '<div class="table-toolbar">' +
+          '<div class="toolbar-left">' +
+            '<button class="btn light" type="button" data-act="config-export">导出</button>' +
+            '<button class="btn primary" type="button" data-act="config-add">新增配置</button>' +
+          "</div>" +
+          '<div class="toolbar-right">' + legendHtml("config") + "</div>" +
+        "</div>" +
+        '<div class="table-wrap" id="configTableWrap"></div>' +
+        '<div id="configPager"></div>' +
+      "</section>";
+    renderConfigTable();
+  }
+
+  function renderConfigTable() {
+    state.configView = filterConfigRows();
+    const cols = MOCK.configColumns;
+    const rows = state.configView;
+    let body;
+    if (!rows.length) {
+      body = '<tr><td colspan="' + cols.length + '"><div class="empty">暂无数据</div></td></tr>';
+    } else {
+      body = rows.map(function (r) {
+        return "<tr>" + cols.map(function (c) {
+          if (c.key === "actions") {
+            return (
+              '<td>' +
+                '<a class="link" data-act="config-edit" data-id="' + esc(r.id) + '">编辑</a>' +
+                '<a class="link danger" data-act="config-delete" data-id="' + esc(r.id) + '">删除</a>' +
+              "</td>"
+            );
+          }
+          return cellHtml(c, r);
+        }).join("") + "</tr>";
+      }).join("");
+    }
+    const total = tablePixelWidth("config", cols);
+    $("configTableWrap").innerHTML =
+      '<table style="width:' + total + "px;min-width:" + total + 'px;">' +
+        colgroupHtml("config", cols) +
+        "<thead><tr>" + cols.map(function (c) { return thHtml(c, "config"); }).join("") + "</tr></thead>" +
+        "<tbody>" + body + "</tbody>" +
+      "</table>";
+    $("configPager").innerHTML = pagerHtml(rows.length);
+  }
+
+  /* —— dialogs —— */
+  function openImportDialog(target) {
+    state.importTarget = target;
+    openOverlay(
+      '<div class="dialog-header"><span>批量导入更新</span><button class="close" type="button" data-act="close">×</button></div>' +
+      '<div class="dialog-body">' +
+        '<div class="import-upload" id="importDrop">' +
+          '<div class="import-upload-icon"><svg viewBox="0 0 67 50"><path d="M33.5 6l12 14h-8v14h-8V20h-8l12-14zm-22 36h44v4H11.5z"/></svg></div>' +
+          '<div class="import-upload-text">将文件拖到此处，或 <em>点击上传</em></div>' +
+          '<div class="import-tip">支持 .xlsx / .csv，单次不超过 10MB（原型演示）</div>' +
+        "</div>" +
+      "</div>" +
+      '<div class="dialog-footer">' +
+        '<button class="btn" type="button" data-act="close">取消</button>' +
+        '<button class="btn primary" type="button" data-act="import-confirm">确认导入</button>' +
+      "</div>",
+      { cls: "narrow" }
+    );
+    const drop = $("importDrop");
+    if (drop) {
+      drop.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        drop.classList.add("dragover");
+      });
+      drop.addEventListener("dragleave", function () { drop.classList.remove("dragover"); });
+      drop.addEventListener("drop", function (e) {
+        e.preventDefault();
+        drop.classList.remove("dragover");
+        showToast("已选择文件（原型）");
+      });
+      drop.addEventListener("click", function () { showToast("已选择文件（原型）"); });
+    }
+  }
+
+  function runGenDoc(target) {
+    const rows = target === "summary" ? state.summaryRows : state.detailRows;
+    let n = 0;
+    rows.forEach(function (r) {
+      if (r.parsedDone === "是" && r.parseAbnormal !== "是" && !r.docNo) {
+        state.docSeq += 1;
+        const prefix = r.docType === "收货列表" ? "IR" : "IA";
+        r.docNo = prefix + "2026" + state.docSeq;
+        n += 1;
+      }
+    });
+    if (target === "summary") renderSummaryTable();
+    else renderDetailTable();
+    showToast(target === "summary"
+      ? ("更新单据生成完成：新生成 " + n + " 条")
+      : ("更新后报告生成单据完成：新生成 " + n + " 条"), "success");
+  }
+
+  function openConfigForm(id) {
+    const row = id ? state.configRows.find(function (r) { return r.id === id; }) : null;
+    state.editingConfigId = id || null;
+    const data = row || {
+      platform: "Amazon", siteLogic: "", statusLogic: "", scene: "备货接收", bizType: "备货接收",
+      bizRule: "", skuField: "msku", dateField: "Date and Time", qtyLogic: "Quantity",
+      inventoryNoField: "", relatedNoField: "", docType: "其他出入库", dbTable: "Inventory Detail",
+      dailySummary: "否", summaryCondition: ""
+    };
+    const fields = [
+      ["platform", "平台"], ["dbTable", "数据库表名"],
+      ["siteLogic", "站点", true], ["statusLogic", "是否可售", true],
+      ["skuField", "平台货品"], ["dateField", "平台日期"], ["qtyLogic", "平台数量"],
+      ["inventoryNoField", "库存流水单号"], ["relatedNoField", "关联单号"],
+      ["scene", "大场景分类"], ["bizType", "业务类"], ["bizRule", "业务类配置规则", true],
+      ["docType", "生成单据类型"],
+      ["dailySummary", "单据生成时按天汇总"], ["summaryCondition", "汇总条件", true]
+    ];
+    const form = fields.map(function (f) {
+      const key = f[0];
+      const label = f[1];
+      const area = f[2];
+      const val = data[key] == null ? "" : data[key];
+      if (key === "dailySummary") {
+        return (
+          '<div class="form-item"><label>' + esc(label) + "</label>" +
+          '<select id="cfg-' + key + '">' +
+            '<option value="是"' + (val === "是" ? " selected" : "") + ">是</option>" +
+            '<option value="否"' + (val !== "是" ? " selected" : "") + ">否</option>" +
+          "</select></div>"
+        );
+      }
+      if (area) {
+        return (
+          '<div class="form-item"><label>' + esc(label) + "</label>" +
+          '<textarea id="cfg-' + key + '">' + esc(val) + "</textarea></div>"
+        );
+      }
+      return (
+        '<div class="form-item"><label>' + esc(label) + "</label>" +
+        '<input id="cfg-' + key + '" value="' + esc(val) + '" /></div>'
+      );
+    }).join("");
+
+    openOverlay(
+      '<div class="dialog-header"><span>' + (id ? "编辑配置" : "新增配置") + '</span>' +
+        '<button class="close" type="button" data-act="close">×</button></div>' +
+      '<div class="dialog-body"><div class="form-grid">' + form + "</div></div>" +
+      '<div class="dialog-footer">' +
+        '<button class="btn" type="button" data-act="close">取消</button>' +
+        '<button class="btn primary" type="button" data-act="config-save">保存</button>' +
+      "</div>",
+      { drawer: true }
+    );
+  }
+
+  function saveConfigForm() {
+    const keys = [
+      "platform", "dbTable", "siteLogic", "statusLogic", "skuField", "dateField",
+      "qtyLogic", "inventoryNoField", "relatedNoField", "scene", "bizType", "bizRule",
+      "docType", "dailySummary", "summaryCondition"
+    ];
+    const payload = {};
+    keys.forEach(function (k) {
+      const el = $("cfg-" + k);
+      payload[k] = el ? el.value : "";
+    });
+    if (!payload.platform || !payload.scene || !payload.bizType) {
+      showToast("请至少填写平台、大场景分类、业务类", "warning");
+      return;
+    }
+    if (state.editingConfigId) {
+      const row = state.configRows.find(function (r) { return r.id === state.editingConfigId; });
+      if (row) Object.keys(payload).forEach(function (k) { row[k] = payload[k]; });
+      showToast("配置已更新", "success");
+    } else {
+      state.configSeq += 1;
+      payload.id = "c" + state.configSeq;
+      state.configRows.push(payload);
+      showToast("配置已新增", "success");
+    }
+    closeOverlay();
+    renderConfigTable();
+  }
+
+  function openDeleteConfirm(id) {
+    state.deleteConfigId = id;
+    const row = state.configRows.find(function (r) { return r.id === id; });
+    openOverlay(
+      '<div class="dialog-header"><span>删除确认</span><button class="close" type="button" data-act="close">×</button></div>' +
+      '<div class="dialog-body"><div class="confirm-msg">确认删除配置「' +
+        esc((row && row.scene) || id) + " / " + esc((row && row.bizType) || "") +
+        "」？删除后不可恢复。</div></div>" +
+      '<div class="dialog-footer">' +
+        '<button class="btn" type="button" data-act="close">取消</button>' +
+        '<button class="btn danger" type="button" data-act="config-delete-confirm">删除</button>' +
+      "</div>",
+      { cls: "narrow" }
+    );
+  }
+
+  function confirmDeleteConfig() {
+    const id = state.deleteConfigId;
+    state.configRows = state.configRows.filter(function (r) { return r.id !== id; });
+    closeOverlay();
+    renderConfigTable();
+    showToast("已删除配置", "success");
+  }
+
+  /* —— navigation —— */
+  function switchPage(page) {
+    const isExisting = !!EXISTING_REPORTS[page];
+    if (!PAGE_META[page] && !isExisting) {
+      showToast("该菜单为正式环境参考入口，本期原型未展开", "warning");
+      return;
+    }
+    state.page = page;
+    expandMenuForPage(page);
+    ["detail", "summary", "config"].forEach(function (p) {
+      const el = $("page-" + p);
+      if (el) el.classList.toggle("active", p === page);
+    });
+    const existingEl = $("page-existing");
+    if (existingEl) existingEl.classList.toggle("active", isExisting);
+    if (isExisting) renderExistingPage(page);
+    renderSideMenu();
+  }
+
+  function bindTips() {
+    document.querySelectorAll(".help-icon").forEach(function (icon) {
+      icon.onmouseenter = function (e) {
+        const tip = $("tooltip");
+        tip.textContent = icon.getAttribute("data-tip") || "";
+        tip.style.display = "block";
+        const rect = icon.getBoundingClientRect();
+        const tipRect = tip.getBoundingClientRect();
+        let top = rect.top - tipRect.height - 8;
+        if (top < 8) top = rect.bottom + 8;
+        let left = rect.left + rect.width / 2 - tipRect.width / 2;
+        if (left < 8) left = 8;
+        tip.style.top = top + "px";
+        tip.style.left = left + "px";
+      };
+      icon.onmouseleave = function () {
+        $("tooltip").style.display = "none";
+      };
+    });
+  }
+
+  document.addEventListener("click", function (e) {
+    const toggleEl = e.target.closest("[data-toggle]");
+    if (toggleEl) {
+      const key = toggleEl.getAttribute("data-toggle");
+      state.menuOpen[key] = !state.menuOpen[key];
+      renderSideMenu();
+      return;
+    }
+
+    const menuItem = e.target.closest("[data-menu]");
+    if (menuItem) {
+      switchPage(menuItem.getAttribute("data-menu"));
+      return;
+    }
+
+    const actEl = e.target.closest("[data-act]");
+    if (!actEl) {
+      if (e.target.id === "overlay") closeOverlay();
+      return;
+    }
+    const act = actEl.getAttribute("data-act");
+    const id = actEl.getAttribute("data-id");
+
+    switch (act) {
+      case "close": closeOverlay(); break;
+      case "detail-search": renderDetailTable(); break;
+      case "detail-reset": renderDetailPage(false); break;
+      case "detail-export": showToast("已导出 " + state.detailView.length + " 条"); break;
+      case "detail-import": openImportDialog("detail"); break;
+      case "detail-gen-doc": runGenDoc("detail"); break;
+      case "summary-search": renderSummaryTable(); break;
+      case "summary-reset": renderSummaryPage(false); break;
+      case "summary-export": showToast("已导出 " + state.summaryView.length + " 条"); break;
+      case "summary-import": openImportDialog("summary"); break;
+      case "summary-gen-doc": runGenDoc("summary"); break;
+      case "import-confirm":
+        closeOverlay();
+        showToast("批量导入更新成功", "success");
+        break;
+      case "config-search": renderConfigTable(); break;
+      case "config-reset": renderConfigPage(false); break;
+      case "config-export": showToast("已导出 " + state.configView.length + " 条"); break;
+      case "config-add": openConfigForm(null); break;
+      case "config-edit": openConfigForm(id); break;
+      case "config-delete": openDeleteConfirm(id); break;
+      case "config-delete-confirm": confirmDeleteConfig(); break;
+      case "config-save": saveConfigForm(); break;
+      case "existing-search":
+      case "existing-reset":
+        renderExistingPage(state.page);
+        break;
+      case "existing-export":
+        showToast("已导出 " + ((EXISTING_REPORTS[state.page] && EXISTING_REPORTS[state.page].rows.length) || 0) + " 条");
+        break;
+      default: break;
+    }
+  });
+
+  /* init */
+  (function bindSidebarResize() {
+    const layout = document.querySelector(".layout");
+    const handle = $("sidebarResizer");
+    const minW = 210;
+    const maxW = 480;
+    const storageKey = "eva-proto-sidebar-width";
+
+    function applyWidth(w) {
+      const width = Math.min(maxW, Math.max(minW, Math.round(w)));
+      document.documentElement.style.setProperty("--sidebar-width", width + "px");
+      return width;
+    }
+
+    const saved = parseInt(localStorage.getItem(storageKey) || "", 10);
+    if (saved) applyWidth(saved);
+
+    let dragging = false;
+
+    handle.addEventListener("mousedown", function (e) {
+      e.preventDefault();
+      dragging = true;
+      layout.classList.add("is-resizing");
+    });
+
+    document.addEventListener("mousemove", function (e) {
+      if (!dragging) return;
+      applyWidth(e.clientX);
+    });
+
+    document.addEventListener("mouseup", function () {
+      if (!dragging) return;
+      dragging = false;
+      layout.classList.remove("is-resizing");
+      const current = getComputedStyle(document.documentElement).getPropertyValue("--sidebar-width").trim();
+      localStorage.setItem(storageKey, String(parseInt(current, 10) || minW));
+    });
+  })();
+
+  (function bindColResize() {
+    let dragging = null;
+
+    document.addEventListener("mousedown", function (e) {
+      const handle = e.target.closest(".col-resizer");
+      if (!handle) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const th = handle.parentElement;
+      const table = th.closest("table");
+      const colKey = handle.getAttribute("data-resize-col");
+      dragging = {
+        tableKey: handle.getAttribute("data-resize-table"),
+        colKey: colKey,
+        th: th,
+        col: table.querySelector('col[data-col="' + colKey + '"]'),
+        table: table,
+        startX: e.clientX,
+        startW: th.getBoundingClientRect().width,
+        handle: handle
+      };
+      handle.classList.add("is-active");
+      document.body.classList.add("is-col-resizing");
+    });
+
+    document.addEventListener("mousemove", function (e) {
+      if (!dragging) return;
+      const w = Math.min(COL_MAX_DRAG, Math.max(COL_MIN, Math.round(dragging.startW + (e.clientX - dragging.startX))));
+      dragging.th.style.width = w + "px";
+      if (dragging.col) dragging.col.style.width = w + "px";
+      setColWidth(dragging.tableKey, dragging.colKey, w);
+      let total = 0;
+      dragging.table.querySelectorAll("col").forEach(function (colEl) {
+        total += parseInt(colEl.style.width, 10) || 0;
+      });
+      dragging.table.style.width = total + "px";
+      dragging.table.style.minWidth = total + "px";
+    });
+
+    document.addEventListener("mouseup", function () {
+      if (!dragging) return;
+      dragging.handle.classList.remove("is-active");
+      document.body.classList.remove("is-col-resizing");
+      dragging = null;
+    });
+  })();
+
+  renderSideMenu();
+  renderDetailPage(false);
+  renderSummaryPage(false);
+  renderConfigPage(false);
+  switchPage("detail");
+})();
+  </script>
+</body>
+</html>
