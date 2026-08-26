@@ -38,8 +38,8 @@
       { "key": "exception", "label": "更新/异常字段", "color": "#ec808d" }
     ],
     "config": [
-      { "key": "common", "label": "通用逻辑字段", "color": "#80ffff" },
-      { "key": "diff", "label": "差异逻辑字段", "color": "#ffff80" }
+      { "key": "common", "label": "同一平台共用逻辑字段", "color": "#80ffff" },
+      { "key": "diff", "label": "同一平台差异逻辑字段", "color": "#ffff80" }
     ]
   },
   "detailColumns": [
