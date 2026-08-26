@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>亚马逊平台报告 - 高保真原型</title>
+  <title>多平台库存报告拉取/解析_需求原型</title>
   <style>
     :root {
       --primary: #1677ff;
@@ -765,8 +765,8 @@
         { "key": "exception", "label": "更新/异常字段", "color": "#ec808d" }
       ],
       "config": [
-        { "key": "common", "label": "通用逻辑字段", "color": "#80ffff" },
-        { "key": "diff", "label": "差异逻辑字段", "color": "#ffff80" }
+        { "key": "common", "label": "同一平台共用逻辑字段", "color": "#80ffff" },
+        { "key": "diff", "label": "同一平台差异逻辑字段", "color": "#ffff80" }
       ]
     },
     "detailColumns": [
@@ -1034,7 +1034,7 @@
     },
     config: {
       title: "平台仓库存报告配置",
-      desc: "维护平台仓库存报告的站点/状态匹配、业务类规则、单据类型与汇总逻辑。蓝色底为通用逻辑，黄色底为差异逻辑。"
+      desc: "维护平台仓库存报告的站点/状态匹配、业务类规则、单据类型与汇总逻辑。蓝色底为同一平台共用逻辑，黄色底为同一平台差异逻辑。"
     }
   };
 
