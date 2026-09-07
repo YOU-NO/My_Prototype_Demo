@@ -1,17 +1,19 @@
 {
   "menu": {
-    "note": "侧栏：销售平台报告（含 Coupang/亚马逊平台报告）与「平台仓库存报告配置」同级；已删除报告解析配置入口。",
+    "note": "侧栏：销售平台报告（含 Coupang平台报告、Amazon平台报告）与「库存报告规则配置」同级；已删除报告解析配置入口。",
     "parents": [
       "销售平台报告",
-      "平台仓库存报告配置",
-      "财务推送任务"
+      "库存报告规则配置",
+      "财务系统对接"
     ],
     "coupangPlatformChildren": [
       { "id": "coupangGlobalOrder", "label": "Coupang海外订单报告" },
       { "id": "coupangGlobalReturn", "label": "Coupang海外退货报告" },
       { "id": "coupangGlobalSettle", "label": "Coupang海外结算报告" },
+      { "id": "coupangGlobalInventory", "label": "Coupang海外库存报告" },
       { "id": "coupangDomesticOrder", "label": "Coupang本土订单报告" },
-      { "id": "coupangDomesticFee", "label": "Coupang本土费用产生报告" }
+      { "id": "coupangDomesticFee", "label": "Coupang本土费用产生报告" },
+      { "id": "coupangDomesticInventory", "label": "Coupang本土库存报告" }
     ],
     "amazonPlatformChildren": [
       { "id": "amazonShipment", "label": "亚马逊发货运输报告" },
@@ -21,7 +23,7 @@
       { "id": "summary", "label": "亚马逊库存汇总报告" }
     ],
     "topLevel": [
-      { "id": "config", "label": "平台仓库存报告配置" }
+      { "id": "config", "label": "库存报告规则配置" }
     ]
   },
   "filters": {
@@ -32,10 +34,9 @@
   },
   "legend": {
     "report": [
-      { "key": "platform", "label": "平台原始字段", "color": "#81d3f8" },
-      { "key": "parsed", "label": "EVA 解析字段", "color": "#ffff80" },
-      { "key": "docNo", "label": "生成单据号", "color": "#95f204" },
-      { "key": "exception", "label": "更新/异常字段", "color": "#ec808d" }
+      { "key": "platform", "label": "报告原始字段", "color": "#81d3f8" },
+      { "key": "parsed", "label": "报告解析字段", "color": "#ffff80" },
+      { "key": "exception", "label": "报告状态字段", "color": "#ec808d" }
     ],
     "config": [
       { "key": "common", "label": "同一平台共用逻辑字段", "color": "#80ffff" },
@@ -56,9 +57,7 @@
     { "key": "country", "label": "Country", "group": "platform" },
     { "key": "disposition", "label": "Disposition", "group": "platform" },
     { "key": "dateAndTime", "label": "Date and Time", "group": "platform" },
-    { "key": "newQuantity", "label": "New Quantity", "group": "platform", "align": "right" },
-    { "key": "platform", "label": "平台", "group": "platform" },
-    { "key": "monthEnd", "label": "是否月末报告", "group": "platform" },
+    { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
     { "key": "site", "label": "站点", "group": "parsed" },
     { "key": "localDate", "label": "当地日期", "group": "parsed" },
     { "key": "systemSku", "label": "系统sku", "group": "parsed" },
@@ -69,8 +68,8 @@
     { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
     { "key": "docType", "label": "生成单据类型", "group": "parsed" },
     { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
-    { "key": "parsedDone", "label": "是否解析完成", "group": "parsed" },
-    { "key": "docNo", "label": "生成单据号", "group": "docNo" },
+    { "key": "docNo", "label": "生成单据号", "group": "parsed" },
+    { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
     { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
     { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
     { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" },
@@ -99,9 +98,7 @@
     { "key": "endingBalance", "label": "Ending Warehouse Balance", "group": "platform", "align": "right" },
     { "key": "location", "label": "Location", "group": "platform" },
     { "key": "unknownEvents", "label": "Unknown Events", "group": "platform", "align": "right" },
-    { "key": "newQuantity", "label": "New Quantity", "group": "platform", "align": "right" },
-    { "key": "platform", "label": "平台", "group": "platform" },
-    { "key": "monthEnd", "label": "是否月末报告", "group": "platform" },
+    { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
     { "key": "site", "label": "站点", "group": "parsed" },
     { "key": "localDate", "label": "当地日期", "group": "parsed" },
     { "key": "systemSku", "label": "系统sku", "group": "parsed" },
@@ -112,8 +109,8 @@
     { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
     { "key": "docType", "label": "生成单据类型", "group": "parsed" },
     { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
-    { "key": "parsedDone", "label": "是否解析完成", "group": "parsed" },
-    { "key": "docNo", "label": "生成单据号", "group": "docNo" },
+    { "key": "docNo", "label": "生成单据号", "group": "parsed" },
+    { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
     { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
     { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
     { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" },
@@ -134,7 +131,7 @@
     { "key": "bizType", "label": "业务类", "group": "diff" },
     { "key": "bizRule", "label": "业务类配置规则", "group": "diff" },
     { "key": "docType", "label": "生成单据类型", "group": "diff" },
-    { "key": "dailySummary", "label": "单据生成时按天汇总", "group": "diff" },
+    { "key": "dailySummary", "label": "单据生成是否按天汇总", "group": "diff" },
     { "key": "summaryCondition", "label": "汇总条件", "group": "diff" },
     { "key": "actions", "label": "操作", "group": "plain" }
   ],
@@ -448,6 +445,146 @@
       "dbTable": "Inventory Summary",
       "dailySummary": "是",
       "summaryCondition": "按站点+MSKU+Disposition 按天汇总"
+    }
+  ],
+  "coupangDomesticColumns": [
+    { "key": "productId", "label": "注册商品ID", "group": "platform" },
+    { "key": "attrId", "label": "属性ID", "group": "platform" },
+    { "key": "skuId", "label": "SKU ID", "group": "platform" },
+    { "key": "productName", "label": "注册商品名", "group": "platform" },
+    { "key": "qtyBefore", "label": "变更前数量", "group": "platform", "align": "right" },
+    { "key": "transferDoneQty", "label": "调拨完成数量", "group": "platform", "align": "right" },
+    { "key": "inboundApplyQty", "label": "入库申请数量", "group": "platform", "align": "right" },
+    { "key": "sellableQty", "label": "可售数量", "group": "platform", "align": "right" },
+    { "key": "transferringQty", "label": "调拨中数量", "group": "platform", "align": "right" },
+    { "key": "delaySaleQty", "label": "延迟开始销售数量", "group": "platform", "align": "right" },
+    { "key": "outboundQty", "label": "出库数量", "group": "platform", "align": "right" },
+    { "key": "redistribQty", "label": "重新配送数量", "group": "platform", "align": "right" },
+    { "key": "customerReturnQty", "label": "顾客退货数量", "group": "platform", "align": "right" },
+    { "key": "removedQty", "label": "已移出库数量", "group": "platform", "align": "right" },
+    { "key": "processingQty", "label": "处理中数量", "group": "platform", "align": "right" },
+    { "key": "lostDamagedQty", "label": "确认丢失/损坏数量", "group": "platform", "align": "right" },
+    { "key": "qtyAfter", "label": "变更后数量", "group": "platform", "align": "right" },
+    { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
+    { "key": "site", "label": "站点", "group": "parsed" },
+    { "key": "localDate", "label": "当地日期", "group": "parsed" },
+    { "key": "systemSku", "label": "系统SKU", "group": "parsed" },
+    { "key": "scene", "label": "大场景分类", "group": "parsed" },
+    { "key": "bizType", "label": "业务类", "group": "parsed" },
+    { "key": "warehouse", "label": "仓库", "group": "parsed" },
+    { "key": "sellable", "label": "是否可售", "group": "parsed" },
+    { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
+    { "key": "docType", "label": "生成单据类型", "group": "parsed" },
+    { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
+    { "key": "docNo", "label": "生成单据号", "group": "parsed" },
+    { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
+    { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
+    { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
+    { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" },
+    { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
+    { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" }
+  ],
+  "coupangGlobalColumns": [
+    { "key": "viId", "label": "VI ID", "group": "platform" },
+    { "key": "productId", "label": "Product ID", "group": "platform" },
+    { "key": "quantity", "label": "Quantity", "group": "platform", "align": "right" },
+    { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
+    { "key": "site", "label": "站点", "group": "parsed" },
+    { "key": "localDate", "label": "当地日期", "group": "parsed" },
+    { "key": "systemSku", "label": "系统SKU", "group": "parsed" },
+    { "key": "scene", "label": "大场景分类", "group": "parsed" },
+    { "key": "bizType", "label": "业务类", "group": "parsed" },
+    { "key": "warehouse", "label": "仓库", "group": "parsed" },
+    { "key": "sellable", "label": "是否可售", "group": "parsed" },
+    { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
+    { "key": "docType", "label": "生成单据类型", "group": "parsed" },
+    { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
+    { "key": "docNo", "label": "生成单据号", "group": "parsed" },
+    { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
+    { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
+    { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
+    { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" },
+    { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
+    { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" }
+  ],
+  "coupangDomesticRowsNote": "样例来自 平台报告原型示例数据表.xlsx Sheet Coupang本土库存报告；平台数量列均为 0，解析数量见 qty。",
+  "coupangDomesticRows": [
+    {
+      "id": "cdi1", "productId": "16194119404", "attrId": "95393260616", "skuId": "73369384",
+      "productName": "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320",
+      "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
+      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
+      "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
+      "scene": "期初", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 720, "docType": "其他出入库", "dailySummary": "否",
+      "docNo": "", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+    },
+    {
+      "id": "cdi2", "productId": "16194119404", "attrId": "95393260616", "skuId": "73369384",
+      "productName": "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320",
+      "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
+      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
+      "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
+      "scene": "发运", "bizType": "出库", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -566, "docType": "其他出入库", "dailySummary": "否",
+      "docNo": "", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+    },
+    {
+      "id": "cdi3", "productId": "16194119404", "attrId": "95393260616", "skuId": "73369384",
+      "productName": "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320",
+      "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
+      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
+      "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
+      "scene": "发运", "bizType": "重新配送", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -1, "docType": "其他出入库", "dailySummary": "否",
+      "docNo": "", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+    },
+    {
+      "id": "cdi4", "productId": "16194119404", "attrId": "95393260616", "skuId": "73369384",
+      "productName": "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320",
+      "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
+      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
+      "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
+      "scene": "退运", "bizType": "顾客退货", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 35, "docType": "其他出入库", "dailySummary": "否",
+      "docNo": "", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+    },
+    {
+      "id": "cdi5", "productId": "16194119404", "attrId": "95393260616", "skuId": "73369384",
+      "productName": "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320",
+      "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
+      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
+      "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
+      "scene": "移除", "bizType": "已移出库", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -11, "docType": "其他出入库", "dailySummary": "否",
+      "docNo": "", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+    },
+    {
+      "id": "cdi6", "productId": "16194119404", "attrId": "95393260616", "skuId": "73369384",
+      "productName": "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320",
+      "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
+      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
+      "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
+      "scene": "其他", "bizType": "处理中", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -11, "docType": "其他出入库", "dailySummary": "否",
+      "docNo": "", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+    },
+    {
+      "id": "cdi7", "productId": "16194119404", "attrId": "95393260616", "skuId": "73369384",
+      "productName": "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320",
+      "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
+      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
+      "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
+      "scene": "期末", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 166, "docType": "其他出入库", "dailySummary": "否",
+      "docNo": "", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+    }
+  ],
+  "coupangGlobalRows": [
+    {
+      "id": "cgi1", "viId": "92529096184", "productId": "92529096184", "quantity": 31, "newQuantity": "",
+      "site": "Coupang-CGF1", "localDate": "2026-07-31", "systemSku": "S700-ST-BL-KR-615-REF",
+      "scene": "", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 31, "docType": "其他出入库", "dailySummary": "否",
+      "docNo": "", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+    },
+    {
+      "id": "cgi2", "viId": "93316832936", "productId": "8991797344", "quantity": 647, "newQuantity": "",
+      "site": "Coupang-CGF2", "localDate": "2026-07-31", "systemSku": "E310-ST-GY-KR-646",
+      "scene": "", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 647, "docType": "其他出入库", "dailySummary": "否",
+      "docNo": "", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
     }
   ],
   "fieldNotes": {
