@@ -171,6 +171,26 @@
       white-space: nowrap;
     }
 
+    .el-menu-item.is-scope {
+      background: #fff7e6;
+    }
+
+    .el-menu-item.is-scope.is-active {
+      background: var(--primary-weak);
+    }
+
+    .menu-scope-tag {
+      flex: none;
+      margin-left: 6px;
+      padding: 0 5px;
+      height: 16px;
+      line-height: 16px;
+      font-size: 10px;
+      color: #fff;
+      background: #e6a23c;
+      border-radius: 2px;
+    }
+
     .submenu-arrow {
       margin-left: auto;
       color: #909399;
@@ -445,6 +465,26 @@
 
     tbody tr:hover { background: #f9fbff; }
 
+    th.col-sticky-right,
+    td.col-sticky-right {
+      position: sticky;
+      right: 0;
+      box-shadow: -6px 0 8px -4px rgba(0, 0, 0, 0.12);
+    }
+
+    th.col-sticky-right {
+      z-index: 3;
+    }
+
+    td.col-sticky-right {
+      z-index: 2;
+      background: #fff;
+    }
+
+    tbody tr:hover td.col-sticky-right {
+      background: #f9fbff;
+    }
+
     .empty {
       padding: 36px 0;
       color: var(--secondary);
@@ -697,6 +737,16 @@
       resize: vertical;
     }
 
+    .form-item input:disabled,
+    .form-item select:disabled,
+    .form-item textarea:disabled {
+      color: #c0c4cc;
+      background: #f5f7fa;
+      border-color: #e4e7ed;
+      cursor: not-allowed;
+      resize: none;
+    }
+
     .confirm-msg {
       color: var(--regular);
       line-height: 20px;
@@ -720,6 +770,7 @@
           <section id="page-summary" class="page-panel"></section>
           <section id="page-config" class="page-panel"></section>
           <section id="page-existing" class="page-panel"></section>
+          <section id="page-empty" class="page-panel"></section>
         </div>
       </div>
     </main>
@@ -740,8 +791,10 @@
         { "id": "coupangGlobalOrder", "label": "Coupang海外订单报告", "icon": "leaf" },
         { "id": "coupangGlobalReturn", "label": "Coupang海外退货报告", "icon": "leaf" },
         { "id": "coupangGlobalSettle", "label": "Coupang海外结算报告", "icon": "globe" },
+        { "id": "coupangGlobalInventory", "label": "Coupang海外库存报告", "icon": "leaf", "scope": true },
         { "id": "coupangDomesticOrder", "label": "Coupang本土订单报告", "icon": "leaf" },
-        { "id": "coupangDomesticFee", "label": "Coupang本土费用产生报告", "icon": "leaf" }
+        { "id": "coupangDomesticFee", "label": "Coupang本土费用产生报告", "icon": "leaf" },
+        { "id": "coupangDomesticInventory", "label": "Coupang本土库存报告", "icon": "leaf", "scope": true }
       ],
       "amazonPlatformChildren": [
         { "id": "amazonShipment", "label": "亚马逊发货运输报告", "icon": "leaf" },
@@ -759,10 +812,9 @@
     },
     "legend": {
       "report": [
-        { "key": "platform", "label": "平台原始字段", "color": "#81d3f8" },
-        { "key": "parsed", "label": "EVA 解析字段", "color": "#ffff80" },
-        { "key": "docNo", "label": "生成单据号", "color": "#95f204" },
-        { "key": "exception", "label": "更新/异常字段", "color": "#ec808d" }
+        { "key": "platform", "label": "报告原始字段", "color": "#81d3f8" },
+        { "key": "parsed", "label": "报告解析字段", "color": "#ffff80" },
+        { "key": "exception", "label": "报告状态字段", "color": "#ec808d" }
       ],
       "config": [
         { "key": "common", "label": "同一平台共用逻辑字段", "color": "#80ffff" },
@@ -783,9 +835,7 @@
       { "key": "country", "label": "Country", "group": "platform" },
       { "key": "disposition", "label": "Disposition", "group": "platform" },
       { "key": "dateAndTime", "label": "Date and Time", "group": "platform" },
-      { "key": "newQuantity", "label": "New Quantity", "group": "platform", "align": "right" },
-      { "key": "platform", "label": "平台", "group": "platform" },
-      { "key": "monthEnd", "label": "是否月末报告", "group": "platform" },
+      { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
       { "key": "site", "label": "站点", "group": "parsed" },
       { "key": "localDate", "label": "当地日期", "group": "parsed" },
       { "key": "systemSku", "label": "系统sku", "group": "parsed" },
@@ -796,8 +846,8 @@
       { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
       { "key": "docType", "label": "生成单据类型", "group": "parsed" },
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
-      { "key": "parsedDone", "label": "是否解析完成", "group": "parsed" },
-      { "key": "docNo", "label": "生成单据号", "group": "docNo" },
+      { "key": "docNo", "label": "生成单据号", "group": "parsed" },
+      { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
       { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
       { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
       { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" },
@@ -826,9 +876,7 @@
       { "key": "endingBalance", "label": "Ending Warehouse Balance", "group": "platform", "align": "right" },
       { "key": "location", "label": "Location", "group": "platform" },
       { "key": "unknownEvents", "label": "Unknown Events", "group": "platform", "align": "right" },
-      { "key": "newQuantity", "label": "New Quantity", "group": "platform", "align": "right" },
-      { "key": "platform", "label": "平台", "group": "platform" },
-      { "key": "monthEnd", "label": "是否月末报告", "group": "platform" },
+      { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
       { "key": "site", "label": "站点", "group": "parsed" },
       { "key": "localDate", "label": "当地日期", "group": "parsed" },
       { "key": "systemSku", "label": "系统sku", "group": "parsed" },
@@ -839,8 +887,8 @@
       { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
       { "key": "docType", "label": "生成单据类型", "group": "parsed" },
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
-      { "key": "parsedDone", "label": "是否解析完成", "group": "parsed" },
-      { "key": "docNo", "label": "生成单据号", "group": "docNo" },
+      { "key": "docNo", "label": "生成单据号", "group": "parsed" },
+      { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
       { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
       { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
       { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" },
@@ -861,7 +909,7 @@
       { "key": "bizType", "label": "业务类", "group": "diff" },
       { "key": "bizRule", "label": "业务类配置规则", "group": "diff" },
       { "key": "docType", "label": "生成单据类型", "group": "diff" },
-      { "key": "dailySummary", "label": "单据生成时按天汇总", "group": "diff" },
+      { "key": "dailySummary", "label": "单据生成是否按天汇总", "group": "diff" },
       { "key": "summaryCondition", "label": "汇总条件", "group": "diff" },
       { "key": "actions", "label": "操作", "group": "plain" }
     ],
@@ -988,6 +1036,68 @@
         "dbTable": "Inventory Summary", "dailySummary": "是", "summaryCondition": "按站点+MSKU+Disposition 按天汇总"
       }
     ],
+    "coupangDomesticColumns": [
+      { "key": "productId", "label": "注册商品ID", "group": "platform" },
+      { "key": "attrId", "label": "属性ID", "group": "platform" },
+      { "key": "skuId", "label": "SKU ID", "group": "platform" },
+      { "key": "productName", "label": "注册商品名", "group": "platform" },
+      { "key": "qtyBefore", "label": "变更前数量", "group": "platform", "align": "right" },
+      { "key": "transferDoneQty", "label": "调拨完成数量", "group": "platform", "align": "right" },
+      { "key": "inboundApplyQty", "label": "入库申请数量", "group": "platform", "align": "right" },
+      { "key": "sellableQty", "label": "可售数量", "group": "platform", "align": "right" },
+      { "key": "transferringQty", "label": "调拨中数量", "group": "platform", "align": "right" },
+      { "key": "delaySaleQty", "label": "延迟开始销售数量", "group": "platform", "align": "right" },
+      { "key": "outboundQty", "label": "出库数量", "group": "platform", "align": "right" },
+      { "key": "redistribQty", "label": "重新配送数量", "group": "platform", "align": "right" },
+      { "key": "customerReturnQty", "label": "顾客退货数量", "group": "platform", "align": "right" },
+      { "key": "removedQty", "label": "已移出库数量", "group": "platform", "align": "right" },
+      { "key": "processingQty", "label": "处理中数量", "group": "platform", "align": "right" },
+      { "key": "lostDamagedQty", "label": "确认丢失/损坏数量", "group": "platform", "align": "right" },
+      { "key": "qtyAfter", "label": "变更后数量", "group": "platform", "align": "right" },
+      { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
+      { "key": "site", "label": "站点", "group": "parsed" },
+      { "key": "localDate", "label": "当地日期", "group": "parsed" },
+      { "key": "systemSku", "label": "系统SKU", "group": "parsed" },
+      { "key": "scene", "label": "大场景分类", "group": "parsed" },
+      { "key": "bizType", "label": "业务类", "group": "parsed" },
+      { "key": "warehouse", "label": "仓库", "group": "parsed" },
+      { "key": "sellable", "label": "是否可售", "group": "parsed" },
+      { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
+      { "key": "docType", "label": "生成单据类型", "group": "parsed" },
+      { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
+      { "key": "docNo", "label": "生成单据号", "group": "parsed" },
+      { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
+      { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
+      { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
+      { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" },
+      { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
+      { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" }
+    ],
+    "coupangGlobalColumns": [
+      { "key": "viId", "label": "VI ID", "group": "platform" },
+      { "key": "productId", "label": "Product ID", "group": "platform" },
+      { "key": "quantity", "label": "Quantity", "group": "platform", "align": "right" },
+      { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
+      { "key": "site", "label": "站点", "group": "parsed" },
+      { "key": "localDate", "label": "当地日期", "group": "parsed" },
+      { "key": "systemSku", "label": "系统SKU", "group": "parsed" },
+      { "key": "scene", "label": "大场景分类", "group": "parsed" },
+      { "key": "bizType", "label": "业务类", "group": "parsed" },
+      { "key": "warehouse", "label": "仓库", "group": "parsed" },
+      { "key": "sellable", "label": "是否可售", "group": "parsed" },
+      { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
+      { "key": "docType", "label": "生成单据类型", "group": "parsed" },
+      { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
+      { "key": "docNo", "label": "生成单据号", "group": "parsed" },
+      { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
+      { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
+      { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
+      { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" },
+      { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
+      { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" }
+    ],
+    "coupangDomesticRows": [],
+    "coupangGlobalRows": [],
     "fieldNotes": {
       "newQuantity": "更新时数量不一致则写入此字段；未生成单据时可直接改 Quantity。",
       "monthEnd": "默认为否，解析时自动带出；月末汇总报告通过日期转为当月最后一天。",
@@ -1004,22 +1114,135 @@
     }
   };
 
+  (function fillCoupangInventoryRows() {
+    const productName = "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320";
+    const domesticBase = {
+      productId: "16194119404",
+      attrId: "95393260616",
+      skuId: "73369384",
+      productName: productName,
+      qtyBefore: 0,
+      transferDoneQty: 0,
+      inboundApplyQty: 0,
+      sellableQty: 0,
+      transferringQty: 0,
+      delaySaleQty: 0,
+      outboundQty: 0,
+      redistribQty: 0,
+      customerReturnQty: 0,
+      removedQty: 0,
+      processingQty: 0,
+      lostDamagedQty: 0,
+      qtyAfter: 0,
+      newQuantity: 0,
+      site: "Coupang本土-KR",
+      localDate: "2026-07-31",
+      systemSku: "E320-ST-WT-KR-608",
+      warehouse: "韩国Coupang本土店仓",
+      sellable: "",
+      docType: "其他出入库",
+      dailySummary: "否",
+      docNo: "",
+      parsedDone: "是",
+      hasUpdate: "否",
+      docAbnormal: "否",
+      docAbnormalReason: "",
+      parseAbnormal: "否",
+      parseAbnormalReason: ""
+    };
+    const domesticScenes = [
+      { id: "cdi1", scene: "期初", bizType: "", qty: 720 },
+      { id: "cdi2", scene: "发运", bizType: "出库", qty: -566 },
+      { id: "cdi3", scene: "发运", bizType: "重新配送", qty: -1 },
+      { id: "cdi4", scene: "退运", bizType: "顾客退货", qty: 35 },
+      { id: "cdi5", scene: "移除", bizType: "已移出库", qty: -11 },
+      { id: "cdi6", scene: "其他", bizType: "处理中", qty: -11 },
+      { id: "cdi7", scene: "期末", bizType: "", qty: 166 }
+    ];
+    MOCK.coupangDomesticRows = domesticScenes.map(function (item) {
+      const row = {};
+      Object.keys(domesticBase).forEach(function (k) { row[k] = domesticBase[k]; });
+      row.id = item.id;
+      row.scene = item.scene;
+      row.bizType = item.bizType;
+      row.qty = item.qty;
+      return row;
+    });
+    function cleanSku(v) {
+      return String(v || "").replace(/\r/g, "").trim();
+    }
+    MOCK.coupangGlobalRows = [
+      {
+        id: "cgi1",
+        viId: "92529096184",
+        productId: "92529096184",
+        quantity: 31,
+        newQuantity: "",
+        site: "Coupang-CGF1",
+        localDate: "2026-07-31",
+        systemSku: cleanSku("S700-ST-BL-KR-615-REF"),
+        scene: "",
+        bizType: "",
+        warehouse: "韩国Coupang本土店仓",
+        sellable: "",
+        qty: 31,
+        docType: "其他出入库",
+        dailySummary: "否",
+        docNo: "",
+        parsedDone: "是",
+        hasUpdate: "否",
+        docAbnormal: "否",
+        docAbnormalReason: "",
+        parseAbnormal: "否",
+        parseAbnormalReason: ""
+      },
+      {
+        id: "cgi2",
+        viId: "93316832936",
+        productId: "8991797344",
+        quantity: 647,
+        newQuantity: "",
+        site: "Coupang-CGF2",
+        localDate: "2026-07-31",
+        systemSku: cleanSku("E310-ST-GY-KR-646"),
+        scene: "",
+        bizType: "",
+        warehouse: "韩国Coupang本土店仓",
+        sellable: "",
+        qty: 647,
+        docType: "其他出入库",
+        dailySummary: "否",
+        docNo: "",
+        parsedDone: "是",
+        hasUpdate: "否",
+        docAbnormal: "否",
+        docAbnormalReason: "",
+        parseAbnormal: "否",
+        parseAbnormalReason: ""
+      }
+    ];
+  })();
+
   /* —— state —— */
   const state = {
     page: "detail",
     detailRows: JSON.parse(JSON.stringify(MOCK.detailRows)),
     summaryRows: JSON.parse(JSON.stringify(MOCK.summaryRows)),
     configRows: JSON.parse(JSON.stringify(MOCK.configRows)),
+    cdiRows: JSON.parse(JSON.stringify(MOCK.coupangDomesticRows)),
+    cgiRows: JSON.parse(JSON.stringify(MOCK.coupangGlobalRows)),
     detailView: [],
     summaryView: [],
     configView: [],
+    cdiView: [],
+    cgiView: [],
     docSeq: 700,
     configSeq: 5,
     editingConfigId: null,
     deleteConfigId: null,
     importTarget: "detail",
     toastTimer: null,
-    menuOpen: { sales: true, coupang: false, amazon: true, finance: false },
+    menuOpen: { sales: true, coupang: true, amazon: false, finance: false },
     colWidths: {}
   };
 
@@ -1033,10 +1256,22 @@
       desc: "展示平台库存汇总水位差异（Unknown Events 等）及解析、单据结果；支持导入更新、解析与单据生成。"
     },
     config: {
-      title: "平台仓库存报告配置",
+      title: "库存报告规则配置",
       desc: "维护平台仓库存报告的站点/状态匹配、业务类规则、单据类型与汇总逻辑。蓝色底为同一平台共用逻辑，黄色底为同一平台差异逻辑。"
+    },
+    coupangGlobalInventory: {
+      title: "Coupang海外库存报告",
+      desc: "展示 Coupang 海外库存水位及 EVA 解析、单据生成结果；筛选与操作对齐亚马逊分类明细报告。"
+    },
+    coupangDomesticInventory: {
+      title: "Coupang本土库存报告",
+      desc: "展示 Coupang 本土库存事件明细及 EVA 解析、单据生成结果；筛选与操作对齐亚马逊分类明细报告。"
     }
   };
+
+  function isCoupangInvPage(page) {
+    return page === "coupangGlobalInventory" || page === "coupangDomesticInventory";
+  }
 
   const ICONS = {
     report: '<svg viewBox="0 0 16 16"><path d="M4 2.5h6l2 2v9H4z"/><path d="M10 2.5v2h2"/><path d="M6 8h4"/><path d="M6 10.5h3"/></svg>',
@@ -1162,11 +1397,16 @@
   function leafItemsHtml(items) {
     return items.map(function (item) {
       const active = state.page === item.id ? " is-active" : "";
+      const scope = item.scope ? " is-scope" : "";
       const icon = ICONS[item.icon] || ICONS.leaf;
+      const tag = item.scope
+        ? '<span class="menu-scope-tag" title="本期需求改动页面">本期</span>'
+        : "";
       return (
-        '<div class="el-menu-item level-3' + active + '" data-menu="' + item.id + '">' +
+        '<div class="el-menu-item level-3' + active + scope + '" data-menu="' + item.id + '">' +
           '<span class="menu-icon">' + icon + "</span>" +
           '<span class="sle">' + esc(item.label) + "</span>" +
+          tag +
         "</div>"
       );
     }).join("");
@@ -1199,20 +1439,21 @@
         "</div>" +
         '<div class="el-sub-menu__title level-2" data-toggle="amazon">' +
           '<span class="menu-icon">' + ICONS.warehouse + "</span>" +
-          '<span class="sle">亚马逊平台报告</span>' +
+          '<span class="sle">Amazon平台报告</span>' +
           '<span class="submenu-arrow">' + (amazonOpen ? "⌃" : "⌄") + "</span>" +
         "</div>" +
         '<div class="menu-group' + (amazonOpen ? " is-open" : "") + '">' +
           leafItemsHtml(MOCK.menu.amazonPlatformChildren) +
         "</div>" +
       "</div>" +
-      '<div class="el-menu-item level-1' + (state.page === "config" ? " is-active" : "") + '" data-menu="config">' +
+      '<div class="el-menu-item level-1' + (state.page === "config" ? " is-active" : "") + ' is-scope" data-menu="config">' +
         '<span class="menu-icon">' + ICONS.warehouse + "</span>" +
-        '<span class="sle">平台仓库存报告配置</span>' +
+        '<span class="sle">库存报告规则配置</span>' +
+        '<span class="menu-scope-tag" title="本期需求改动页面">本期</span>' +
       "</div>" +
       '<div class="el-sub-menu__title" data-toggle="finance">' +
         '<span class="menu-icon">' + ICONS.push + "</span>" +
-        '<span class="sle">财务推送任务</span>' +
+        '<span class="sle">财务系统对接</span>' +
         '<span class="submenu-arrow">' + (financeOpen ? "⌃" : "⌄") + "</span>" +
       "</div>";
   }
@@ -1278,6 +1519,34 @@
     return ["全部"].concat(Object.keys(set).sort());
   }
 
+  function uniqueFromRows(rows, key) {
+    const set = {};
+    (rows || []).forEach(function (r) {
+      const v = r[key];
+      if (v) set[v] = true;
+    });
+    return Object.keys(set);
+  }
+
+  function coupangInvCtx(page) {
+    if (page === "coupangGlobalInventory") {
+      return {
+        page: page,
+        cols: MOCK.coupangGlobalColumns,
+        rowsKey: "cgiRows",
+        viewKey: "cgiView",
+        skuKeys: ["viId", "productId"]
+      };
+    }
+    return {
+      page: page,
+      cols: MOCK.coupangDomesticColumns,
+      rowsKey: "cdiRows",
+      viewKey: "cdiView",
+      skuKeys: ["skuId"]
+    };
+  }
+
   function legendHtml(kind) {
     const items = MOCK.legend[kind] || [];
     return (
@@ -1314,7 +1583,7 @@
   }
 
   function autoColWidth(label, key) {
-    if (key === "actions") return 100;
+    if (key === "actions") return 148;
     let w = textWidthPx(label);
     if (key === "dbTable") {
       (state.configRows || []).forEach(function (row) {
@@ -1357,15 +1626,16 @@
 
   function thHtml(col, tableKey) {
     const num = col.align === "right" ? " num" : "";
-    const help = (col.key === "newQuantity" || col.key === "monthEnd") ? " help-th" : "";
+    const help = col.key === "newQuantity" ? " help-th" : "";
+    const sticky = col.key === "actions" ? " col-sticky-right" : "";
     const group = col.group || "plain";
     const w = getColWidth(tableKey, col.key, col.label);
     let label = esc(col.label);
-    if (col.key === "newQuantity" || col.key === "monthEnd") {
+    if (col.key === "newQuantity") {
       label = '<span class="header-help">' + label + tipIcon(col.key) + "</span>";
     }
     return (
-      '<th class="g-' + group + num + help + '" style="width:' + w + 'px;" title="' + esc(col.label) + '" data-col="' + esc(col.key) + '">' +
+      '<th class="g-' + group + num + help + sticky + '" style="width:' + w + 'px;" title="' + esc(col.label) + '" data-col="' + esc(col.key) + '">' +
         '<span class="th-text">' + label + "</span>" +
         '<span class="col-resizer" data-resize-table="' + esc(tableKey) + '" data-resize-col="' + esc(col.key) + '"></span>' +
       "</th>"
@@ -1520,6 +1790,124 @@
     bindTips();
   }
 
+  /* —— Coupang inventory pages —— */
+  function getCoupangInvFilters() {
+    function norm(v) {
+      return (!v || v === "全部") ? "全部" : v;
+    }
+    return {
+      abnormal: norm(($("ci-abnormal") || {}).value),
+      sellable: norm(($("ci-sellable") || {}).value),
+      site: norm(($("ci-site") || {}).value),
+      docNo: ($("ci-docNo") || {}).value || "",
+      msku: ($("ci-msku") || {}).value || "",
+      systemSku: ($("ci-systemSku") || {}).value || "",
+      scene: norm(($("ci-scene") || {}).value),
+      bizType: norm(($("ci-biz") || {}).value),
+      dateFrom: ($("ci-dateFrom") || {}).value || "",
+      dateTo: ($("ci-dateTo") || {}).value || ""
+    };
+  }
+
+  function filterCoupangInvRows(ctx) {
+    const f = getCoupangInvFilters();
+    return state[ctx.rowsKey].filter(function (r) {
+      if (!matchYesNo(f.abnormal, isAbnormalRow(r) ? "是" : "否")) return false;
+      if (!matchYesNo(f.sellable, r.sellable)) return false;
+      if (f.site !== "全部" && r.site !== f.site) return false;
+      if (!matchText(f.docNo, r.docNo)) return false;
+      if (f.msku) {
+        const hit = ctx.skuKeys.some(function (k) { return matchText(f.msku, r[k]); });
+        if (!hit) return false;
+      }
+      if (!matchText(f.systemSku, r.systemSku)) return false;
+      if (f.scene !== "全部" && r.scene !== f.scene) return false;
+      if (f.bizType !== "全部" && r.bizType !== f.bizType) return false;
+      if (f.dateFrom && String(r.localDate || "") < f.dateFrom) return false;
+      if (f.dateTo && String(r.localDate || "") > f.dateTo) return false;
+      return true;
+    });
+  }
+
+  function renderCoupangInvPage(keepFilters) {
+    const ctx = coupangInvCtx(state.page);
+    const rows = state[ctx.rowsKey];
+    const f = keepFilters ? getCoupangInvFilters() : {
+      abnormal: "全部", sellable: "全部", site: "全部", docNo: "",
+      msku: "", systemSku: "", scene: "全部", bizType: "全部", dateFrom: "", dateTo: ""
+    };
+    const sites = sitesFromRows(rows);
+    const scenes = uniqueFromRows(rows, "scene");
+    const bizTypes = uniqueFromRows(rows, "bizType");
+    $("page-empty").innerHTML =
+      '<div class="search-bar" id="coupangInvFilters">' +
+        '<select id="ci-abnormal" class="control short">' +
+          '<option value="">是否异常</option>' +
+          optionsHtml(["是", "否"], f.abnormal === "全部" ? "" : f.abnormal) +
+        "</select>" +
+        '<select id="ci-sellable" class="control short">' +
+          '<option value="">是否可售</option>' +
+          optionsHtml(["是", "否"], f.sellable === "全部" ? "" : f.sellable) +
+        "</select>" +
+        '<select id="ci-site" class="control">' +
+          '<option value="">站点</option>' +
+          optionsHtml(sites.filter(function (v) { return v !== "全部"; }), f.site === "全部" ? "" : f.site) +
+        "</select>" +
+        '<input id="ci-docNo" class="input-control" placeholder="生成单据号" value="' + esc(f.docNo) + '" />' +
+        '<input id="ci-msku" class="input-control" placeholder="平台SKU" value="' + esc(f.msku) + '" />' +
+        '<input id="ci-systemSku" class="input-control wide" placeholder="系统SKU" value="' + esc(f.systemSku) + '" />' +
+        '<select id="ci-scene" class="control">' +
+          '<option value="">大场景分类</option>' +
+          optionsHtml(scenes, f.scene === "全部" ? "" : f.scene) +
+        "</select>" +
+        '<select id="ci-biz" class="control">' +
+          '<option value="">业务类</option>' +
+          optionsHtml(bizTypes, f.bizType === "全部" ? "" : f.bizType) +
+        "</select>" +
+        '<input id="ci-dateFrom" class="control date" type="date" value="' + esc(f.dateFrom) + '" title="当地日期起" />' +
+        '<input id="ci-dateTo" class="control date" type="date" value="' + esc(f.dateTo) + '" title="当地日期止" />' +
+        '<button class="btn primary" type="button" data-act="ci-search">搜索</button>' +
+        '<button class="btn" type="button" data-act="ci-reset">重置</button>' +
+      "</div>" +
+      '<section class="table-shell">' +
+        '<div class="table-toolbar">' +
+          '<div class="toolbar-left">' +
+            '<button class="btn light" type="button" data-act="ci-export">导出</button>' +
+            '<button class="btn light" type="button" data-act="ci-import">批量导入更新</button>' +
+            '<button class="btn light" type="button" data-act="ci-gen-doc">更新后报告生成单据</button>' +
+          "</div>" +
+          '<div class="toolbar-right">' + legendHtml("report") + "</div>" +
+        "</div>" +
+        '<div class="table-wrap" id="coupangInvTableWrap"></div>' +
+        '<div id="coupangInvPager"></div>' +
+      "</section>";
+    renderCoupangInvTable();
+  }
+
+  function renderCoupangInvTable() {
+    const ctx = coupangInvCtx(state.page);
+    const cols = ctx.cols;
+    const rows = filterCoupangInvRows(ctx);
+    state[ctx.viewKey] = rows;
+    let body;
+    if (!rows.length) {
+      body = '<tr><td colspan="' + cols.length + '"><div class="empty">暂无数据</div></td></tr>';
+    } else {
+      body = rows.map(function (r) {
+        return "<tr>" + cols.map(function (c) { return cellHtml(c, r); }).join("") + "</tr>";
+      }).join("");
+    }
+    const total = tablePixelWidth(ctx.page, cols);
+    $("coupangInvTableWrap").innerHTML =
+      '<table style="width:' + total + "px;min-width:" + total + 'px;">' +
+        colgroupHtml(ctx.page, cols) +
+        "<thead><tr>" + cols.map(function (c) { return thHtml(c, ctx.page); }).join("") + "</tr></thead>" +
+        "<tbody>" + body + "</tbody>" +
+      "</table>";
+    $("coupangInvPager").innerHTML = pagerHtml(rows.length);
+    bindTips();
+  }
+
   /* —— summary page —— */
   function getSummaryFilters() {
     function norm(v) {
@@ -1636,19 +2024,25 @@
       return (!v || v === "全部") ? "全部" : v;
     }
     return {
-      site: ($("c-site") || {}).value || "",
+      platform: norm(($("c-platform") || {}).value),
       scene: norm(($("c-scene") || {}).value),
       bizType: norm(($("c-biz") || {}).value)
     };
   }
 
+  function configPlatformOptions() {
+    const set = {};
+    (state.configRows || []).forEach(function (r) {
+      if (r.platform) set[r.platform] = true;
+    });
+    ["Amazon", "Coupang"].forEach(function (p) { set[p] = true; });
+    return Object.keys(set).sort();
+  }
+
   function filterConfigRows() {
     const f = getConfigFilters();
     return state.configRows.filter(function (r) {
-      if (f.site) {
-        const hay = (String(r.siteLogic || "") + " " + String(r.platform || "")).toLowerCase();
-        if (hay.indexOf(String(f.site).toLowerCase()) < 0) return false;
-      }
+      if (f.platform !== "全部" && r.platform !== f.platform) return false;
       if (f.scene !== "全部" && r.scene !== f.scene) return false;
       if (f.bizType !== "全部" && r.bizType !== f.bizType) return false;
       return true;
@@ -1656,10 +2050,13 @@
   }
 
   function renderConfigPage(keepFilters) {
-    const f = keepFilters ? getConfigFilters() : { site: "", scene: "全部", bizType: "全部" };
+    const f = keepFilters ? getConfigFilters() : { platform: "全部", scene: "全部", bizType: "全部" };
     $("page-config").innerHTML =
       '<div class="search-bar">' +
-        '<input id="c-site" class="input-control" placeholder="站点关键字" value="' + esc(f.site) + '" />' +
+        '<select id="c-platform" class="control">' +
+          '<option value="">平台</option>' +
+          optionsHtml(configPlatformOptions(), f.platform === "全部" ? "" : f.platform) +
+        "</select>" +
         '<select id="c-scene" class="control">' +
           '<option value="">大场景分类</option>' +
           optionsHtml(MOCK.filters.sceneOptions.filter(function (v) { return v !== "全部"; }), f.scene === "全部" ? "" : f.scene) +
@@ -1697,7 +2094,8 @@
         return "<tr>" + cols.map(function (c) {
           if (c.key === "actions") {
             return (
-              '<td>' +
+              '<td class="col-sticky-right">' +
+                '<a class="link" data-act="config-view" data-id="' + esc(r.id) + '">查看</a>' +
                 '<a class="link" data-act="config-edit" data-id="' + esc(r.id) + '">编辑</a>' +
                 '<a class="link danger" data-act="config-delete" data-id="' + esc(r.id) + '">删除</a>' +
               "</td>"
@@ -1752,7 +2150,23 @@
   }
 
   function runGenDoc(target) {
-    const rows = target === "summary" ? state.summaryRows : state.detailRows;
+    let rows;
+    let refresh;
+    let successMsg;
+    if (target === "summary") {
+      rows = state.summaryRows;
+      refresh = renderSummaryTable;
+      successMsg = "更新单据生成完成：新生成 ";
+    } else if (isCoupangInvPage(target)) {
+      const ctx = coupangInvCtx(target);
+      rows = state[ctx.rowsKey];
+      refresh = renderCoupangInvTable;
+      successMsg = "更新后报告生成单据完成：新生成 ";
+    } else {
+      rows = state.detailRows;
+      refresh = renderDetailTable;
+      successMsg = "更新后报告生成单据完成：新生成 ";
+    }
     let n = 0;
     rows.forEach(function (r) {
       if (r.parsedDone === "是" && r.parseAbnormal !== "是" && !r.docNo) {
@@ -1762,16 +2176,14 @@
         n += 1;
       }
     });
-    if (target === "summary") renderSummaryTable();
-    else renderDetailTable();
-    showToast(target === "summary"
-      ? ("更新单据生成完成：新生成 " + n + " 条")
-      : ("更新后报告生成单据完成：新生成 " + n + " 条"), "success");
+    refresh();
+    showToast(successMsg + n + " 条", "success");
   }
 
-  function openConfigForm(id) {
+  function openConfigForm(id, mode) {
+    const viewOnly = mode === "view";
     const row = id ? state.configRows.find(function (r) { return r.id === id; }) : null;
-    state.editingConfigId = id || null;
+    state.editingConfigId = viewOnly ? null : (id || null);
     const data = row || {
       platform: "Amazon", siteLogic: "", statusLogic: "", scene: "备货接收", bizType: "备货接收",
       bizRule: "", skuField: "msku", dateField: "Date and Time", qtyLogic: "Quantity",
@@ -1785,8 +2197,9 @@
       ["inventoryNoField", "库存流水单号"], ["relatedNoField", "关联单号"],
       ["scene", "大场景分类"], ["bizType", "业务类"], ["bizRule", "业务类配置规则", true],
       ["docType", "生成单据类型"],
-      ["dailySummary", "单据生成时按天汇总"], ["summaryCondition", "汇总条件", true]
+      ["dailySummary", "单据生成是否按天汇总"], ["summaryCondition", "汇总条件", true]
     ];
+    const disabled = viewOnly ? " disabled" : "";
     const form = fields.map(function (f) {
       const key = f[0];
       const label = f[1];
@@ -1795,7 +2208,7 @@
       if (key === "dailySummary") {
         return (
           '<div class="form-item"><label>' + esc(label) + "</label>" +
-          '<select id="cfg-' + key + '">' +
+          '<select id="cfg-' + key + '"' + disabled + '>' +
             '<option value="是"' + (val === "是" ? " selected" : "") + ">是</option>" +
             '<option value="否"' + (val !== "是" ? " selected" : "") + ">否</option>" +
           "</select></div>"
@@ -1804,23 +2217,26 @@
       if (area) {
         return (
           '<div class="form-item"><label>' + esc(label) + "</label>" +
-          '<textarea id="cfg-' + key + '">' + esc(val) + "</textarea></div>"
+          '<textarea id="cfg-' + key + '"' + disabled + '>' + esc(val) + "</textarea></div>"
         );
       }
       return (
         '<div class="form-item"><label>' + esc(label) + "</label>" +
-        '<input id="cfg-' + key + '" value="' + esc(val) + '" /></div>'
+        '<input id="cfg-' + key + '" value="' + esc(val) + '"' + disabled + ' /></div>'
       );
     }).join("");
 
+    const title = viewOnly ? "查看配置" : (id ? "编辑配置" : "新增配置");
+    const footer = viewOnly
+      ? '<button class="btn primary" type="button" data-act="close">关闭</button>'
+      : ('<button class="btn" type="button" data-act="close">取消</button>' +
+         '<button class="btn primary" type="button" data-act="config-save">保存</button>');
+
     openOverlay(
-      '<div class="dialog-header"><span>' + (id ? "编辑配置" : "新增配置") + '</span>' +
+      '<div class="dialog-header"><span>' + title + '</span>' +
         '<button class="close" type="button" data-act="close">×</button></div>' +
       '<div class="dialog-body"><div class="form-grid">' + form + "</div></div>" +
-      '<div class="dialog-footer">' +
-        '<button class="btn" type="button" data-act="close">取消</button>' +
-        '<button class="btn primary" type="button" data-act="config-save">保存</button>' +
-      "</div>",
+      '<div class="dialog-footer">' + footer + "</div>",
       { drawer: true }
     );
   }
@@ -1881,6 +2297,7 @@
   /* —— navigation —— */
   function switchPage(page) {
     const isExisting = !!EXISTING_REPORTS[page];
+    const isCoupangInv = isCoupangInvPage(page);
     if (!PAGE_META[page] && !isExisting) {
       showToast("该菜单为正式环境参考入口，本期原型未展开", "warning");
       return;
@@ -1894,6 +2311,12 @@
     const existingEl = $("page-existing");
     if (existingEl) existingEl.classList.toggle("active", isExisting);
     if (isExisting) renderExistingPage(page);
+    const emptyEl = $("page-empty");
+    if (emptyEl) {
+      emptyEl.classList.toggle("active", isCoupangInv);
+      if (isCoupangInv) renderCoupangInvPage(false);
+      else emptyEl.innerHTML = "";
+    }
     renderSideMenu();
   }
 
@@ -1948,6 +2371,15 @@
       case "detail-export": showToast("已导出 " + state.detailView.length + " 条"); break;
       case "detail-import": openImportDialog("detail"); break;
       case "detail-gen-doc": runGenDoc("detail"); break;
+      case "ci-search": renderCoupangInvTable(); break;
+      case "ci-reset": renderCoupangInvPage(false); break;
+      case "ci-export":
+        showToast("已导出 " + ((isCoupangInvPage(state.page)
+          ? state[coupangInvCtx(state.page).viewKey]
+          : []).length) + " 条");
+        break;
+      case "ci-import": openImportDialog(state.page); break;
+      case "ci-gen-doc": runGenDoc(state.page); break;
       case "summary-search": renderSummaryTable(); break;
       case "summary-reset": renderSummaryPage(false); break;
       case "summary-export": showToast("已导出 " + state.summaryView.length + " 条"); break;
@@ -1961,6 +2393,7 @@
       case "config-reset": renderConfigPage(false); break;
       case "config-export": showToast("已导出 " + state.configView.length + " 条"); break;
       case "config-add": openConfigForm(null); break;
+      case "config-view": openConfigForm(id, "view"); break;
       case "config-edit": openConfigForm(id); break;
       case "config-delete": openDeleteConfirm(id); break;
       case "config-delete-confirm": confirmDeleteConfig(); break;
@@ -2066,7 +2499,7 @@
   renderDetailPage(false);
   renderSummaryPage(false);
   renderConfigPage(false);
-  switchPage("detail");
+  switchPage("coupangDomesticInventory");
 })();
   </script>
 </body>
