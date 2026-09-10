@@ -43,6 +43,34 @@
       { "key": "diff", "label": "同一平台差异逻辑字段", "color": "#ffff80" }
     ]
   },
+  "configLookups": {
+    "platformsNote": "来自平台管理 platformName，对齐 PlatformEnums（不含虚拟平台 SHOPEEGLOBAL）",
+    "platforms": [
+      "Amazon", "eBay", "Rakuten", "Shopee", "Lazada", "Shopify", "Naver", "Coupang",
+      "Temu", "Shein", "Walmart", "Cdiscount", "Tiktok", "Aliexpress", "Salesforce",
+      "Netsuite", "Market", "KR", "BackMarket", "Other", "Yahoo", "国际分销", "Gmarket", "Noon"
+    ],
+    "dbTablesNote": "原型示例表名，非正式库表",
+    "dbTables": [
+      "Inventory Detail",
+      "Inventory Summary",
+      "Coupang_KR_Inventory_Daily",
+      "Coupang_Global_Inventory_Snapshot",
+      "FBA_Inventory_Ledger",
+      "Platform_SKU_Qty_Delta"
+    ],
+    "firstScenesNote": "其他入库单一级库存场景；代码已引用备货、调拨，其余为与本期配置样例对齐的级联项",
+    "firstScenes": ["备货", "调拨", "报废", "找回", "Unknown Events"],
+    "secondScenesNote": "其他入库单二级库存场景；中途取消、品质调拨入库来自现有业务代码/单据生成说明",
+    "secondScenesByFirst": {
+      "备货": ["备货接收", "中途取消"],
+      "调拨": ["中途取消", "品质调拨入库"],
+      "报废": ["报废"],
+      "找回": ["找回"],
+      "Unknown Events": ["Unknown Events"]
+    },
+    "docTypes": ["其他入库单", "其他出库单"]
+  },
   "detailColumns": [
     { "key": "sellerid", "label": "sellerid", "group": "platform" },
     { "key": "date", "label": "Date", "group": "platform" },
@@ -122,9 +150,9 @@
     { "key": "dbTable", "label": "数据库表名", "group": "common" },
     { "key": "siteLogic", "label": "站点", "group": "common" },
     { "key": "statusLogic", "label": "是否可售", "group": "common" },
-    { "key": "skuField", "label": "平台货品", "group": "common" },
+    { "key": "skuField", "label": "货品SKU", "group": "common" },
     { "key": "dateField", "label": "平台日期", "group": "common" },
-    { "key": "qtyLogic", "label": "平台数量", "group": "common" },
+    { "key": "qtyLogic", "label": "货品数量", "group": "common" },
     { "key": "inventoryNoField", "label": "库存流水单号", "group": "common" },
     { "key": "relatedNoField", "label": "关联单号", "group": "common" },
     { "key": "scene", "label": "大场景分类", "group": "diff" },
@@ -132,7 +160,6 @@
     { "key": "bizRule", "label": "业务类配置规则", "group": "diff" },
     { "key": "docType", "label": "生成单据类型", "group": "diff" },
     { "key": "dailySummary", "label": "单据生成是否按天汇总", "group": "diff" },
-    { "key": "summaryCondition", "label": "汇总条件", "group": "diff" },
     { "key": "actions", "label": "操作", "group": "plain" }
   ],
   "detailRows": [
@@ -379,7 +406,7 @@
       "platform": "Amazon",
       "siteLogic": "统一规则，识别所有的站点",
       "statusLogic": "统一规则，识别所有的状态",
-      "scene": "备货接收",
+      "scene": "备货",
       "bizType": "备货接收",
       "bizRule": "EventType = 'Receipts'",
       "skuField": "msku",
@@ -387,7 +414,7 @@
       "qtyLogic": "Quantity",
       "inventoryNoField": "记录流水 ID，需标记到单据",
       "relatedNoField": "货件计划、退货 RMA 等上游单号",
-      "docType": "收货列表",
+      "docType": "其他入库单",
       "dbTable": "Inventory Detail",
       "dailySummary": "否",
       "summaryCondition": ""
@@ -405,7 +432,7 @@
       "qtyLogic": "Quantity",
       "inventoryNoField": "ReferenceID",
       "relatedNoField": "ReferenceID",
-      "docType": "其他出入库",
+      "docType": "其他入库单",
       "dbTable": "Inventory Detail",
       "dailySummary": "否",
       "summaryCondition": ""
@@ -423,7 +450,7 @@
       "qtyLogic": "Quantity",
       "inventoryNoField": "ReferenceID",
       "relatedNoField": "ReferenceID",
-      "docType": "其他出入库",
+      "docType": "其他出库单",
       "dbTable": "Inventory Detail",
       "dailySummary": "否",
       "summaryCondition": ""
@@ -441,7 +468,7 @@
       "qtyLogic": "Unknown Events",
       "inventoryNoField": "",
       "relatedNoField": "",
-      "docType": "其他出入库",
+      "docType": "其他入库单",
       "dbTable": "Inventory Summary",
       "dailySummary": "是",
       "summaryCondition": "按站点+MSKU+Disposition 按天汇总"
@@ -590,7 +617,7 @@
   "fieldNotes": {
     "newQuantity": "更新时数量不一致则写入此字段；未生成单据时可直接改 Quantity。",
     "monthEnd": "默认为否，解析时自动带出；月末汇总报告通过日期转为当月最后一天。",
-    "docType": "多选；一条明细可对应多个单据类型。",
+    "docType": "其他入库单、其他出库单。",
     "parseFlow": [
       "监控缓存是否可解析",
       "校验数据库表名",
