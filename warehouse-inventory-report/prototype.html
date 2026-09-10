@@ -821,6 +821,30 @@
         { "key": "diff", "label": "同一平台差异逻辑字段", "color": "#ffff80" }
       ]
     },
+    "configLookups": {
+      "platforms": [
+        "Amazon", "eBay", "Rakuten", "Shopee", "Lazada", "Shopify", "Naver", "Coupang",
+        "Temu", "Shein", "Walmart", "Cdiscount", "Tiktok", "Aliexpress", "Salesforce",
+        "Netsuite", "Market", "KR", "BackMarket", "Other", "Yahoo", "国际分销", "Gmarket", "Noon"
+      ],
+      "dbTables": [
+        "Inventory Detail",
+        "Inventory Summary",
+        "Coupang_KR_Inventory_Daily",
+        "Coupang_Global_Inventory_Snapshot",
+        "FBA_Inventory_Ledger",
+        "Platform_SKU_Qty_Delta"
+      ],
+      "firstScenes": ["备货", "调拨", "报废", "找回", "Unknown Events"],
+      "secondScenesByFirst": {
+        "备货": ["备货接收", "中途取消"],
+        "调拨": ["中途取消", "品质调拨入库"],
+        "报废": ["报废"],
+        "找回": ["找回"],
+        "Unknown Events": ["Unknown Events"]
+      },
+      "docTypes": ["其他入库单", "其他出库单"]
+    },
     "detailColumns": [
       { "key": "sellerid", "label": "sellerid", "group": "platform" },
       { "key": "date", "label": "Date", "group": "platform" },
@@ -900,9 +924,9 @@
       { "key": "dbTable", "label": "数据库表名", "group": "common" },
       { "key": "siteLogic", "label": "站点", "group": "common" },
       { "key": "statusLogic", "label": "是否可售", "group": "common" },
-      { "key": "skuField", "label": "平台货品", "group": "common" },
+      { "key": "skuField", "label": "货品SKU", "group": "common" },
       { "key": "dateField", "label": "平台日期", "group": "common" },
-      { "key": "qtyLogic", "label": "平台数量", "group": "common" },
+      { "key": "qtyLogic", "label": "货品数量", "group": "common" },
       { "key": "inventoryNoField", "label": "库存流水单号", "group": "common" },
       { "key": "relatedNoField", "label": "关联单号", "group": "common" },
       { "key": "scene", "label": "大场景分类", "group": "diff" },
@@ -910,7 +934,6 @@
       { "key": "bizRule", "label": "业务类配置规则", "group": "diff" },
       { "key": "docType", "label": "生成单据类型", "group": "diff" },
       { "key": "dailySummary", "label": "单据生成是否按天汇总", "group": "diff" },
-      { "key": "summaryCondition", "label": "汇总条件", "group": "diff" },
       { "key": "actions", "label": "操作", "group": "plain" }
     ],
     "detailRows": [
@@ -1004,10 +1027,10 @@
     "configRows": [
       {
         "id": "c1", "platform": "Amazon", "siteLogic": "统一规则，识别所有的站点",
-        "statusLogic": "统一规则，识别所有的状态", "scene": "备货接收", "bizType": "备货接收",
+        "statusLogic": "统一规则，识别所有的状态", "scene": "备货", "bizType": "备货接收",
         "bizRule": "EventType = 'Receipts'", "skuField": "msku", "dateField": "Date and Time",
         "qtyLogic": "Quantity", "inventoryNoField": "记录流水 ID，需标记到单据",
-        "relatedNoField": "货件计划、退货 RMA 等上游单号", "docType": "收货列表",
+        "relatedNoField": "货件计划、退货 RMA 等上游单号", "docType": "其他入库单",
         "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": ""
       },
       {
@@ -1016,7 +1039,7 @@
         "statusLogic": "case when Disposition = 'sellable' then 'sellerable' else 'unsell' end",
         "scene": "找回", "bizType": "找回", "bizRule": "EventType = 'Adjustments' and reason in ('F','N')",
         "skuField": "msku", "dateField": "Date and Time", "qtyLogic": "Quantity",
-        "inventoryNoField": "ReferenceID", "relatedNoField": "ReferenceID", "docType": "其他出入库",
+        "inventoryNoField": "ReferenceID", "relatedNoField": "ReferenceID", "docType": "其他入库单",
         "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": ""
       },
       {
@@ -1024,7 +1047,7 @@
         "statusLogic": "统一规则，识别所有的状态", "scene": "报废", "bizType": "报废",
         "bizRule": "EventType = 'Adjustments' and reason in ('6','7','E','H','K','U','G')",
         "skuField": "msku", "dateField": "Date and Time", "qtyLogic": "Quantity",
-        "inventoryNoField": "ReferenceID", "relatedNoField": "ReferenceID", "docType": "其他出入库",
+        "inventoryNoField": "ReferenceID", "relatedNoField": "ReferenceID", "docType": "其他出库单",
         "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": ""
       },
       {
@@ -1032,7 +1055,7 @@
         "statusLogic": "统一规则，识别所有的状态", "scene": "Unknown Events", "bizType": "Unknown Events",
         "bizRule": "StartingWarehouseBalance + ... - EndingWarehouseBalance <> 0",
         "skuField": "msku", "dateField": "Date", "qtyLogic": "Unknown Events",
-        "inventoryNoField": "", "relatedNoField": "", "docType": "其他出入库",
+        "inventoryNoField": "", "relatedNoField": "", "docType": "其他入库单",
         "dbTable": "Inventory Summary", "dailySummary": "是", "summaryCondition": "按站点+MSKU+Disposition 按天汇总"
       }
     ],
@@ -1101,7 +1124,7 @@
     "fieldNotes": {
       "newQuantity": "更新时数量不一致则写入此字段；未生成单据时可直接改 Quantity。",
       "monthEnd": "默认为否，解析时自动带出；月末汇总报告通过日期转为当月最后一天。",
-      "docType": "多选；一条明细可对应多个单据类型。",
+      "docType": "其他入库单、其他出库单。",
       "parseFlow": [
         "监控缓存是否可解析",
         "校验数据库表名",
@@ -2031,12 +2054,49 @@
   }
 
   function configPlatformOptions() {
-    const set = {};
-    (state.configRows || []).forEach(function (r) {
-      if (r.platform) set[r.platform] = true;
+    return (MOCK.configLookups && MOCK.configLookups.platforms) || ["Amazon", "Coupang"];
+  }
+
+  function configDbTableOptions() {
+    return (MOCK.configLookups && MOCK.configLookups.dbTables) || [];
+  }
+
+  function configDocTypeOptions() {
+    return (MOCK.configLookups && MOCK.configLookups.docTypes) || ["其他入库单", "其他出库单"];
+  }
+
+  function configFirstSceneOptions() {
+    return (MOCK.configLookups && MOCK.configLookups.firstScenes) || [];
+  }
+
+  function configSecondSceneOptions(firstScene) {
+    const map = (MOCK.configLookups && MOCK.configLookups.secondScenesByFirst) || {};
+    if (firstScene && map[firstScene]) return map[firstScene].slice();
+    const all = [];
+    Object.keys(map).forEach(function (k) {
+      map[k].forEach(function (v) {
+        if (all.indexOf(v) < 0) all.push(v);
+      });
     });
-    ["Amazon", "Coupang"].forEach(function (p) { set[p] = true; });
-    return Object.keys(set).sort();
+    return all;
+  }
+
+  function withCurrentOption(list, current) {
+    const out = (list || []).slice();
+    if (current && out.indexOf(current) < 0) out.unshift(current);
+    return out;
+  }
+
+  function lookupSelectHtml(id, list, selected, disabled, placeholder) {
+    const emptyOpt = placeholder === false
+      ? ""
+      : '<option value="">' + esc(placeholder || "请选择") + "</option>";
+    return (
+      '<select id="' + id + '"' + (disabled ? " disabled" : "") + ">" +
+        emptyOpt +
+        optionsHtml(list, selected) +
+      "</select>"
+    );
   }
 
   function filterConfigRows() {
@@ -2059,11 +2119,11 @@
         "</select>" +
         '<select id="c-scene" class="control">' +
           '<option value="">大场景分类</option>' +
-          optionsHtml(MOCK.filters.sceneOptions.filter(function (v) { return v !== "全部"; }), f.scene === "全部" ? "" : f.scene) +
+          optionsHtml(configFirstSceneOptions(), f.scene === "全部" ? "" : f.scene) +
         "</select>" +
         '<select id="c-biz" class="control">' +
           '<option value="">业务类</option>' +
-          optionsHtml(MOCK.filters.bizOptions.filter(function (v) { return v !== "全部"; }), f.bizType === "全部" ? "" : f.bizType) +
+          optionsHtml(configSecondSceneOptions(""), f.bizType === "全部" ? "" : f.bizType) +
         "</select>" +
         '<button class="btn primary" type="button" data-act="config-search">搜索</button>' +
         '<button class="btn" type="button" data-act="config-reset">重置</button>' +
@@ -2185,19 +2245,19 @@
     const row = id ? state.configRows.find(function (r) { return r.id === id; }) : null;
     state.editingConfigId = viewOnly ? null : (id || null);
     const data = row || {
-      platform: "Amazon", siteLogic: "", statusLogic: "", scene: "备货接收", bizType: "备货接收",
+      platform: "Amazon", siteLogic: "", statusLogic: "", scene: "备货", bizType: "备货接收",
       bizRule: "", skuField: "msku", dateField: "Date and Time", qtyLogic: "Quantity",
-      inventoryNoField: "", relatedNoField: "", docType: "其他出入库", dbTable: "Inventory Detail",
-      dailySummary: "否", summaryCondition: ""
+      inventoryNoField: "", relatedNoField: "", docType: "其他入库单", dbTable: "Inventory Detail",
+      dailySummary: "否"
     };
     const fields = [
       ["platform", "平台"], ["dbTable", "数据库表名"],
       ["siteLogic", "站点", true], ["statusLogic", "是否可售", true],
-      ["skuField", "平台货品"], ["dateField", "平台日期"], ["qtyLogic", "平台数量"],
+      ["skuField", "货品SKU"], ["dateField", "平台日期"], ["qtyLogic", "货品数量"],
       ["inventoryNoField", "库存流水单号"], ["relatedNoField", "关联单号"],
       ["scene", "大场景分类"], ["bizType", "业务类"], ["bizRule", "业务类配置规则", true],
       ["docType", "生成单据类型"],
-      ["dailySummary", "单据生成是否按天汇总"], ["summaryCondition", "汇总条件", true]
+      ["dailySummary", "单据生成是否按天汇总"]
     ];
     const disabled = viewOnly ? " disabled" : "";
     const form = fields.map(function (f) {
@@ -2205,6 +2265,43 @@
       const label = f[1];
       const area = f[2];
       const val = data[key] == null ? "" : data[key];
+      if (key === "platform") {
+        return (
+          '<div class="form-item"><label>' + esc(label) + "</label>" +
+          lookupSelectHtml("cfg-platform", withCurrentOption(configPlatformOptions(), val), val, viewOnly, "请选择平台") +
+          "</div>"
+        );
+      }
+      if (key === "dbTable") {
+        return (
+          '<div class="form-item"><label>' + esc(label) + "</label>" +
+          lookupSelectHtml("cfg-dbTable", withCurrentOption(configDbTableOptions(), val), val, viewOnly, "请选择数据库表名") +
+          "</div>"
+        );
+      }
+      if (key === "scene") {
+        return (
+          '<div class="form-item"><label>' + esc(label) + "</label>" +
+          lookupSelectHtml("cfg-scene", withCurrentOption(configFirstSceneOptions(), val), val, viewOnly, "请选择大场景分类") +
+          "</div>"
+        );
+      }
+      if (key === "bizType") {
+        return (
+          '<div class="form-item"><label>' + esc(label) + "</label>" +
+          lookupSelectHtml("cfg-biz", withCurrentOption(configSecondSceneOptions(data.scene), val), val, viewOnly, "请选择业务类") +
+          "</div>"
+        );
+      }
+      if (key === "docType") {
+        const docTypes = withCurrentOption(configDocTypeOptions(), val);
+        const docVal = val || docTypes[0] || "";
+        return (
+          '<div class="form-item"><label>' + esc(label) + "</label>" +
+          lookupSelectHtml("cfg-docType", docTypes, docVal, viewOnly, false) +
+          "</div>"
+        );
+      }
       if (key === "dailySummary") {
         return (
           '<div class="form-item"><label>' + esc(label) + "</label>" +
@@ -2214,15 +2311,9 @@
           "</select></div>"
         );
       }
-      if (area) {
-        return (
-          '<div class="form-item"><label>' + esc(label) + "</label>" +
-          '<textarea id="cfg-' + key + '"' + disabled + '>' + esc(val) + "</textarea></div>"
-        );
-      }
       return (
         '<div class="form-item"><label>' + esc(label) + "</label>" +
-        '<input id="cfg-' + key + '" value="' + esc(val) + '"' + disabled + ' /></div>'
+        '<textarea id="cfg-' + key + '"' + disabled + '>' + esc(val) + "</textarea></div>"
       );
     }).join("");
 
@@ -2239,13 +2330,22 @@
       '<div class="dialog-footer">' + footer + "</div>",
       { drawer: true }
     );
+    const sceneEl = $("cfg-scene");
+    const bizEl = $("cfg-biz");
+    if (sceneEl && bizEl && !viewOnly) {
+      sceneEl.addEventListener("change", function () {
+        const next = configSecondSceneOptions(sceneEl.value);
+        const keep = next.indexOf(bizEl.value) >= 0 ? bizEl.value : "";
+        bizEl.innerHTML = '<option value="">请选择业务类</option>' + optionsHtml(next, keep);
+      });
+    }
   }
 
   function saveConfigForm() {
     const keys = [
       "platform", "dbTable", "siteLogic", "statusLogic", "skuField", "dateField",
       "qtyLogic", "inventoryNoField", "relatedNoField", "scene", "bizType", "bizRule",
-      "docType", "dailySummary", "summaryCondition"
+      "docType", "dailySummary"
     ];
     const payload = {};
     keys.forEach(function (k) {
