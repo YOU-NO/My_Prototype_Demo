@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coupang 平台仓报告解析与库存盘点原型</title>
+  <style>
+    :root {
+      --primary: #1890ff;
+      --primary-dark: #096dd9;
+      --sidebar-dark: #001529;
+      --sidebar-icon: #002140;
+      --border: #e8e8e8;
+      --text: #333;
+      --text-secondary: #666;
+      --bg: #f0f2f5;
+      --white: #fff;
+      --success: #52c41a;
+      --danger: #ff4d4f;
+      --warning: #faad14;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-width: 1100px;
+      height: 100vh;
+      overflow: hidden;
+      color: var(--text);
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+    .layout { display: flex; height: 100vh; }
+    .icon-sidebar {
+      width: 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      padding-top: 8px;
+      background: var(--sidebar-dark);
+    }
+    .icon-item {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+      border-radius: 4px;
+      color: rgba(255,255,255,.65);
+      cursor: pointer;
+      font-size: 17px;
+    }
+    .icon-item:hover { color: #fff; background: rgba(255,255,255,.08); }
+    .icon-item.active { color: #fff; background: var(--primary); }
+    .sub-sidebar {
+      width: 200px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      background: var(--white);
+    }
+    .sub-sidebar.hidden { display: none; }
+    .sub-sidebar-title { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 16px; font-weight: 600; }
+    .menu-group { border-bottom: 1px solid var(--border); }
+    .menu-group-title { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; cursor: default; user-select: none; }
+    .menu-group-title .arrow { color: var(--text-secondary); font-size: 10px; }
+    .menu-items { display: none; }
+    .menu-group.open .menu-items { display: block; }
+    .menu-item { padding: 10px 20px 10px 36px; color: var(--text-secondary); cursor: pointer; }
+    .menu-item:hover { color: var(--primary); background: #e6f7ff; }
+    .menu-item.active { padding-right: 17px; border-right: 3px solid var(--primary); color: var(--primary); background: #e6f7ff; font-weight: 500; }
+    .main-area { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+    .topbar { height: 48px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; padding: 0 16px; border-bottom: 1px solid var(--border); background: var(--white); }
+    .topbar-left, .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .hamburger { color: var(--text-secondary); font-size: 18px; }
+    .breadcrumb { color: var(--text-secondary); font-size: 13px; }
+    .breadcrumb span { color: var(--text); }
+    .topbar-right { gap: 16px; color: var(--text-secondary); }
+    .topbar-right .badge { display: inline-block; min-width: 16px; padding: 0 5px; border-radius: 10px; color: #fff; background: var(--danger); font-size: 11px; line-height: 17px; text-align: center; }
+    .content { flex: 1; overflow: auto; padding: 16px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-card { padding: 16px; border-radius: 4px; background: var(--white); box-shadow: 0 1px 2px rgba(0,0,0,.03); }
+    .page-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .page-title { font-size: 16px; font-weight: 600; }
+    .header-note { margin-top: 5px; color: var(--text-secondary); font-size: 12px; }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-bottom: 16px; }
+    .toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+    .filter-group { display: flex; align-items: center; gap: 8px; }
+    .filter-group label { color: var(--text-secondary); font-size: 13px; white-space: nowrap; }
+    .multi-month-select { position: relative; min-width: 150px; }
+    .multi-month-trigger { width: 150px; height: 32px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 4px; color: var(--text-secondary); background: #fff; cursor: pointer; font-size: 13px; text-align: left; }
+    .multi-month-trigger:hover, .multi-month-trigger.open { border-color: var(--primary); }
+    .multi-month-trigger.has-value { color: var(--text); }
+    .multi-month-trigger span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .month-calendar-panel { position: absolute; top: 36px; left: 0; z-index: 15; display: none; width: 230px; padding: 8px 10px 10px; border: 1px solid #d9d9d9; border-radius: 2px; background: #fff; box-shadow: 0 3px 10px rgba(0,0,0,.12); }
+    .month-calendar-panel.open { display: block; }
+    .month-calendar-year { padding: 5px 10px; color: var(--text); background: #f5f5f5; font-size: 13px; font-weight: 600; }
+    .month-calendar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px 4px; padding: 10px 2px 8px; }
+    .month-calendar-grid button { height: 30px; border: 1px solid transparent; border-radius: 2px; color: var(--text); background: transparent; cursor: pointer; font-size: 13px; }
+    .month-calendar-grid button:hover { color: var(--primary); background: #e6f7ff; }
+    .month-calendar-grid button.selected { border-color: var(--primary); color: #fff; background: var(--primary); }
+    .month-calendar-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid #f0f0f0; }
+    .month-calendar-footer .link { font-size: 13px; }
+    select, input[type="text"], input[type="date"], input[type="month"] { min-width: 120px; height: 32px; padding: 0 8px; outline: none; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; font-size: 13px; }
+    select:focus, input[type="text"]:focus, input[type="date"]:focus, input[type="month"]:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(24,144,255,.2); }
+    .btn { height: 32px; padding: 0 16px; border: 1px solid #d9d9d9; border-radius: 4px; color: var(--text); background: var(--white); cursor: pointer; font-size: 13px; }
+    .btn:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-primary { border-color: var(--primary); color: #fff; background: var(--primary); }
+    .btn-primary:hover { border-color: var(--primary-dark); color: #fff; background: var(--primary-dark); }
+    .btn-danger { border-color: #ffb3b3; color: var(--danger); }
+    .btn-danger:hover { border-color: var(--danger); color: var(--danger); }
+    .btn:disabled { cursor: not-allowed; opacity: .55; }
+    .table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 4px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
+    th { position: sticky; top: 0; z-index: 1; color: var(--text); background: #fafafa; font-weight: 600; }
+    tr:hover td { background: #fafafa; }
+    thead.group-row th { position: static; color: #555; background: #f5f8ff; text-align: center; }
+    .derived-col { border-left: 2px solid #91caff !important; }
+    .center { text-align: center; }
+    .right { text-align: right; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+    .tag-coupang { color: #722ed1; background: #f9f0ff; }
+    .tag-success { color: #389e0d; background: #f6ffed; }
+    .tag-warning { color: #d48806; background: #fffbe6; }
+    .tag-error { color: #cf1322; background: #fff1f0; }
+    .tag-gray { color: #666; background: #f5f5f5; }
+    .status-yes { color: var(--danger); font-weight: 500; }
+    .status-no { color: var(--success); }
+    .value-pos { color: #389e0d; font-variant-numeric: tabular-nums; }
+    .value-neg { color: #cf1322; font-variant-numeric: tabular-nums; }
+    .value-zero { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .section-label { margin-bottom: 8px; color: var(--text-secondary); font-size: 12px; }
+    .pagination { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 16px; color: var(--text-secondary); font-size: 13px; }
+    .pagination button { width: 28px; height: 28px; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; cursor: pointer; }
+    .pagination button.active { border-color: var(--primary); color: var(--primary); }
+    .sort-tip { margin-top: 10px; color: var(--text-secondary); font-size: 12px; }
+    .info-grid { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 16px 24px; }
+    .info-grid label { display: block; margin-bottom: 4px; color: var(--text-secondary); font-size: 12px; }
+    .notice { padding: 9px 12px; margin-bottom: 12px; border: 1px solid #91caff; border-radius: 4px; color: #0958d9; background: #e6f4ff; font-size: 12px; line-height: 20px; }
+    .link { padding: 0; border: 0; color: var(--primary); background: transparent; cursor: pointer; }
+    .link:hover { color: var(--primary-dark); text-decoration: underline; }
+    .edit-cell input, .edit-cell select { min-width: 120px; height: 28px; font-size: 12px; }
+    .toast { position: fixed; right: 24px; top: 64px; z-index: 30; display: none; max-width: 440px; padding: 10px 14px; border: 1px solid #91caff; border-radius: 4px; color: #0958d9; background: #e6f4ff; box-shadow: 0 3px 10px rgba(0,0,0,.12); font-size: 13px; line-height: 20px; }
+    .toast.error { border-color: #ffccc7; color: #cf1322; background: #fff2f0; }
+    .toast.success { border-color: #b7eb8f; color: #389e0d; background: #f6ffed; }
+    .order-query { align-items: center; gap: 8px; padding: 8px 0 14px; }
+    .order-query select { min-width: 150px; }
+    .order-query select:nth-of-type(2) { min-width: 108px; }
+    .order-query input { min-width: 240px; }
+    .modal-mask { position: fixed; inset: 0; z-index: 40; display: none; align-items: flex-start; justify-content: center; padding-top: 18px; background: rgba(0,0,0,.48); }
+    .modal-mask.open { display: flex; }
+    .order-modal { width: min(1320px, calc(100vw - 64px)); max-height: calc(100vh - 36px); overflow: auto; background: var(--white); box-shadow: 0 6px 20px rgba(0,0,0,.2); }
+    .order-modal-title { display: flex; align-items: center; justify-content: space-between; min-height: 72px; padding: 0 28px; border-bottom: 1px solid var(--border); font-size: 20px; font-weight: 500; }
+    .modal-close { border: 0; color: #999; background: transparent; cursor: pointer; font-size: 28px; line-height: 1; }
+    .order-modal-content { padding: 28px; }
+    .modal-section-title { position: relative; margin: 16px 0 14px; padding-left: 34px; font-size: 18px; font-weight: 600; }
+    .modal-section-title::before { content: ''; position: absolute; left: 0; top: 50%; width: 24px; height: 1px; background: #bfbfbf; }
+    .modal-form-grid { display: grid; grid-template-columns: repeat(3, minmax(250px, 1fr)); gap: 16px 36px; padding: 0 34px 20px; }
+    .modal-field { display: grid; grid-template-columns: 104px minmax(0, 1fr); align-items: center; gap: 10px; min-width: 0; }
+    .modal-field label { color: var(--text-secondary); text-align: right; white-space: nowrap; }
+    .modal-value { min-height: 32px; padding: 7px 10px; overflow: hidden; border: 1px solid #e5e9f1; border-radius: 4px; color: #666; background: #f7f9fc; text-overflow: ellipsis; white-space: nowrap; }
+    .modal-note { margin: 0 34px 20px; min-height: 62px; padding: 10px; border: 1px solid #e5e9f1; border-radius: 4px; color: #666; background: #f7f9fc; line-height: 20px; }
+    .modal-table { margin: 0 0 14px; border: 1px solid var(--border); }
+    .modal-table th { position: static; background: #f5f7fa; }
+    .drawer-mask { position: fixed; inset: 0; z-index: 45; display: none; background: rgba(0,0,0,.16); }
+    .drawer-mask.open { display: block; }
+    .task-drawer { position: fixed; top: 0; right: -440px; z-index: 46; width: 420px; height: 100vh; display: flex; flex-direction: column; background: #fff; box-shadow: -4px 0 18px rgba(0,0,0,.14); transition: right .2s ease; }
+    .task-drawer.open { right: 0; }
+    .task-drawer-header { display: flex; align-items: center; justify-content: space-between; min-height: 56px; padding: 0 20px; border-bottom: 1px solid var(--border); font-size: 16px; font-weight: 600; }
+    .task-drawer-body { flex: 1; overflow: auto; padding: 18px 20px; }
+    .task-drawer-section { margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #f0f0f0; }
+    .task-drawer-section:last-child { border-bottom: 0; }
+    .task-drawer-label { margin-bottom: 6px; color: var(--text-secondary); font-size: 12px; }
+    .task-drawer-value { color: var(--text); line-height: 22px; word-break: break-all; }
+    .task-drawer-actions { display: flex; gap: 8px; padding-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="icon-sidebar" aria-label="一级导航">
+      <div class="icon-item" title="首页">□</div>
+      <div class="icon-item active" title="财务" data-module="finance" onclick="switchModule('finance', this)">¥</div>
+      <div class="icon-item" title="产品展示">品</div>
+      <div class="icon-item" title="销售">销</div>
+      <div class="icon-item" title="物流">运</div>
+      <div class="icon-item" title="仓储" data-module="storage" onclick="switchModule('storage', this)">仓</div>
+      <div class="icon-item" title="系统">设</div>
+    </aside>
+    <aside class="sub-sidebar" id="finance-sidebar">
+      <div class="sub-sidebar-title">财务</div>
+      <div class="menu-group open">
+        <div class="menu-group-title" onclick="toggleGroup(this)">销售平台报告 <span class="arrow">▼</span></div>
+        <div class="menu-items"><div class="menu-item">概览</div></div>
+      </div>
+      <div class="menu-group open">
+        <div class="menu-group-title" onclick="toggleGroup(this)">财务系统对接 <span class="arrow">▼</span></div>
+        <div class="menu-items"></div>
+      </div>
+      <div class="menu-group open">
+        <div class="menu-group-title" onclick="toggleGroup(this)">仓库报告 <span class="arrow">▼</span></div>
+        <div class="menu-items">
+          <div class="menu-item active" data-page="local-report">Coupang本土店报告</div>
+          <div class="menu-item" data-page="overseas-report">Coupang海外店报告</div>
+        </div>
+      </div>
+      <div class="menu-group open">
+        <div class="menu-group-title" onclick="toggleGroup(this)">报告解析配置 <span class="arrow">▼</span></div>
+        <div class="menu-items"><div class="menu-item" data-page="report-config">仓库报告配置</div></div>
+      </div>
+    </aside>
+    <aside class="sub-sidebar hidden" id="storage-sidebar">
+      <div class="sub-sidebar-title">仓储</div>
+      <div class="menu-group"><div class="menu-group-title" onclick="toggleGroup(this)">库存同步 <span class="arrow">▼</span></div><div class="menu-items"></div></div>
+      <div class="menu-group"><div class="menu-group-title" onclick="toggleGroup(this)">退货管理 <span class="arrow">▼</span></div><div class="menu-items"></div></div>
+      <div class="menu-group"><div class="menu-group-title" onclick="toggleGroup(this)">库存管理 <span class="arrow">▼</span></div><div class="menu-items"></div></div>
+      <div class="menu-group"><div class="menu-group-title" onclick="toggleGroup(this)">调拨管理 <span class="arrow">▼</span></div><div class="menu-items"></div></div>
+      <div class="menu-group"><div class="menu-group-title" onclick="toggleGroup(this)">发货管理 <span class="arrow">▼</span></div><div class="menu-items"></div></div>
+      <div class="menu-group open">
+        <div class="menu-group-title" onclick="toggleGroup(this)">出入库 <span class="arrow">▼</span></div>
+        <div class="menu-items">
+          <div class="menu-item" data-page="inbound-order">入库单</div>
+          <div class="menu-item" data-page="outbound-order">出库单</div>
+          <div class="menu-item" data-page="other-inbound">其他入库</div>
+          <div class="menu-item" data-page="other-outbound">其他出库</div>
+          <div class="menu-item">SN码出库记录</div>
+        </div>
+      </div>
+      <div class="menu-group"><div class="menu-group-title" onclick="toggleGroup(this)">仓储设置 <span class="arrow">▼</span></div><div class="menu-items"></div></div>
+      <div class="menu-group open">
+        <div class="menu-group-title" onclick="toggleGroup(this)">库存盘点 <span class="arrow">▼</span></div>
+        <div class="menu-items">
+          <div class="menu-item" data-page="monthly-stocktake">月度货品数量盘点</div>
+          <div class="menu-item" data-page="stocktake-results">盘点结果表</div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-left"><span class="hamburger">☰</span><div class="breadcrumb" id="breadcrumb">首页 / 财务 / 仓库报告 / <span>Coupang本土店报告</span></div></div>
+        <div class="topbar-right"><span>▼</span><span>消息 <span class="badge">8</span></span><span>全屏</span><span id="top-module">财务</span></div>
+      </header>
+
+      <main class="content">
+        <section class="page active" id="page-local-report">
+          <div class="page-card">
+            <div class="page-header"><div><div class="page-title">Coupang本土店报告</div><div class="header-note">拉取完成后可按一个或多个必选月份查询；前置展示原始报告字段，后置展示派生字段及报告解析、单据生成处理状态。</div></div><div><button class="btn btn-primary" onclick="pullReport('local')">拉取报告</button><button class="btn" onclick="openTaskDrawer('pull','local')">查看拉取状态</button><button class="btn" onclick="toast('导出成功','success')">导出</button></div></div>
+            <div class="toolbar">
+              <div class="filter-group"><label>是否异常</label><select id="local-abnormal"><option value="">全部</option><option>是</option><option>否</option></select></div>
+              <div class="filter-group"><label>生成单据号</label><input type="text" id="local-docno" placeholder="请输入" /></div>
+              <div class="filter-group"><label>日期<span style="color:#ff4d4f">*</span></label><div class="multi-month-select"><button type="button" class="multi-month-trigger" id="local-month-trigger" onclick="toggleMonthPicker('local')"><span id="local-month-label">----年--月</span><span aria-hidden="true">▣</span></button><div class="month-calendar-panel" id="local-month-panel"><div class="month-calendar-year">2026</div><div class="month-calendar-grid" id="local-month-grid"></div><div class="month-calendar-footer"><button class="link" type="button" onclick="clearMonthPickerDraft('local')">清除</button><button class="btn btn-primary" type="button" onclick="confirmMonthPicker('local')">确认</button></div></div></div></div>
+              <div class="filter-group"><label>站点</label><select id="local-site"><option value="">全部</option><option>Coupang本土-KR</option></select></div>
+              <div class="filter-group"><label>系统SKU</label><input type="text" id="local-syssku" placeholder="请输入" /></div>
+              <div class="filter-group"><label>属性ID</label><input type="text" id="local-attrid" placeholder="请输入" /></div>
+              <div class="filter-group"><label>SKU ID</label><input type="text" id="local-skuid" placeholder="请输入" /></div>
+              <button class="btn btn-primary" onclick="filterLocalReport()">查询</button><button class="btn" onclick="resetLocalReport()">重置</button>
+            </div>
+            <div class="table-wrap"><table><thead class="group-row"><tr><th colspan="17">原始报告字段（本土店库存变动详情，未转置）</th><th colspan="17" class="derived-col">解析后派生字段</th></tr></thead><thead id="local-report-head"></thead><tbody id="local-report-body"></tbody></table></div>
+            <div class="pagination"><span>共 <strong id="local-total">0</strong> 条</span><button>‹</button><button class="active">1</button><button>›</button></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-overseas-report">
+          <div class="page-card">
+            <div class="page-header"><div><div class="page-title">Coupang海外店报告</div><div class="header-note">海外一店、海外二店按导入标识识别仓库；拉取完成后可按一个或多个必选月份查询，报告期末数量作为海外店盘点权威数量。</div></div><div><button class="btn btn-primary" onclick="pullReport('overseas')">拉取报告</button><button class="btn" onclick="openTaskDrawer('pull','overseas')">查看拉取状态</button><button class="btn" onclick="toast('导出成功','success')">导出</button></div></div>
+            <div class="toolbar">
+              <div class="filter-group"><label>海外店</label><select id="over-store"><option value="">全部</option><option value="Coupang-CGF1">海外1店</option><option value="Coupang-CGF2">海外2店</option></select></div>
+              <div class="filter-group"><label>是否异常</label><select id="over-abnormal"><option value="">全部</option><option>是</option><option>否</option></select></div>
+              <div class="filter-group"><label>日期<span style="color:#ff4d4f">*</span></label><div class="multi-month-select"><button type="button" class="multi-month-trigger" id="over-month-trigger" onclick="toggleMonthPicker('over')"><span id="over-month-label">----年--月</span><span aria-hidden="true">▣</span></button><div class="month-calendar-panel" id="over-month-panel"><div class="month-calendar-year">2026</div><div class="month-calendar-grid" id="over-month-grid"></div><div class="month-calendar-footer"><button class="link" type="button" onclick="clearMonthPickerDraft('over')">清除</button><button class="btn btn-primary" type="button" onclick="confirmMonthPicker('over')">确认</button></div></div></div></div>
+              <div class="filter-group"><label>站点</label><select id="over-site"><option value="">全部</option><option>Coupang-CGF1</option><option>Coupang-CGF2</option></select></div>
+              <div class="filter-group"><label>系统SKU</label><input type="text" id="over-syssku" placeholder="请输入" /></div>
+              <div class="filter-group"><label>VI ID</label><input type="text" id="over-viid" placeholder="请输入" /></div>
+              <div class="filter-group"><label>Product ID</label><input type="text" id="over-productid" placeholder="请输入" /></div>
+              <button class="btn btn-primary" onclick="filterOverseasReport()">查询</button><button class="btn" onclick="resetOverseasReport()">重置</button>
+            </div>
+            <div class="table-wrap"><table><thead class="group-row"><tr><th colspan="3">原始报告字段</th><th colspan="17" class="derived-col">派生字段</th></tr></thead><thead id="overseas-report-head"></thead><tbody id="overseas-report-body"></tbody></table></div>
+            <div class="pagination"><span>共 <strong id="overseas-total">0</strong> 条</span><button>‹</button><button class="active">1</button><button>›</button></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-report-config">
+          <div class="page-card">
+            <div class="page-header"><div class="page-title">仓库报告配置</div><button class="btn btn-primary" onclick="addConfig()">新增配置</button></div>
+            <div class="toolbar">
+              <div class="filter-group"><label>平台</label><select id="cfg-platform"><option value="">全部</option><option>Coupang</option></select></div>
+              <div class="filter-group"><label>站点</label><select id="cfg-site"><option value="">全部</option><option>Coupang本土-KR</option><option>Coupang-CGF1</option><option>Coupang-CGF2</option></select></div>
+              <div class="filter-group"><label>大场景分类</label><select id="cfg-scene"><option value="">全部</option><option>调拨</option><option>发运</option><option>退运</option><option>移除</option><option>其他</option><option>期末</option></select></div>
+              <div class="filter-group"><label>业务类</label><select id="cfg-biz"><option value="">全部</option><option>调拨</option><option>出库</option><option>重新配送</option><option>顾客退货</option><option>已移出库</option><option>处理中</option></select></div>
+              <button class="btn btn-primary" onclick="renderConfig()">查询</button><button class="btn" onclick="resetConfig()">重置</button>
+            </div>
+            <div class="section-label">仓库报告配置表</div>
+            <div class="table-wrap"><table><thead><tr><th>平台*</th><th>站点*</th><th>站点匹配逻辑*</th><th>平台货品字段*</th><th>平台日期*</th><th>平台数量*</th><th>平台状态字段*</th><th>状态设置规则*</th><th>库存变动单号*</th><th>大场景分类*</th><th>业务类分类规则*</th><th>生成单据*</th><th>数据库表名*</th><th class="center">操作</th></tr></thead><tbody id="config-body"></tbody></table></div>
+            <div class="pagination"><span>共 <strong id="config-total">0</strong> 条</span></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-inbound-order">
+          <div class="page-card">
+            <div class="toolbar order-query">
+              <select id="inbound-order-key"><option>入库单号</option></select>
+              <select id="inbound-order-match"><option>精确</option></select>
+              <input type="text" id="inbound-order-value" placeholder="批量查询" />
+              <select id="inbound-order-warehouse"><option value="">韩国Coupang本土店仓</option><option>韩国Coupang本土店仓</option></select>
+              <select id="inbound-order-type"><option value="">业务类型</option><option>调拨入库</option><option>退货入库</option></select>
+              <div class="filter-group"><label>入库时间：</label><input type="text" id="inbound-order-date" placeholder="开始日期 - 结束日期" /></div>
+              <button class="btn btn-primary" onclick="queryRegularOrders('inbound')">⌕ 搜索</button><button class="btn" onclick="resetRegularOrders('inbound')">⌫ 重置</button>
+            </div>
+            <div class="toolbar">
+              <button class="btn" onclick="toast('导出成功','success')">⇩ 导出</button>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th class="center">#</th><th>入库单号</th><th>入库仓库</th><th>业务类型</th><th>业务单号</th><th class="right">入库总数</th><th>入库时间</th><th>备注</th><th>创建人</th><th class="center">操作</th></tr></thead><tbody id="inbound-order-body"></tbody></table></div>
+            <div class="pagination"><span>共 <strong id="inbound-order-total">0</strong> 条</span><button>‹</button><button class="active">1</button><button>›</button><span>10条/页</span></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-outbound-order">
+          <div class="page-card">
+            <div class="toolbar order-query">
+              <select id="outbound-order-key"><option>出库单号</option></select>
+              <select id="outbound-order-match"><option>精确</option></select>
+              <input type="text" id="outbound-order-value" placeholder="批量查询" />
+              <select id="outbound-order-warehouse"><option value="">韩国Coupang本土店仓</option><option>韩国Coupang本土店仓</option></select>
+              <select id="outbound-order-type"><option value="">业务类型</option><option>调拨出库</option><option>销售出库</option></select>
+              <div class="filter-group"><label>出库时间：</label><input type="text" id="outbound-order-date" placeholder="开始日期 - 结束日期" /></div>
+              <button class="btn btn-primary" onclick="queryRegularOrders('outbound')">⌕ 搜索</button><button class="btn" onclick="resetRegularOrders('outbound')">⌫ 重置</button>
+            </div>
+            <div class="toolbar">
+              <button class="btn" onclick="toast('导出成功','success')">⇩ 导出</button>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th class="center">#</th><th>出库单号</th><th>出库仓库</th><th>业务类型</th><th>业务单号</th><th class="right">出库总数</th><th>出库时间</th><th>备注</th><th>创建人</th><th class="center">操作</th></tr></thead><tbody id="outbound-order-body"></tbody></table></div>
+            <div class="pagination"><span>共 <strong id="outbound-order-total">0</strong> 条</span><button>‹</button><button class="active">1</button><button>›</button><span>10条/页</span></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-other-inbound">
+          <div class="page-card">
+            <div class="toolbar order-query">
+              <select id="other-inbound-key"><option>入库单号</option></select>
+              <select id="other-inbound-match"><option>精确</option></select>
+              <input type="text" id="other-inbound-value" placeholder="批量查询" />
+              <select id="other-inbound-status"><option value="">状态</option><option>已审核</option></select>
+              <select id="other-inbound-warehouse"><option value="">入库仓库</option><option>韩国Coupang本土店仓</option><option>韩国Coupang海外1店仓</option><option>韩国Coupang海外2店仓</option></select>
+              <select id="other-inbound-first-scene"><option value="">一级库存场景</option><option>盘点</option></select>
+              <select id="other-inbound-second-scene"><option value="">二级库存场景</option><option>调拨入库调增</option></select>
+              <button class="btn btn-primary" onclick="queryOtherOrders('inbound')">⌕ 搜索</button><button class="btn" onclick="resetOtherOrders('inbound')">⌫ 重置</button>
+            </div>
+            <div class="toolbar">
+              <button class="btn btn-primary" onclick="toast('新增功能沿用中台现有其他入库单能力','success')">⊕ 新增</button><button class="btn" onclick="toast('导出成功','success')">⇩ 导出</button><button class="btn" onclick="toast('导入功能沿用中台现有其他入库单能力','success')">⇧ 导入</button><button class="btn" onclick="toast('批量提交功能沿用中台现有能力','success')">批量提交</button><button class="btn" onclick="toast('批量审核功能沿用中台现有能力','success')">批量审核</button>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th class="center">□</th><th>入库单号</th><th>状态</th><th>入库仓库</th><th class="right">入库总数</th><th>入库时间</th><th>一级库存场景</th><th>二级库存场景</th><th>业务节点</th><th>关联单据</th><th>仓库入库时间</th><th>备注</th><th>创建人</th><th>创建时间</th><th class="center">操作</th></tr></thead><tbody id="other-inbound-body"></tbody></table></div>
+            <div class="pagination"><span>共 <strong id="other-inbound-total">0</strong> 条</span><button>‹</button><button class="active">1</button><button>›</button><span>10条/页</span></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-other-outbound">
+          <div class="page-card">
+            <div class="toolbar order-query">
+              <select id="other-outbound-key"><option>出库单号</option></select>
+              <select id="other-outbound-match"><option>精确</option></select>
+              <input type="text" id="other-outbound-value" placeholder="批量查询" />
+              <select id="other-outbound-status"><option value="">状态</option><option>已审核</option></select>
+              <select id="other-outbound-warehouse"><option value="">出库仓库</option><option>韩国Coupang本土店仓</option><option>韩国Coupang海外1店仓</option><option>韩国Coupang海外2店仓</option></select>
+              <select id="other-outbound-first-scene"><option value="">一级库存场景</option><option>盘点</option></select>
+              <select id="other-outbound-second-scene"><option value="">二级库存场景</option><option>销售出库调减</option><option>调拨出库调减</option><option>确认丢失/损坏调减</option></select>
+              <button class="btn btn-primary" onclick="queryOtherOrders('outbound')">⌕ 搜索</button><button class="btn" onclick="resetOtherOrders('outbound')">⌫ 重置</button>
+            </div>
+            <div class="toolbar">
+              <button class="btn btn-primary" onclick="toast('新增功能沿用中台现有其他出库单能力','success')">⊕ 新增</button><button class="btn" onclick="toast('导出成功','success')">⇩ 导出</button><button class="btn" onclick="toast('导入功能沿用中台现有其他出库单能力','success')">⇧ 导入</button><button class="btn" onclick="toast('批量提交功能沿用中台现有能力','success')">批量提交</button><button class="btn" onclick="toast('批量审核功能沿用中台现有能力','success')">批量审核</button>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th class="center">□</th><th>出库单号</th><th>状态</th><th>出库仓库</th><th class="right">出库总数</th><th>出库时间</th><th>一级库存场景</th><th>二级库存场景</th><th>业务节点</th><th>关联单据</th><th>仓库出库时间</th><th>备注</th><th>创建人</th><th>创建时间</th><th class="center">操作</th></tr></thead><tbody id="other-outbound-body"></tbody></table></div>
+            <div class="pagination"><span>共 <strong id="other-outbound-total">0</strong> 条</span><button>‹</button><button class="active">1</button><button>›</button><span>10条/页</span></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-monthly-stocktake">
+          <div class="page-card">
+            <div class="page-header"><div class="page-title">月度货品数量盘点</div></div>
+            <div class="toolbar">
+              <div class="filter-group"><label>平台</label><select id="stocktake-platform"><option>Coupang</option></select></div>
+              <div class="filter-group"><label>仓库<span style="color:#ff4d4f">*</span></label><select id="stocktake-warehouse"><option value="">请选择仓库</option><option value="local">韩国Coupang本土店仓</option><option value="o1">韩国Coupang海外1店仓</option><option value="o2">韩国Coupang海外2店仓</option></select></div>
+              <div class="filter-group"><label>月份<span style="color:#ff4d4f">*</span></label><input type="month" id="stocktake-month" /></div>
+              <div class="filter-group"><label>系统SKU</label><input type="text" id="stocktake-sku" placeholder="请输入" /></div>
+              <button class="btn btn-primary" onclick="queryStocktake(true)">查询</button><button class="btn" onclick="reconcileInventory()">核对库存</button><button class="btn" onclick="openTaskDrawer('reconcile')">查看核对状态</button><button class="btn" onclick="toast('导出成功','success')">导出</button><button class="btn btn-primary" onclick="createStocktakeResult()">生成盘点结果表</button>
+            </div>
+            <div class="table-wrap"><table><thead id="stocktake-head"></thead><tbody id="stocktake-body"></tbody></table></div>
+            <div class="sort-tip" id="stocktake-tip"></div><div class="pagination"><span>共 <strong id="stocktake-total">0</strong> 条</span></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-stocktake-results">
+          <div class="page-card">
+            <div class="page-header"><div class="page-title">盘点结果表</div><button class="btn" onclick="toast('导出成功','success')">导出</button></div>
+            <div class="toolbar">
+              <div class="filter-group"><label>平台</label><select id="result-platform"><option value="">全部</option><option>Coupang</option></select></div>
+              <div class="filter-group"><label>仓库</label><select id="result-warehouse"><option value="">全部</option><option>韩国Coupang本土店仓</option><option>韩国Coupang海外1店仓</option><option>韩国Coupang海外2店仓</option></select></div>
+              <div class="filter-group"><label>月份</label><input type="month" id="result-month" /></div>
+              <div class="filter-group"><label>类型</label><select id="result-type"><option value="">全部</option><option>Coupang本土店月度盘点</option><option>Coupang海外店月度盘点</option></select></div>
+              <div class="filter-group"><label>状态</label><select id="result-status"><option value="">全部</option><option>待生成单据</option><option>已完成</option><option>生成失败</option></select></div>
+              <button class="btn btn-primary" onclick="renderResults()">查询</button><button class="btn" onclick="resetResults()">重置</button>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th>盘点结果编号</th><th>平台</th><th>仓库</th><th>盘点维度</th><th>月份</th><th>类型</th><th>状态</th><th>单据生成条件</th><th>创建时间</th><th class="center">操作</th></tr></thead><tbody id="results-body"></tbody></table></div>
+            <div class="pagination"><span>共 <strong id="results-total">0</strong> 条</span></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-stocktake-detail">
+          <div class="page-card">
+            <div class="page-header"><div><div class="page-title">盘点结果详情</div><div class="header-note">盘点结果完成后可基于更新后的报告或新增出入库流水创建下一轮结果；已生成单据不提供删除操作。</div></div><div><button class="btn" onclick="showPage('stocktake-results')">返回</button></div></div>
+            <div class="info-grid" id="detail-info"></div>
+            <div class="toolbar" style="margin-top:18px"><div class="filter-group"><label>是否按照站点汇总</label><select id="site-summary-condition" onchange="updateSiteSummaryCondition()"><option value="">请选择</option><option value="是">是</option><option value="否">否</option></select></div><div class="toolbar-actions"><button class="btn btn-primary" id="generate-docs" onclick="generateDocs()">生成单据</button><button class="btn" onclick="openTaskDrawer('generation')">查看生成状态</button><button class="btn" onclick="toast('导出成功','success')">导出</button></div></div>
+            <div class="section-label" style="margin-top:18px">盘点差异明细</div>
+            <div class="table-wrap"><table><thead id="detail-head"></thead><tbody id="detail-body"></tbody></table></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="drawer-mask" id="task-drawer-mask" onclick="closeTaskDrawer()"></div>
+  <aside class="task-drawer" id="task-drawer" aria-label="任务执行状态侧边栏">
+    <div class="task-drawer-header"><span id="task-drawer-title">任务执行状态</span><button class="modal-close" onclick="closeTaskDrawer()">×</button></div>
+    <div class="task-drawer-body" id="task-drawer-body"></div>
+  </aside>
+  <div class="modal-mask" id="other-order-modal" onclick="if(event.target===this) closeOtherOrderModal()">
+    <div class="order-modal" role="dialog" aria-modal="true" aria-label="查看其他出入库单">
+      <div class="order-modal-title"><span id="other-order-modal-title">查看其他入库单</span><button class="modal-close" onclick="closeOtherOrderModal()">×</button></div>
+      <div class="order-modal-content" id="other-order-modal-content"></div>
+    </div>
+  </div>
+
+  <script>
+    const pageTitles = {
+      'local-report': '首页 / 财务 / 仓库报告 / Coupang本土店报告',
+      'overseas-report': '首页 / 财务 / 仓库报告 / Coupang海外店报告',
+      'report-config': '首页 / 财务 / 报告解析配置 / 仓库报告配置',
+      'inbound-order': '首页 / 仓储 / 出入库 / 入库单',
+      'outbound-order': '首页 / 仓储 / 出入库 / 出库单',
+      'other-inbound': '首页 / 仓储 / 出入库 / 其他入库',
+      'other-outbound': '首页 / 仓储 / 出入库 / 其他出库',
+      'monthly-stocktake': '首页 / 仓储 / 库存盘点 / 月度货品数量盘点',
+      'stocktake-results': '首页 / 仓储 / 库存盘点 / 盘点结果表',
+      'stocktake-detail': '首页 / 仓储 / 库存盘点 / 盘点结果详情'
+    };
+
+    const localColumns = [
+      ['registrationId','注册商品ID'], ['attributeId','属性ID'], ['skuId','SKU ID'], ['productName','注册商品名，属性名'],
+      ['beforeQty','变更前 (A)'], ['transferDone','调拨完成 (B)'], ['inboundRequest','入库申请数量'], ['inbound','入库 (C1)'], ['transferInProgress','调拨中 (C2)'], ['delayedSale','延迟开始销售 (C2)'], ['outbound','出库 (D1)'], ['redelivery','重新配送 (D2)'], ['customerReturn','顾客退货 (E)'], ['movedOut','已移出库 (F)'], ['processing','处理中 (G)'], ['confirmedLoss','确认丢失/损坏 (H)'], ['afterQty','变更后 (J)'],
+      ['newQuantity','New Quantity'], ['site','站点'], ['localDate','当地日期'], ['systemSku','系统SKU'], ['scene','大场景分类'], ['biz','业务类'], ['warehouse','仓库'], ['sellable','是否可售'], ['quantity','数量'], ['dailySummary','是否按天汇总'], ['parsed','是否解析完成'], ['documentNo','生成单据号'], ['hasUpdate','是否存在更新'], ['docAbnormal','单据生成是否异常'], ['docAbnormalReason','单据生成异常原因'], ['parseAbnormal','报告解析是否异常'], ['parseAbnormalReason','报告解析异常原因']
+    ];
+    const overseasColumns = [
+      ['viId','VI ID'], ['productId','Product ID'], ['sourceQuantity','Quantity'],
+      ['newQuantity','New Quantity'], ['site','站点'], ['localDate','当地日期'], ['systemSku','系统SKU'], ['scene','大场景分类'], ['biz','业务类'], ['warehouse','仓库'], ['sellable','是否可售'], ['quantity','数量'], ['dailySummary','是否按天汇总'], ['parsed','是否解析完成'], ['documentNo','生成单据号'], ['hasUpdate','是否存在更新'], ['docAbnormal','单据生成是否异常'], ['docAbnormalReason','单据生成异常原因'], ['parseAbnormal','报告解析是否异常'], ['parseAbnormalReason','报告解析异常原因']
+    ];
+
+    const localReportData = [
+      { registrationId:'16194119404', attributeId:'95393260616', skuId:'73369384', productName:'本土店报告原始商品名称 A', beforeQty:120, transferDone:20, inboundRequest:0, inbound:0, transferInProgress:0, delayedSale:0, outbound:0, redelivery:0, customerReturn:0, movedOut:0, processing:0, confirmedLoss:0, afterQty:140, newQuantity:'', site:'Coupang本土-KR', localDate:'2026-07-31', systemSku:'E320-ST-WT-KR-608', scene:'', biz:'', warehouse:'韩国Coupang本土店仓', sellable:'', quantity:'', dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'', stocktakeScene:{ scene:'调拨入库', report:20, system:18, direction:'其他入库' } },
+      { registrationId:'16194119405', attributeId:'95393260635', skuId:'73369402', productName:'本土店报告原始商品名称 B', beforeQty:80, transferDone:15, inboundRequest:0, inbound:0, transferInProgress:0, delayedSale:0, outbound:0, redelivery:0, customerReturn:0, movedOut:0, processing:0, confirmedLoss:0, afterQty:95, newQuantity:'', site:'Coupang本土-KR', localDate:'2026-07-31', systemSku:'E320-ST-WT-KR-613', scene:'', biz:'', warehouse:'韩国Coupang本土店仓', sellable:'', quantity:'', dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'', stocktakeScene:{ scene:'调拨入库', report:15, system:13, direction:'其他入库' } },
+      { registrationId:'16194119406', attributeId:'95393260648', skuId:'73369411', productName:'本土店报告原始商品名称 C', beforeQty:60, transferDone:6, inboundRequest:0, inbound:0, transferInProgress:0, delayedSale:0, outbound:0, redelivery:0, customerReturn:0, movedOut:0, processing:0, confirmedLoss:0, afterQty:66, newQuantity:'', site:'Coupang本土-KR', localDate:'2026-07-31', systemSku:'E320-ST-WT-KR-614', scene:'', biz:'', warehouse:'韩国Coupang本土店仓', sellable:'', quantity:'', dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'', stocktakeScene:{ scene:'调拨入库', report:6, system:6, direction:'-' } },
+      { registrationId:'16194119407', attributeId:'95393260629', skuId:'73369391', productName:'本土店报告原始商品名称 D', beforeQty:600, transferDone:0, inboundRequest:0, inbound:0, transferInProgress:0, delayedSale:0, outbound:-567, redelivery:0, customerReturn:0, movedOut:0, processing:0, confirmedLoss:0, afterQty:33, newQuantity:'', site:'Coupang本土-KR', localDate:'2026-07-31', systemSku:'E320-ST-WT-KR-609', scene:'', biz:'', warehouse:'韩国Coupang本土店仓', sellable:'', quantity:'', dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'', stocktakeScene:{ scene:'销售出库', report:-567, system:-565, direction:'其他出库' } },
+      { registrationId:'16194119408', attributeId:'95393260657', skuId:'73369418', productName:'本土店报告原始商品名称 E', beforeQty:50, transferDone:0, inboundRequest:0, inbound:0, transferInProgress:0, delayedSale:0, outbound:0, redelivery:0, customerReturn:35, movedOut:0, processing:0, confirmedLoss:0, afterQty:85, newQuantity:'', site:'Coupang本土-KR', localDate:'2026-07-31', systemSku:'E320-ST-WT-KR-610', scene:'', biz:'', warehouse:'韩国Coupang本土店仓', sellable:'', quantity:'', dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'', stocktakeScene:{ scene:'退货入库', report:35, system:35, direction:'-' } },
+      { registrationId:'16194119409', attributeId:'95393260663', skuId:'73369422', productName:'本土店报告原始商品名称 F', beforeQty:30, transferDone:0, inboundRequest:0, inbound:0, transferInProgress:0, delayedSale:0, outbound:0, redelivery:0, customerReturn:0, movedOut:-11, processing:0, confirmedLoss:0, afterQty:19, newQuantity:'', site:'Coupang本土-KR', localDate:'2026-07-31', systemSku:'E320-ST-WT-KR-611', scene:'', biz:'', warehouse:'韩国Coupang本土店仓', sellable:'', quantity:'', dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'', stocktakeScene:{ scene:'调拨出库', report:-11, system:-9, direction:'其他出库' } },
+      { registrationId:'16194119410', attributeId:'95393260674', skuId:'73369435', productName:'本土店报告原始商品名称 G', beforeQty:35, transferDone:0, inboundRequest:0, inbound:0, transferInProgress:0, delayedSale:0, outbound:0, redelivery:0, customerReturn:0, movedOut:0, processing:0, confirmedLoss:-1, afterQty:34, newQuantity:'', site:'Coupang本土-KR', localDate:'2026-07-31', systemSku:'E320-ST-WT-KR-612', scene:'', biz:'', warehouse:'韩国Coupang本土店仓', sellable:'', quantity:'', dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'', stocktakeScene:{ scene:'确认丢失/损坏', report:-1, system:0, direction:'其他出库' } },
+      { registrationId:'16194119521', attributeId:'95393260721', skuId:'73369521', productName:'本土店 8 月调拨入库演示货品 A', beforeQty:100, transferDone:8, inboundRequest:0, inbound:0, transferInProgress:0, delayedSale:0, outbound:0, redelivery:0, customerReturn:0, movedOut:0, processing:0, confirmedLoss:0, afterQty:108, newQuantity:'', site:'Coupang本土-KR', localDate:'2026-08-31', systemSku:'C120-AC-BK-KR-801', scene:'', biz:'', warehouse:'韩国Coupang本土店仓', sellable:'', quantity:'', dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'', stocktakeScene:{ scene:'调拨入库', report:8, system:6, direction:'其他入库' } },
+      { registrationId:'16194119523', attributeId:'95393260723', skuId:'73369523', productName:'本土店 8 月调拨入库演示货品 B', beforeQty:90, transferDone:11, inboundRequest:0, inbound:0, transferInProgress:0, delayedSale:0, outbound:0, redelivery:0, customerReturn:0, movedOut:0, processing:0, confirmedLoss:0, afterQty:101, newQuantity:'', site:'Coupang本土-KR', localDate:'2026-08-31', systemSku:'C120-AC-BK-KR-802', scene:'', biz:'', warehouse:'韩国Coupang本土店仓', sellable:'', quantity:'', dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'', stocktakeScene:{ scene:'调拨入库', report:11, system:8, direction:'其他入库' } },
+      { registrationId:'16194119524', attributeId:'95393260724', skuId:'73369524', productName:'本土店 8 月调拨入库演示货品 C', beforeQty:70, transferDone:14, inboundRequest:0, inbound:0, transferInProgress:0, delayedSale:0, outbound:0, redelivery:0, customerReturn:0, movedOut:0, processing:0, confirmedLoss:0, afterQty:84, newQuantity:'', site:'Coupang本土-KR', localDate:'2026-08-31', systemSku:'C120-AC-BK-KR-803', scene:'', biz:'', warehouse:'韩国Coupang本土店仓', sellable:'', quantity:'', dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'', generationError:'库存体系未维护，无法创建其他入库单。', stocktakeScene:{ scene:'调拨入库', report:14, system:10, direction:'其他入库' } },
+      { registrationId:'16194119522', attributeId:'95393260722', skuId:'73369522', productName:'本土店 8 月销售出库演示货品', beforeQty:80, transferDone:0, inboundRequest:0, inbound:0, transferInProgress:0, delayedSale:0, outbound:-5, redelivery:0, customerReturn:0, movedOut:0, processing:0, confirmedLoss:0, afterQty:75, newQuantity:'', site:'Coupang本土-KR', localDate:'2026-08-31', systemSku:'E310-ST-GY-KR-802', scene:'', biz:'', warehouse:'韩国Coupang本土店仓', sellable:'', quantity:'', dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'', stocktakeScene:{ scene:'销售出库', report:-5, system:-2, direction:'其他出库' } }
+    ];
+    // 海外店演示数据：数量等于原始 Quantity；盘点期末读取“数量”，New Quantity 仅保留为报告派生展示字段。
+    const overseasReportData = [
+      { viId:'92529096184', productId:'92529096184', sourceQuantity:19, newQuantity:19, site:'Coupang-CGF1', localDate:'2026-07-31', systemSku:'S700-ST-BL-KR-615-REF', scene:'', biz:'', warehouse:'韩国Coupang海外1店仓', sellable:'', quantity:19, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'92529096185', productId:'92529096185', sourceQuantity:86, newQuantity:86, site:'Coupang-CGF1', localDate:'2026-07-31', systemSku:'S820-ST-BK-KR-615', scene:'', biz:'', warehouse:'韩国Coupang海外1店仓', sellable:'', quantity:86, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'92529096186', productId:'92529096186', sourceQuantity:41, newQuantity:41, site:'Coupang-CGF1', localDate:'2026-07-31', systemSku:'E310-ST-GY-KR-615', scene:'', biz:'', warehouse:'韩国Coupang海外1店仓', sellable:'', quantity:41, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'92529096187', productId:'92529096187', sourceQuantity:66, newQuantity:66, site:'Coupang-CGF1', localDate:'2026-07-31', systemSku:'C120-AC-BK-KR-615', scene:'', biz:'', warehouse:'韩国Coupang海外1店仓', sellable:'', quantity:66, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'93316832936', productId:'8991797344', sourceQuantity:647, newQuantity:647, site:'Coupang-CGF2', localDate:'2026-07-31', systemSku:'E310-ST-GY-KR-646', scene:'', biz:'', warehouse:'韩国Coupang海外2店仓', sellable:'', quantity:647, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'93316832937', productId:'8991797345', sourceQuantity:208, newQuantity:208, site:'Coupang-CGF2', localDate:'2026-07-31', systemSku:'S700-ST-BL-KR-646', scene:'', biz:'', warehouse:'韩国Coupang海外2店仓', sellable:'', quantity:208, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'93316832938', productId:'8991797346', sourceQuantity:36, newQuantity:36, site:'Coupang-CGF2', localDate:'2026-07-31', systemSku:'T520-ST-WT-KR-646', scene:'', biz:'', warehouse:'韩国Coupang海外2店仓', sellable:'', quantity:36, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'93316832939', productId:'8991797347', sourceQuantity:80, newQuantity:80, site:'Coupang-CGF2', localDate:'2026-07-31', systemSku:'S820-ST-BK-KR-646', scene:'', biz:'', warehouse:'韩国Coupang海外2店仓', sellable:'', quantity:80, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'92529096184', productId:'92529096184', sourceQuantity:12, newQuantity:12, site:'Coupang-CGF1', localDate:'2026-08-31', systemSku:'S700-ST-BL-KR-615-REF', scene:'', biz:'', warehouse:'韩国Coupang海外1店仓', sellable:'', quantity:12, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'92529096185', productId:'92529096185', sourceQuantity:92, newQuantity:92, site:'Coupang-CGF1', localDate:'2026-08-31', systemSku:'S820-ST-BK-KR-615', scene:'', biz:'', warehouse:'韩国Coupang海外1店仓', sellable:'', quantity:92, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'92529096186', productId:'92529096186', sourceQuantity:30, newQuantity:30, site:'Coupang-CGF1', localDate:'2026-08-31', systemSku:'E310-ST-GY-KR-615', scene:'', biz:'', warehouse:'韩国Coupang海外1店仓', sellable:'', quantity:30, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'92529096187', productId:'92529096187', sourceQuantity:72, newQuantity:72, site:'Coupang-CGF1', localDate:'2026-08-31', systemSku:'C120-AC-BK-KR-615', scene:'', biz:'', warehouse:'韩国Coupang海外1店仓', sellable:'', quantity:72, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'93316832936', productId:'8991797344', sourceQuantity:694, newQuantity:694, site:'Coupang-CGF2', localDate:'2026-08-31', systemSku:'E310-ST-GY-KR-646', scene:'', biz:'', warehouse:'韩国Coupang海外2店仓', sellable:'', quantity:694, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'93316832937', productId:'8991797345', sourceQuantity:201, newQuantity:201, site:'Coupang-CGF2', localDate:'2026-08-31', systemSku:'S700-ST-BL-KR-646', scene:'', biz:'', warehouse:'韩国Coupang海外2店仓', sellable:'', quantity:201, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'93316832938', productId:'8991797346', sourceQuantity:39, newQuantity:39, site:'Coupang-CGF2', localDate:'2026-08-31', systemSku:'T520-ST-WT-KR-646', scene:'', biz:'', warehouse:'韩国Coupang海外2店仓', sellable:'', quantity:39, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' },
+      { viId:'93316832939', productId:'8991797347', sourceQuantity:68, newQuantity:68, site:'Coupang-CGF2', localDate:'2026-08-31', systemSku:'S820-ST-BK-KR-646', scene:'', biz:'', warehouse:'韩国Coupang海外2店仓', sellable:'', quantity:68, dailySummary:'否', parsed:'是', documentNo:'', hasUpdate:'否', docAbnormal:'否', docAbnormalReason:'', parseAbnormal:'否', parseAbnormalReason:'' }
+    ];
+
+    let configData = [
+      { id:1, platform:'Coupang', site:'Coupang本土-KR', siteLogic:'按本土店报告来源识别', skuField:'属性ID', platformDate:'Date', platformQty:'数量', statusField:'Type', statusRule:'按 Type 配置解析规则', inventoryNo:'无（报告未提供）', scene:'按规则匹配', bizRule:'按 Type 配置业务类规则', docGen:'其他出入库单', tableName:'待确认' },
+      { id:2, platform:'Coupang', site:'Coupang-CGF1', siteLogic:'按海外1店导入标识识别', skuField:'VI ID', platformDate:'Date', platformQty:'Quantity', statusField:'无', statusRule:'无场景状态字段', inventoryNo:'无（报告未提供）', scene:'', bizRule:'', docGen:'不在报告解析阶段生成', tableName:'待确认' },
+      { id:3, platform:'Coupang', site:'Coupang-CGF2', siteLogic:'按海外2店导入标识识别', skuField:'VI ID', platformDate:'Date', platformQty:'Quantity', statusField:'无', statusRule:'无场景状态字段', inventoryNo:'无（报告未提供）', scene:'', bizRule:'', docGen:'不在报告解析阶段生成', tableName:'待确认' }
+    ];
+    let configEditing = null;
+    let configId = 4;
+
+    // 本土店出入库单演示数据：普通出入库单仅保留销售出库、调拨出库、退货入库、调拨入库四种业务类型。
+    const regularInboundOrders = [
+      { documentNo:'IB260731001', documentType:'入库单', documentDate:'2026-07-31', warehouse:'韩国Coupang本土店仓', status:'已审核', businessNode:'调拨入库', businessDocumentNo:'AS26073100001', warehouseTime:'2026-07-31 23:59:59', createdBy:'系统', createdAt:'2026-07-31 23:59:59', note:'Coupang本土店调拨入库演示数据', items:[
+        { sku:'E320-ST-WT-KR-608', name:'本土店报告原始商品名称 A', quantity:18, inventorySystem:'公共' },
+        { sku:'E320-ST-WT-KR-613', name:'本土店报告原始商品名称 B', quantity:13, inventorySystem:'公共' },
+        { sku:'E320-ST-WT-KR-614', name:'本土店报告原始商品名称 C', quantity:6, inventorySystem:'公共' }
+      ]},
+      { documentNo:'IB260731002', documentType:'入库单', documentDate:'2026-07-31', warehouse:'韩国Coupang本土店仓', status:'已审核', businessNode:'退货入库', businessDocumentNo:'RMA26073100001', warehouseTime:'2026-07-31 23:59:59', createdBy:'系统', createdAt:'2026-07-31 23:59:59', note:'Coupang本土店退货入库演示数据', items:[
+        { sku:'E320-ST-WT-KR-610', name:'本土店报告原始商品名称 E', quantity:35, inventorySystem:'公共' }
+      ]},
+      { documentNo:'IB260831001', documentType:'入库单', documentDate:'2026-08-31', warehouse:'韩国Coupang本土店仓', status:'已审核', businessNode:'调拨入库', businessDocumentNo:'AS26083100001', warehouseTime:'2026-08-31 23:59:59', createdBy:'系统', createdAt:'2026-08-31 23:59:59', note:'Coupang本土店调拨入库演示数据', items:[
+        { sku:'C120-AC-BK-KR-801', name:'本土店 8 月调拨入库演示货品 A', quantity:6, inventorySystem:'公共' },
+        { sku:'C120-AC-BK-KR-802', name:'本土店 8 月调拨入库演示货品 B', quantity:8, inventorySystem:'公共' },
+        { sku:'C120-AC-BK-KR-803', name:'本土店 8 月调拨入库演示货品 C', quantity:10, inventorySystem:'公共' }
+      ]}
+    ];
+    const regularOutboundOrders = [
+      { documentNo:'OB260731001', documentType:'出库单', documentDate:'2026-07-31', warehouse:'韩国Coupang本土店仓', status:'已审核', businessNode:'销售出库', businessDocumentNo:'SO26073100001', warehouseTime:'2026-07-31 23:59:59', createdBy:'系统', createdAt:'2026-07-31 23:59:59', note:'Coupang本土店销售出库演示数据', items:[
+        { sku:'E320-ST-WT-KR-609', name:'本土店报告原始商品名称 D', quantity:565, inventorySystem:'公共' }
+      ]},
+      { documentNo:'OB260731002', documentType:'出库单', documentDate:'2026-07-31', warehouse:'韩国Coupang本土店仓', status:'已审核', businessNode:'调拨出库', businessDocumentNo:'AS26073100002', warehouseTime:'2026-07-31 23:59:59', createdBy:'系统', createdAt:'2026-07-31 23:59:59', note:'Coupang本土店调拨出库演示数据', items:[
+        { sku:'E320-ST-WT-KR-611', name:'本土店报告原始商品名称 F', quantity:9, inventorySystem:'公共' }
+      ]},
+      { documentNo:'OB260831001', documentType:'出库单', documentDate:'2026-08-31', warehouse:'韩国Coupang本土店仓', status:'已审核', businessNode:'销售出库', businessDocumentNo:'SO26083100001', warehouseTime:'2026-08-31 23:59:59', createdBy:'系统', createdAt:'2026-08-31 23:59:59', note:'Coupang本土店销售出库演示数据', items:[
+        { sku:'E310-ST-GY-KR-802', name:'本土店 8 月单据生成失败演示货品', quantity:2, inventorySystem:'公共' }
+      ]}
+    ];
+    function regularDocumentImpact(date, sku, businessNode) {
+      const month=date.slice(0,7);
+      const count=(orders, sign)=>orders.filter(order=>order.documentDate.startsWith(month)&&order.businessNode===businessNode).flatMap(order=>order.items).filter(item=>item.sku===sku).reduce((sum,item)=>sum+sign*item.quantity,0);
+      return count(regularInboundOrders,1)+count(regularOutboundOrders,-1);
+    }
+    function buildLocalStocktake() {
+      return localReportData.map(row => ({
+        month: row.localDate.slice(0, 7),
+        date: row.localDate,
+        sku: row.systemSku,
+        name: row.productName,
+        warehouse: row.warehouse,
+        generationError: row.generationError || '',
+        ...row.stocktakeScene,
+        system: regularDocumentImpact(row.localDate,row.systemSku,row.stocktakeScene.scene),
+        diff: regularDocumentImpact(row.localDate,row.systemSku,row.stocktakeScene.scene) - row.stocktakeScene.report
+      }));
+    }
+    let localStocktake = buildLocalStocktake();
+    // 演示用的当月系统流水。期初从同仓、同系统 SKU 的上月报告“数量”获取，期末同样读取本月报告“数量”。
+    const overseasSystemFlows = {
+      'Coupang-CGF1|S700-ST-BL-KR-615-REF':-5,
+      'Coupang-CGF1|S820-ST-BK-KR-615':6,
+      'Coupang-CGF1|E310-ST-GY-KR-615':-8,
+      'Coupang-CGF1|C120-AC-BK-KR-615':4,
+      'Coupang-CGF2|E310-ST-GY-KR-646':45,
+      'Coupang-CGF2|S700-ST-BL-KR-646':-7,
+      'Coupang-CGF2|T520-ST-WT-KR-646':1,
+      'Coupang-CGF2|S820-ST-BK-KR-646':-10
+    };
+    function previousMonth(month) {
+      const [year, currentMonth]=month.split('-').map(Number);
+      const date=new Date(year, currentMonth-2, 1);
+      return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
+    }
+    function buildOverseasStocktake(site, month) {
+      const previous=previousMonth(month);
+      return overseasReportData.filter(row=>row.site===site&&row.localDate.startsWith(month)).map(row=>{
+        const priorRow=overseasReportData.find(item=>item.site===site&&item.systemSku===row.systemSku&&item.localDate.startsWith(previous));
+        const opening=priorRow?Number(priorRow.quantity):0;
+        const flow=overseasSystemFlows[`${site}|${row.systemSku}`]||0;
+        const closing=Number(row.quantity);
+        const diff=opening+flow-closing;
+        return {
+          month:row.localDate.slice(0,7), date:row.localDate, sku:row.systemSku, name:row.systemSku,
+          opening, flow, closing, diff,
+          direction:diff>0?'其他出库':diff<0?'其他入库':'-'
+        };
+      });
+    }
+    const overseasStocktake = {
+      o1: buildOverseasStocktake('Coupang-CGF1', '2026-08'),
+      o2: buildOverseasStocktake('Coupang-CGF2', '2026-08')
+    };
+    let results = [];
+    let generatedDocuments = [];
+    let detailResult = null;
+    let stocktakeQueried = false;
+    let stocktakeFormalQueried = false;
+    let localReportQueried = false;
+    let overseasReportQueried = false;
+    let toastTimer;
+    let activeDrawer = null;
+    const reportPullStates = {
+      local: { label:'Coupang本土店', status:'未拉取', completed:false, running:false, count:0, exception:'—', finishedAt:'—', updateNote:'首次拉取后可按月份查询。' },
+      overseas: { label:'Coupang海外店', status:'未拉取', completed:false, running:false, count:0, exception:'—', finishedAt:'—', updateNote:'首次拉取后可按月份查询。' }
+    };
+    const stocktakeReconcileStates = {};
+
+    function escapeHtml(value) { return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function toast(message, type='') { const node=document.getElementById('toast'); node.textContent=message; node.className='toast '+type; node.style.display='block'; clearTimeout(toastTimer); toastTimer=setTimeout(()=>node.style.display='none',3300); }
+    function taskStatusTag(status) { const cls=status==='已完成'?'tag-success':status==='进行中'?'tag-warning':status==='生成失败'?'tag-error':'tag-gray'; return `<span class="tag ${cls}">${status}</span>`; }
+    function taskSection(label, content) { return `<div class="task-drawer-section"><div class="task-drawer-label">${label}</div><div class="task-drawer-value">${content}</div></div>`; }
+    function taskTime() { const now=new Date(); return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`; }
+    const reportMonthPickerStates = { local: { draft: [], applied: [] }, over: { draft: [], applied: [] } };
+    function sortMonths(months) { return [...months].sort(); }
+    function selectedReportMonths(kind) { return reportMonthPickerStates[kind].applied; }
+    function renderMonthPicker(kind) {
+      const state=reportMonthPickerStates[kind]; const grid=document.getElementById(`${kind}-month-grid`);
+      if(!grid) return;
+      grid.innerHTML=Array.from({length:12},(_,index)=>{ const month=`2026-${String(index+1).padStart(2,'0')}`; return `<button type="button" class="${state.draft.includes(month)?'selected':''}" onclick="toggleMonthValue('${kind}','${month}')">${index+1}月</button>`; }).join('');
+    }
+    function toggleMonthPicker(kind) {
+      const panel=document.getElementById(`${kind}-month-panel`); const trigger=document.getElementById(`${kind}-month-trigger`); const willOpen=!panel.classList.contains('open');
+      ['local','over'].forEach(other=>{ if(other!==kind) { document.getElementById(`${other}-month-panel`).classList.remove('open'); document.getElementById(`${other}-month-trigger`).classList.remove('open'); } });
+      if(willOpen) reportMonthPickerStates[kind].draft=[...reportMonthPickerStates[kind].applied];
+      panel.classList.toggle('open',willOpen); trigger.classList.toggle('open',willOpen); if(willOpen) renderMonthPicker(kind);
+    }
+    function toggleMonthValue(kind,month) { const state=reportMonthPickerStates[kind]; state.draft=state.draft.includes(month)?state.draft.filter(item=>item!==month):sortMonths([...state.draft,month]); renderMonthPicker(kind); }
+    function confirmMonthPicker(kind) {
+      const state=reportMonthPickerStates[kind]; state.applied=sortMonths(state.draft); const label=document.getElementById(`${kind}-month-label`); const trigger=document.getElementById(`${kind}-month-trigger`);
+      label.textContent=state.applied.length?state.applied.map(month=>`${month.slice(0,4)}年${Number(month.slice(5))}月`).join(', '):'----年--月';
+      trigger.classList.toggle('has-value',state.applied.length>0); document.getElementById(`${kind}-month-panel`).classList.remove('open'); trigger.classList.remove('open');
+    }
+    function clearMonthPickerDraft(kind) { reportMonthPickerStates[kind].draft=[]; renderMonthPicker(kind); }
+    function clearReportMonths(kind) {
+      reportMonthPickerStates[kind].draft=[]; reportMonthPickerStates[kind].applied=[]; const label=document.getElementById(`${kind}-month-label`); const trigger=document.getElementById(`${kind}-month-trigger`);
+      label.textContent='----年--月'; trigger.classList.remove('has-value','open'); document.getElementById(`${kind}-month-panel`).classList.remove('open'); renderMonthPicker(kind);
+    }
+    function reportMonthFilter(months, date) { return months.includes(date.slice(0,7)); }
+    function reconcileKey(type, month) { return `${type}|${month}`; }
+    function reconcileState(type, month) { return stocktakeReconcileStates[reconcileKey(type,month)] || { status:'未核对', completed:false, running:false, finishedAt:'—', exception:'—', snapshot:null }; }
+    function stocktakeRowsForQuery(type, month) {
+      const state=reconcileState(type,month);
+      const rows=state.completed&&Array.isArray(state.snapshot)?state.snapshot:getStocktakeRows(type).filter(row=>row.month===month);
+      return rows.map(row=>({...row}));
+    }
+    function closeTaskDrawer() { document.getElementById('task-drawer').classList.remove('open'); document.getElementById('task-drawer-mask').classList.remove('open'); activeDrawer=null; }
+    function openTaskDrawer(kind, key) {
+      if(kind==='generation'&&!detailResult) { toast('请先打开盘点结果详情','error'); return; }
+      activeDrawer={ kind, key:key||'' }; renderTaskDrawer(); document.getElementById('task-drawer').classList.add('open'); document.getElementById('task-drawer-mask').classList.add('open');
+    }
+    function renderTaskDrawer() {
+      if(!activeDrawer) return;
+      const drawerTitle=document.getElementById('task-drawer-title'); const drawerBody=document.getElementById('task-drawer-body');
+      if(activeDrawer.kind==='pull') {
+        const state=reportPullStates[activeDrawer.key];
+        drawerTitle.textContent=`${state.label}报告拉取状态`;
+        drawerBody.innerHTML=taskSection('任务状态',taskStatusTag(state.status))+taskSection('拉取次数',String(state.count))+taskSection('拉取结果',state.completed?'报告已完成拉取，可按必选月份查询。':state.running?'正在拉取报告，请稍候。':'尚未完成拉取。')+taskSection('异常信息',escapeHtml(state.exception))+taskSection('完成时间',state.finishedAt)+taskSection('数据更新说明',escapeHtml(state.updateNote));
+        return;
+      }
+      if(activeDrawer.kind==='reconcile') {
+        const type=value('stocktake-warehouse'); const month=value('stocktake-month'); const state=type&&month?reconcileState(type,month):null;
+        drawerTitle.textContent='库存核对状态';
+        drawerBody.innerHTML=!state?taskSection('提示','请选择仓库和月份后再查看核对状态。'):taskSection('核对范围',`${warehouseName(type)} / ${month}`)+taskSection('任务状态',taskStatusTag(state.status))+taskSection('核对结果',state.running?'正在核对报告与系统流水，请稍候。':state.completed?'已完成。请人工点击“查询”查看本次核对快照；再次拉取报告不会自动覆盖，需再次核对后更新。':'未完成。查询仅展示报告数据，系统流水及差异数量显示“—”。')+taskSection('异常信息',escapeHtml(state.exception))+taskSection('完成时间',state.finishedAt);
+        return;
+      }
+      const result=detailResult;
+      if(result.generationRunning) {
+        drawerTitle.textContent='盘点单据生成状态';
+        drawerBody.innerHTML=taskSection('盘点结果编号',result.id)+taskSection('任务状态',taskStatusTag('进行中'))+taskSection('生成结果',`正在按明细逐行生成单据：共 ${result.generationTotalRows||0} 行，每行等待 0.5 秒。`)+taskSection('异常单据','生成结束后更新。');
+        return;
+      }
+      const failures=generationFailureGroups(result);
+      drawerTitle.textContent='盘点单据生成状态';
+      const failureHtml=failures.length?failures.map(group=>`<div>${escapeHtml(group.documentNo)}：${escapeHtml(group.message)}</div>`).join(''):'无';
+      const actions=failures.length&&result.generationAttempt&&!result.errorResolved?'<div class="task-drawer-actions"><button class="btn btn-primary" onclick="resolveGenerationFailures()">模拟完成异常处理</button></div>':'';
+      const generationResult=!result.generationAttempt?'尚未执行生成。':result.errorResolved&&result.status==='生成失败'?'异常处理已完成；当前状态和报错信息保留，待点击“再次生成”后更新。':`${result.generatedDocumentCount||0} 张单据已生成；${failures.length} 张单据待处理。`;
+      drawerBody.innerHTML=taskSection('盘点结果编号',result.id)+taskSection('任务状态',taskStatusTag(result.status==='已完成'?'已完成':result.status==='生成失败'?'生成失败':result.status))+taskSection('生成结果',generationResult)+taskSection('异常单据',failureHtml)+actions;
+    }
+    function applySecondLocalPullUpdate() {
+      const transferRow=localReportData.find(row=>row.systemSku==='E320-ST-WT-KR-608');
+      const outboundRow=localReportData.find(row=>row.systemSku==='E320-ST-WT-KR-609');
+      if(!transferRow||!outboundRow||transferRow.reportUpdated) return;
+      transferRow.transferDone+=3; transferRow.afterQty+=3; transferRow.stocktakeScene.report+=3; transferRow.hasUpdate='是'; transferRow.reportUpdated=true;
+      outboundRow.outbound-=5; outboundRow.afterQty-=5; outboundRow.stocktakeScene.report-=5; outboundRow.hasUpdate='是'; outboundRow.reportUpdated=true;
+      localStocktake=buildLocalStocktake();
+    }
+    function pullReport(kind) {
+      const state=reportPullStates[kind];
+      if(state.running) { toast('报告正在拉取，请稍候','error'); openTaskDrawer('pull',kind); return; }
+      state.running=true; state.completed=false; state.status='进行中'; state.exception='—'; state.updateNote='正在模拟拉取报告，预计 3 秒完成。';
+      if(kind==='local') { localReportQueried=false; renderLocalInitial(); } else { overseasReportQueried=false; renderOverseasInitial(); }
+      openTaskDrawer('pull',kind);
+      setTimeout(()=>{
+        state.running=false; state.completed=true; state.status='已完成'; state.count+=1; state.finishedAt=taskTime();
+        if(kind==='local'&&state.count===2) { applySecondLocalPullUpdate(); state.updateNote='第二次拉取已更新 2026-07：SKU E320-ST-WT-KR-608 的调拨入库报告数量增加 3；SKU E320-ST-WT-KR-609 的销售出库报告数量减少 5。'; }
+        else state.updateNote=state.count===1?'首次拉取完成，可按一个或多个必选月份查询。':'本次拉取完成，未发现新的演示更新。';
+        if(activeDrawer&&activeDrawer.kind==='pull'&&activeDrawer.key===kind) renderTaskDrawer();
+        toast(`${state.label}报告拉取完成`,'success');
+      },3000);
+    }
+    function reconcileInventory() {
+      const type=value('stocktake-warehouse'); const month=value('stocktake-month');
+      if(!type||!month) { toast(!type&&!month?'请选择仓库和月份后再核对库存':!type?'请选择仓库后再核对库存':'请选择月份后再核对库存','error'); return; }
+      const key=reconcileKey(type,month); const state=stocktakeReconcileStates[key]||{};
+      if(state.running) { openTaskDrawer('reconcile'); return; }
+      stocktakeFormalQueried=false;
+      // 再次核对期间保留上一份已完成快照；本次完成后才原子替换快照。
+      stocktakeReconcileStates[key]={ status:'进行中', completed:Boolean(state.completed&&state.snapshot), running:true, finishedAt:state.finishedAt||'—', exception:'—', snapshot:state.snapshot||null };
+      openTaskDrawer('reconcile');
+      setTimeout(()=>{
+        stocktakeReconcileStates[key]={ status:'已完成', completed:true, running:false, finishedAt:taskTime(), exception:'—', snapshot:getStocktakeRows(type).filter(row=>row.month===month).map(row=>({...row})) };
+        if(activeDrawer&&activeDrawer.kind==='reconcile') renderTaskDrawer();
+        toast('库存核对完成，请点击“查询”查看核对后的正确数量','success');
+      },2000);
+    }
+    const storagePages = new Set(['inbound-order','outbound-order','other-inbound','other-outbound','monthly-stocktake','stocktake-results','stocktake-detail']);
+    function activateModule(module) {
+      const isStorage = module === 'storage';
+      document.getElementById('finance-sidebar').classList.toggle('hidden', isStorage);
+      document.getElementById('storage-sidebar').classList.toggle('hidden', !isStorage);
+      document.querySelectorAll('.icon-item[data-module]').forEach(node=>node.classList.toggle('active', node.dataset.module === module));
+      document.getElementById('top-module').textContent = isStorage ? '仓储' : '财务';
+    }
+    function switchModule(module) { showPage(module === 'storage' ? 'monthly-stocktake' : 'local-report'); }
+    function toggleGroup(title) { title.parentElement.classList.toggle('open'); }
+    function showPage(page) {
+      const module = storagePages.has(page) ? 'storage' : 'finance';
+      activateModule(module);
+      document.querySelectorAll('.page').forEach(node=>node.classList.toggle('active',node.id==='page-'+page));
+      const menuPage=page==='stocktake-detail'?'stocktake-results':page;
+      document.querySelectorAll('.menu-item[data-page]').forEach(node=>node.classList.toggle('active',node.dataset.page===menuPage));
+      document.getElementById('breadcrumb').innerHTML=pageTitles[page].replace(/^首页 \/ /,'').replace(/ \/ ([^/]+)$/,' / <span>$1</span>');
+      if(page==='local-report') { localReportQueried=false; renderLocalInitial(); }
+      if(page==='overseas-report') { overseasReportQueried=false; renderOverseasInitial(); }
+      if(page==='stocktake-results') renderResults();
+      if(page==='monthly-stocktake') { stocktakeQueried=false; stocktakeFormalQueried=false; renderStocktakeInitial(); }
+      if(page==='inbound-order') renderRegularOrders('inbound');
+      if(page==='outbound-order') renderRegularOrders('outbound');
+      if(page==='other-inbound') renderOtherOrders('inbound');
+      if(page==='other-outbound') renderOtherOrders('outbound');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+    document.querySelectorAll('.menu-item[data-page]').forEach(node=>node.addEventListener('click',()=>showPage(node.dataset.page)));
+    function cell(value) { if(value === '' || value === null || value === undefined) return '<span style="color:#999">—</span>'; if(typeof value==='number') return `<span class="${value>0?'value-pos':value<0?'value-neg':'value-zero'}">${value}</span>`; if(value==='是') return '<span class="status-no">是</span>'; if(value==='否') return '<span class="status-no">否</span>'; return escapeHtml(value); }
+    function statusCell(value) { return value==='是'?'<span class="status-yes">是</span>':'<span class="status-no">否</span>'; }
+    function reportHead(columns, derivedStart) { return '<tr>'+columns.map((column,index)=>`<th class="${index === derivedStart ? 'derived-col':''}">${column[1]}</th>`).join('')+'</tr>'; }
+    function reportRows(rows, columns, isLocal) { return rows.map(row=>'<tr>'+columns.map((column,index)=>{ const cls=(isLocal && index===17)||(!isLocal&&index===3)?' class="derived-col"':''; const key=column[0]; const value=['docAbnormal','parseAbnormal'].includes(key)?statusCell(row[key]):cell(row[key]); return `<td${cls}>${value}</td>`; }).join('')+'</tr>').join(''); }
+    function matchText(value, query) { return !query || String(value || '').toLowerCase().includes(query.toLowerCase()); }
+    function filterLocalReport() {
+      const months=selectedReportMonths('local');
+      if(!reportPullStates.local.completed) { toast('请先拉取报告并等待拉取完成','error'); return; }
+      if(!months.length) { toast('请选择至少一个日期后再查询','error'); return; }
+      const rows=localReportData.filter(row => (!value('local-abnormal') || (value('local-abnormal')==='是' ? row.parseAbnormal==='是'||row.docAbnormal==='是' : row.parseAbnormal==='否'&&row.docAbnormal==='否')) && matchText(row.documentNo,value('local-docno')) && reportMonthFilter(months,row.localDate) && (!value('local-site') || row.site===value('local-site')) && matchText(row.systemSku,value('local-syssku')) && matchText(row.attributeId,value('local-attrid')) && matchText(row.skuId,value('local-skuid')));
+      localReportQueried=true; renderLocal(rows); toast('查询完成','success');
+    }
+    function renderLocal(rows=localReportData) { document.getElementById('local-report-head').innerHTML=reportHead(localColumns,17); document.getElementById('local-report-body').innerHTML=reportRows(rows,localColumns,true); document.getElementById('local-total').textContent=rows.length; }
+    function renderLocalInitial() { document.getElementById('local-report-head').innerHTML=reportHead(localColumns,17); document.getElementById('local-report-body').innerHTML=`<tr><td colspan="34" class="center" style="padding:32px;color:#999">${reportPullStates.local.completed?'请选择至少一个日期后点击“查询”获取报告数据':'请先拉取报告，拉取完成后按日期查询报告数据'}</td></tr>`; document.getElementById('local-total').textContent='0'; }
+    function resetLocalReport() { ['local-abnormal','local-docno','local-site','local-syssku','local-attrid','local-skuid'].forEach(id=>document.getElementById(id).value=''); clearReportMonths('local'); localReportQueried=false; renderLocalInitial(); }
+    function filterOverseasReport() {
+      const months=selectedReportMonths('over');
+      if(!reportPullStates.overseas.completed) { toast('请先拉取报告并等待拉取完成','error'); return; }
+      if(!months.length) { toast('请选择至少一个日期后再查询','error'); return; }
+      const rows=overseasReportData.filter(row=>(!value('over-store')||row.site===value('over-store'))&&(!value('over-abnormal')||(value('over-abnormal')==='是'?row.parseAbnormal==='是'||row.docAbnormal==='是':row.parseAbnormal==='否'&&row.docAbnormal==='否'))&&reportMonthFilter(months,row.localDate)&&(!value('over-site')||row.site===value('over-site'))&&matchText(row.systemSku,value('over-syssku'))&&matchText(row.viId,value('over-viid'))&&matchText(row.productId,value('over-productid')));
+      overseasReportQueried=true; renderOverseas(rows); toast('查询完成','success');
+    }
+    function renderOverseas(rows=overseasReportData) { document.getElementById('overseas-report-head').innerHTML=reportHead(overseasColumns,3); document.getElementById('overseas-report-body').innerHTML=reportRows(rows,overseasColumns,false); document.getElementById('overseas-total').textContent=rows.length; }
+    function renderOverseasInitial() { document.getElementById('overseas-report-head').innerHTML=reportHead(overseasColumns,3); document.getElementById('overseas-report-body').innerHTML=`<tr><td colspan="20" class="center" style="padding:32px;color:#999">${reportPullStates.overseas.completed?'请选择至少一个日期后点击“查询”获取报告数据':'请先拉取报告，拉取完成后按日期查询报告数据'}</td></tr>`; document.getElementById('overseas-total').textContent='0'; }
+    function resetOverseasReport() { ['over-store','over-abnormal','over-site','over-syssku','over-viid','over-productid'].forEach(id=>document.getElementById(id).value=''); clearReportMonths('over'); overseasReportQueried=false; renderOverseasInitial(); }
+    function value(id) { return document.getElementById(id).value; }
+
+    function configInput(field,row,type='text',options=[]) { if(configEditing!==row.id) return escapeHtml(row[field]||'—'); if(type==='select') return `<select data-field="${field}">${options.map(option=>`<option ${row[field]===option?'selected':''}>${option}</option>`).join('')}</select>`; return `<input type="text" data-field="${field}" value="${escapeHtml(row[field]||'')}" />`; }
+    function currentConfigRows() { return configData.filter(row=>(!value('cfg-platform')||row.platform===value('cfg-platform'))&&(!value('cfg-site')||row.site===value('cfg-site'))&&(!value('cfg-scene')||row.scene===value('cfg-scene'))&&(!value('cfg-biz')||row.bizRule.includes(value('cfg-biz')))); }
+    function renderConfig() {
+      const rows=currentConfigRows();
+      document.getElementById('config-body').innerHTML=rows.map(row=>`<tr data-id="${row.id}" class="${configEditing===row.id?'edit-cell':''}"><td>${configInput('platform',row,'select',['Coupang'])}</td><td>${configInput('site',row,'select',['Coupang本土-KR','Coupang-CGF1','Coupang-CGF2'])}</td><td>${configInput('siteLogic',row)}</td><td>${configInput('skuField',row)}</td><td>${configInput('platformDate',row)}</td><td>${configInput('platformQty',row)}</td><td>${configInput('statusField',row)}</td><td>${configInput('statusRule',row)}</td><td>${configInput('inventoryNo',row)}</td><td>${configInput('scene',row)}</td><td>${configInput('bizRule',row)}</td><td>${configInput('docGen',row,'select',['其他出入库单','不在报告解析阶段生成','无'])}</td><td>${configInput('tableName',row)}</td><td class="center">${configEditing===row.id?`<button class="link" onclick="saveConfig(${row.id})">保存</button> <button class="link" onclick="cancelConfig()">取消</button>`:`<button class="link" onclick="editConfig(${row.id})">编辑</button> <button class="link" onclick="removeConfig(${row.id})">删除</button>`}</td></tr>`).join('');
+      document.getElementById('config-total').textContent=rows.length;
+    }
+    function editConfig(id) { configEditing=id; renderConfig(); }
+    function cancelConfig() { configEditing=null; renderConfig(); }
+    function saveConfig(id) { const row=configData.find(item=>item.id===id); const tr=document.querySelector(`tr[data-id="${id}"]`); tr.querySelectorAll('[data-field]').forEach(node=>row[node.dataset.field]=node.value.trim()); configEditing=null; renderConfig(); toast('保存成功','success'); }
+    function addConfig() { configData.unshift({id:configId++,platform:'Coupang',site:'Coupang本土-KR',siteLogic:'',skuField:'',platformDate:'',platformQty:'',statusField:'',statusRule:'',inventoryNo:'',scene:'',bizRule:'',docGen:'其他出入库单',tableName:'待确认'}); configEditing=configData[0].id; renderConfig(); }
+    function removeConfig(id) { configData=configData.filter(row=>row.id!==id); renderConfig(); toast('已删除配置行','success'); }
+    function resetConfig() { ['cfg-platform','cfg-site','cfg-scene','cfg-biz'].forEach(id=>document.getElementById(id).value=''); renderConfig(); }
+
+    function signed(value) { return `<span class="${value>0?'value-pos':value<0?'value-neg':'value-zero'}">${value}</span>`; }
+    function warehouseName(key) { return key==='local'?'韩国Coupang本土店仓':key==='o1'?'韩国Coupang海外1店仓':'韩国Coupang海外2店仓'; }
+    function monthEnd(month) { if(!month) return ''; const [year, mon] = month.split('-').map(Number); return `${year}-${String(mon).padStart(2,'0')}-${String(new Date(year, mon, 0).getDate()).padStart(2,'0')}`; }
+    function stocktakeRowKey(type, row) { return [type,row.month,row.sku,type==='local'?row.scene:''].join('|'); }
+    function generatedImpact(type, row) {
+      const key=stocktakeRowKey(type,row);
+      return generatedDocuments.filter(doc=>doc.stocktakeType===type).flatMap(doc=>doc.items).filter(item=>item.rowKey===key).reduce((sum,item)=>sum+item.impact,0);
+    }
+    function getStocktakeRows(type) {
+      const baseRows=type==='local'?localStocktake:overseasStocktake[type];
+      return baseRows.map(row=>{
+        const impact=generatedImpact(type,row);
+        if(type==='local') {
+          const system=row.system+impact;
+          const diff=system-row.report;
+          return {...row,system,diff,direction:diff>0?'其他出库':diff<0?'其他入库':'-'};
+        }
+        const flow=row.flow+impact;
+        const diff=row.opening+flow-row.closing;
+        return {...row,flow,diff,direction:diff>0?'其他出库':diff<0?'其他入库':'-'};
+      });
+    }
+    function stocktakeHead() { return '<tr><th>站点</th><th>仓库</th><th>当地店铺日期</th><th>系统货品</th><th>业务分类</th><th class="right">期初数量</th><th class="right">系统流水数量</th><th class="right">报告流水数量</th><th class="right">系统计算期末数量</th><th class="right">报告期末数量</th><th class="right">差异数量</th><th>调整方向</th></tr>'; }
+    function blankStocktakeCell() { return ''; }
+    function pendingStocktakeCell() { return '<span style="color:#999">—</span>'; }
+    function renderStocktakeInitial() {
+      document.getElementById('stocktake-head').innerHTML=stocktakeHead();
+      document.getElementById('stocktake-body').innerHTML='<tr><td colspan="12" class="center" style="padding:32px;color:#999">请设置仓库和月份后点击“查询”获取盘点数据</td></tr>';
+      document.getElementById('stocktake-tip').textContent='查询前可先执行“核对库存”；未完成核对时仅展示报告侧数量，系统流水及差异数量显示“—”。';
+      document.getElementById('stocktake-total').textContent='0';
+    }
+    function renderStocktakeRows(rows, type, reconciled) {
+      const body=document.getElementById('stocktake-body'); const isLocal=type==='local'; const site=isLocal?'Coupang本土-KR':type==='o1'?'Coupang-CGF1':'Coupang-CGF2'; const warehouse=warehouseName(type);
+      body.innerHTML=rows.length?rows.map(row=>{
+        if(isLocal) return `<tr><td>${site}</td><td>${warehouse}</td><td>${monthEnd(row.month)}</td><td>${row.sku}</td><td>${row.scene}</td><td class="right">${blankStocktakeCell()}</td><td class="right">${reconciled?signed(row.system):pendingStocktakeCell()}</td><td class="right">${signed(row.report)}</td><td class="right">${blankStocktakeCell()}</td><td class="right">${blankStocktakeCell()}</td><td class="right">${reconciled?signed(row.diff):pendingStocktakeCell()}</td><td>${reconciled&&row.direction!=='-'?row.direction:reconciled?'—':'—'}</td></tr>`;
+        return `<tr><td>${site}</td><td>${warehouse}</td><td>${monthEnd(row.month)}</td><td>${row.sku}</td><td>${blankStocktakeCell()}</td><td class="right">${row.opening}</td><td class="right">${reconciled?signed(row.flow):pendingStocktakeCell()}</td><td class="right">${blankStocktakeCell()}</td><td class="right">${reconciled?row.opening+row.flow:pendingStocktakeCell()}</td><td class="right">${row.closing}</td><td class="right">${reconciled?signed(row.diff):pendingStocktakeCell()}</td><td>${reconciled&&row.direction!=='-'?row.direction:'—'}</td></tr>`;
+      }).join(''):'<tr><td colspan="12" class="center" style="padding:32px;color:#999">未查询到符合条件的数据</td></tr>';
+    }
+    function queryStocktake(showMessage=false) {
+      const type=value('stocktake-warehouse'); const sku=value('stocktake-sku').toLowerCase(); const selectedMonth=value('stocktake-month');
+      if(!type||!selectedMonth) stocktakeFormalQueried=false;
+      if(!type||!selectedMonth) { stocktakeQueried=false; renderStocktakeInitial(); toast(!type&&!selectedMonth?'请选择仓库和月份后再查询':!type?'请选择仓库后再查询':'请选择月份后再查询','error'); return; }
+      const state=reconcileState(type,selectedMonth);
+      const rows=stocktakeRowsForQuery(type,selectedMonth).filter(row=>!sku||row.sku.toLowerCase().includes(sku));
+      const reconciled=state.completed;
+      stocktakeFormalQueried=reconciled&&!state.running;
+      document.getElementById('stocktake-head').innerHTML=stocktakeHead(); renderStocktakeRows(rows,type,reconciled);
+      document.getElementById('stocktake-tip').textContent=reconciled?(type==='local'?'场景差异 = 系统单据场景库存影响数 - 报告场景库存影响数。处理中 (G) 不进入场景差异或盘点补差。':'总量差异 = 期初数量 + 当月系统流水 - 报告期末数量。期初取上月同仓报告期末，无上月报告时按 0。'):'库存核对尚未完成：当前仅展示报告侧数量，系统流水、系统计算期末、差异数量及调整方向均不参与计算。';
+      if(reconciled) document.getElementById('stocktake-tip').textContent+=state.running?' 当前正在再次核对，页面暂展示上一份已完成核对快照。':' 当前展示已完成核对快照；再次拉取报告不会自动更新本结果。';
+      stocktakeQueried=true; document.getElementById('stocktake-total').textContent=rows.length; if(showMessage) toast(reconciled?(state.running?'查询完成，当前展示上一份核对快照':'查询完成，当前展示已完成核对快照'):'查询完成，当前为未核对的报告预览数据','success');
+    }
+    function createStocktakeResult() {
+      const type=value('stocktake-warehouse'), month=value('stocktake-month');
+      if(!type) { toast('生成盘点结果表前请先选择仓库','error'); return; }
+      const warehouse=warehouseName(type);
+      if(!stocktakeQueried) { toast('请先点击查询获取盘点对比数据','error'); return; }
+      if(!month) { toast('生成盘点结果表前请先选择月份','error'); return; }
+      if(!reconcileState(type,month).completed) { toast('请先完成核对库存，再生成盘点结果表','error'); return; }
+      if(!stocktakeFormalQueried) { toast('库存核对已完成，请重新点击“查询”后再生成盘点结果表','error'); return; }
+      const previous=results.filter(row=>row.warehouse===warehouse&&row.month===month);
+      const unfinished=previous.find(row=>row.status!=='已完成');
+      if(unfinished) { toast(`存在未完成的盘点结果 ${unfinished.id}，请先处理生成失败或待生成单据。`,'error'); return; }
+      if(reconcileState(type,month).running) { toast('库存正在再次核对，请等待完成后重新点击查询再生成盘点结果表','error'); return; }
+      const rows=stocktakeRowsForQuery(type,month); const pending=rows.filter(row=>row.diff!==0).length; const sequence=String(previous.length+1).padStart(3,'0'); const id=`CSTK-${month.replace('-','')}-${type==='local'?'KR-L':type==='o1'?'KR-O1':'KR-O2'}-${sequence}`;
+      detailResult={id,platform:'Coupang',warehouse,dimension:'月度汇总',month,typeName:type==='local'?'Coupang本土店月度盘点':'Coupang海外店月度盘点',pending,status:pending?'待生成单据':'已完成',docGenCondition:'',siteSummaryCondition:'',created:taskTime(),type,rows,generated:false,generationAttempt:false,generatedDocumentCount:0}; results.unshift(detailResult); renderResults(); renderDetail(); showPage('stocktake-detail'); toast('已生成新的盘点结果表','success');
+    }
+    function resultTag(status) { const map={'待生成单据':'tag-warning','已完成':'tag-success','生成失败':'tag-error'}; return `<span class="tag ${map[status]||'tag-gray'}">${status}</span>`; }
+    function renderResults() { const rows=results.filter(row=>(!value('result-platform')||row.platform===value('result-platform'))&&(!value('result-warehouse')||row.warehouse===value('result-warehouse'))&&(!value('result-month')||row.month===value('result-month'))&&(!value('result-type')||row.typeName===value('result-type'))&&(!value('result-status')||row.status===value('result-status'))); document.getElementById('results-body').innerHTML=rows.length?rows.map(row=>`<tr><td>${row.id}</td><td><span class="tag tag-coupang">${row.platform}</span></td><td>${row.warehouse}</td><td>${row.dimension}</td><td>${row.month}</td><td>${row.typeName}</td><td>${resultTag(row.status)}</td><td>${row.docGenCondition||'—'}</td><td>${row.created}</td><td class="center"><button class="link" onclick="openResult('${row.id}')">查看</button></td></tr>`).join(''):'<tr><td colspan="10" class="center" style="padding:32px;color:#999">暂无盘点结果表</td></tr>'; document.getElementById('results-total').textContent=rows.length; }
+    function resetResults() { ['result-platform','result-warehouse','result-month','result-type','result-status'].forEach(id=>document.getElementById(id).value=''); renderResults(); }
+    function openResult(id) { detailResult=results.find(row=>row.id===id); renderDetail(); showPage('stocktake-detail'); }
+    function resultGeneratedImpact(result, row) {
+      const key=stocktakeRowKey(result.type,row);
+      return generatedDocuments.filter(doc=>doc.resultId===result.id).flatMap(doc=>doc.items).filter(item=>item.rowKey===key).reduce((sum,item)=>sum+item.impact,0);
+    }
+    function detailRows() {
+      const baseRows=detailResult.rows || getStocktakeRows(detailResult.type).filter(row=>row.month===detailResult.month);
+      return baseRows.map(row=>{
+        const impact=resultGeneratedImpact(detailResult,row);
+        if(detailResult.type==='local') { const system=row.system+impact; const diff=system-row.report; return {...row,system,diff,direction:diff>0?'其他出库':diff<0?'其他入库':'-',originalDirection:row.direction}; }
+        const flow=row.flow+impact; const diff=row.opening+flow-row.closing; return {...row,flow,diff,direction:diff>0?'其他出库':diff<0?'其他入库':'-',originalDirection:row.direction};
+      });
+    }
+    function hasDocumentsForResult(result) { return generatedDocuments.some(doc=>doc.resultId===result.id); }
+    function generatedDocumentForRow(row, result) {
+      const key=stocktakeRowKey(result.type,row);
+      return generatedDocuments.find(doc=>doc.resultId===result.id&&doc.items.some(item=>item.rowKey===key));
+    }
+    function adjustmentGroupKey(result, row) { const documentType=row.direction==='其他入库'?'其他入库单':'其他出库单'; const scene=result.type==='local'?row.scene:''; return [documentType,monthEnd(result.month),result.warehouse,scene,row.direction].join('|'); }
+    function generationFailureGroups(result) {
+      if(!result) return [];
+      const groups=new Map();
+      (result.rows||[]).filter(row=>row.diff!==0&&row.generationError&&!generatedDocumentForRow(row,result)).forEach(row=>{
+        const key=adjustmentGroupKey(result,row);
+        if(!groups.has(key)) groups.set(key,{key,documentNo:documentNumber(row,result),errorSku:row.sku,message:`单据包含 SKU ${row.sku}，${row.generationError}`,resolved:Boolean(row.generationErrorResolved)});
+      });
+      return [...groups.values()];
+    }
+    function detailLineMeta(row, result) {
+      const document=generatedDocumentForRow(row,result);
+      if(document) return { status:'<span class="tag tag-success">已生成</span>', documentNo:detailDocumentNo(row,result), error:'—' };
+      const failure=generationFailureGroups(result).find(group=>group.key===adjustmentGroupKey(result,{...row,direction:row.originalDirection||row.direction}));
+      if(result.generationAttempt&&failure) return { status:'<span class="tag tag-error">生成失败</span>', documentNo:'—', error:escapeHtml(failure.message) };
+      if(row.diff===0) return { status:'<span class="tag tag-gray">无需调整</span>', documentNo:'—', error:'—' };
+      return { status:'<span class="tag tag-warning">待生成</span>', documentNo:'—', error:'—' };
+    }
+    function renderDetail() {
+      const r=detailResult; if(!r) return; const isLocal=r.type==='local';
+      document.getElementById('detail-info').innerHTML=`<div><label>盘点结果编号</label><div>${r.id}</div></div><div><label>平台</label><div>Coupang</div></div><div><label>仓库</label><div>${r.warehouse}</div></div><div><label>盘点维度</label><div>${r.dimension}</div></div><div><label>月份</label><div>${r.month}</div></div><div><label>汇总方式</label><div>按月汇总（固定）</div></div><div><label>类型</label><div>${r.typeName}</div></div><div><label>状态</label><div>${resultTag(r.status)}</div></div>`;
+      const siteSummary=document.getElementById('site-summary-condition'); siteSummary.value=r.siteSummaryCondition||''; siteSummary.disabled=r.generationAttempt; const generateButton=document.getElementById('generate-docs'); generateButton.textContent=r.generationAttempt?'再次生成':'生成单据'; generateButton.disabled=r.status==='已完成'||r.pending===0;
+      if(r.generationRunning) { siteSummary.disabled=true; generateButton.disabled=true; }
+      const head='<tr><th>站点</th><th>仓库</th><th>当地店铺日期</th><th>系统货品</th><th>业务分类</th><th class="right">期初数量</th><th class="right">系统流水数量</th><th class="right">报告流水数量</th><th class="right">系统计算期末数量</th><th class="right">报告期末数量</th><th class="right">差异数量</th><th>调整方向</th><th>明细状态</th><th>生成单据单号</th><th>异常信息</th></tr>';
+      document.getElementById('detail-head').innerHTML=head;
+      if(isLocal) {
+        document.getElementById('detail-body').innerHTML=detailRows().map(row=>{const meta=detailLineMeta(row,r); const direction=row.diff!==0?row.direction:(meta.documentNo!=='—'?row.originalDirection:'—'); return `<tr><td>Coupang本土-KR</td><td>${r.warehouse}</td><td>${monthEnd(r.month)}</td><td>${row.sku}</td><td>${row.scene}</td><td class="right"></td><td class="right">${signed(row.system)}</td><td class="right">${signed(row.report)}</td><td class="right"></td><td class="right"></td><td class="right">${signed(row.diff)}</td><td>${direction}</td><td>${meta.status}</td><td>${meta.documentNo}</td><td>${meta.error}</td></tr>`;}).join('');
+      } else {
+        const site=r.type==='o1'?'Coupang-CGF1':'Coupang-CGF2';
+        document.getElementById('detail-body').innerHTML=detailRows().map(row=>{const meta=detailLineMeta(row,r); const direction=row.diff!==0?row.direction:(meta.documentNo!=='—'?row.originalDirection:'—'); return `<tr><td>${site}</td><td>${r.warehouse}</td><td>${monthEnd(r.month)}</td><td>${row.sku}</td><td></td><td class="right">${row.opening}</td><td class="right">${signed(row.flow)}</td><td class="right"></td><td class="right">${row.opening+row.flow}</td><td class="right">${row.closing}</td><td class="right">${signed(row.diff)}</td><td>${direction}</td><td>${meta.status}</td><td>${meta.documentNo}</td><td>${meta.error}</td></tr>`;}).join('');
+      }
+    }
+    function detailDocumentNo(row, result) {
+      const document=generatedDocumentForRow(row,result);
+      return document?`<button class="link" onclick="openGeneratedDocument('${document.documentNo}')">${document.documentNo}</button>`:'—';
+    }
+    function documentNumber(row, result) {
+      const dateKey=monthEnd(result.month).replaceAll('-','').slice(2);
+      const prefix=row.direction==='其他入库'?'OIB':'OOB';
+      const revision=result.id.split('-').pop(); const revisionSuffix=revision==='001'?'':`-R${revision}`;
+      if(result.type==='local') {
+        const sequences={ '调拨入库|其他入库':'001', '调拨入库|其他出库':'002', '销售出库|其他出库':'003', '调拨出库|其他出库':'004', '确认丢失/损坏|其他出库':'005' };
+        return `${prefix}${dateKey}${sequences[`${row.scene}|${row.direction}`]||'999'}${revisionSuffix}`;
+      }
+      return `${prefix}${dateKey}${row.direction==='其他入库'?'001':'002'}${revisionSuffix}`;
+    }
+    function buildOtherInventoryDocuments(result) {
+      const condition='按月汇总';
+      const groups=new Map();
+      const failures=generationFailureGroups(result).filter(group=>!group.resolved);
+      detailRows().filter(row=>row.diff!==0).forEach(row=>{
+        const documentDate=monthEnd(result.month);
+        const documentType=row.direction==='其他入库'?'其他入库单':'其他出库单';
+        const scene=result.type==='local'?row.scene:'';
+        const groupKey=[documentType,documentDate,result.warehouse,scene,row.direction].join('|');
+        if(failures.some(group=>group.key===groupKey)||generatedDocuments.some(doc=>doc.resultId===result.id&&doc.groupKey===groupKey)) return;
+        const documentNo=documentNumber(row,result);
+        if(!groups.has(groupKey)) {
+          groups.set(groupKey,{resultId:result.id,stocktakeType:result.type,groupKey,documentNo,documentType,documentDate,warehouse:result.warehouse,firstScene:result.type==='local'?'盘点':'',secondScene:result.type==='local'?`${scene}${row.direction==='其他入库'?'调增':'调减'}`:'',generationCondition:condition,status:'已审核',businessNode:'盘点',relatedDocumentNo:result.id,warehouseTime:`${documentDate} 23:59:59`,createdBy:'系统',createdAt:`${documentDate} 23:59:59`,note:`盘点结果 ${result.id} 自动生成`,items:[]});
+        }
+        groups.get(groupKey).items.push({rowKey:stocktakeRowKey(result.type,row),sku:row.sku,name:row.name||row.sku,scene,quantity:Math.abs(row.diff),impact:row.direction==='其他入库'?Math.abs(row.diff):-Math.abs(row.diff),inventorySystem:'公共'});
+      });
+      return [...groups.values()];
+    }
+    function regularOrderRows(kind) {
+      return kind==='inbound'?regularInboundOrders:regularOutboundOrders;
+    }
+    function queryRegularOrders(kind) {
+      const prefix=`${kind}-order`;
+      const no=value(`${prefix}-value`).trim();
+      const exact=value(`${prefix}-match`)==='精确';
+      const dateRange=value(`${prefix}-date`).match(/\d{4}-\d{2}-\d{2}/g)||[];
+      const rows=regularOrderRows(kind).filter(order=>(!no||(exact?order.documentNo===no:order.documentNo.includes(no)))&&(!value(`${prefix}-warehouse`)||order.warehouse===value(`${prefix}-warehouse`))&&(!value(`${prefix}-type`)||order.businessNode===value(`${prefix}-type`))&&(!dateRange[0]||order.documentDate>=dateRange[0])&&(!dateRange[1]||order.documentDate<=dateRange[1]));
+      renderRegularOrders(kind,rows);
+      toast('查询完成','success');
+    }
+    function resetRegularOrders(kind) {
+      const prefix=`${kind}-order`;
+      [`${prefix}-value`,`${prefix}-warehouse`,`${prefix}-type`,`${prefix}-date`].forEach(id=>document.getElementById(id).value='');
+      document.getElementById(`${prefix}-match`).value='精确';
+      renderRegularOrders(kind);
+    }
+    function renderRegularOrders(kind, suppliedRows) {
+      const rows=suppliedRows||regularOrderRows(kind);
+      const body=document.getElementById(`${kind}-order-body`);
+      const ioLabel=kind==='inbound'?'入库':'出库';
+      body.innerHTML=rows.length?rows.map(order=>`<tr><td class="center">›</td><td>${order.documentNo}</td><td>${order.warehouse}</td><td>${order.businessNode}</td><td>${order.businessDocumentNo}</td><td class="right">${order.items.reduce((sum,item)=>sum+item.quantity,0)}</td><td>${order.warehouseTime}</td><td>${order.note}</td><td>${order.createdBy}</td><td class="center"><button class="link" onclick="openRegularOrder('${kind}','${order.documentNo}')">查看</button></td></tr>`).join(''):`<tr><td colspan="10" class="center" style="padding:32px;color:#999">暂无${ioLabel}单</td></tr>`;
+      document.getElementById(`${kind}-order-total`).textContent=rows.length;
+    }
+    function openRegularOrder(kind, documentNo) {
+      const order=regularOrderRows(kind).find(item=>item.documentNo===documentNo);
+      if(!order) return;
+      const ioLabel=kind==='inbound'?'入库':'出库';
+      const qtyLabel=kind==='inbound'?'入库数量':'出库数量';
+      document.getElementById('other-order-modal-title').textContent=`查看${ioLabel}单`;
+      document.getElementById('other-order-modal-content').innerHTML=`
+        <div class="modal-section-title">基本信息</div>
+        <div class="modal-form-grid">
+          <div class="modal-field"><label>${ioLabel}单号：</label><div class="modal-value">${order.documentNo}</div></div>
+          <div class="modal-field"><label>${ioLabel}仓库：</label><div class="modal-value">${order.warehouse}</div></div>
+          <div class="modal-field"><label>${ioLabel}时间：</label><div class="modal-value">${order.warehouseTime}</div></div>
+          <div class="modal-field"><label>业务类型：</label><div class="modal-value">${order.businessNode}</div></div>
+          <div class="modal-field"><label>业务单据：</label><div class="modal-value">${order.businessDocumentNo}</div></div>
+        </div>
+        <div class="modal-field" style="margin:0 34px 8px"><label>备注：</label></div><div class="modal-note">${order.note}</div>
+        <div class="modal-section-title">${ioLabel}明细</div>
+        <div class="table-wrap modal-table"><table><thead><tr><th><span style="color:#ff4d4f">*</span> SKU</th><th>产品名称</th><th class="right"><span style="color:#ff4d4f">*</span>${qtyLabel}</th><th>备注</th></tr></thead><tbody>${order.items.map(item=>`<tr><td>${item.sku}</td><td>${item.name}</td><td class="right">${item.quantity}</td><td></td></tr>`).join('')}</tbody></table></div>
+        <div style="display:flex;justify-content:flex-end;margin-top:24px"><button class="btn" onclick="closeOtherOrderModal()">取消</button></div>`;
+      document.getElementById('other-order-modal').classList.add('open');
+    }
+    function otherOrderRows(kind) {
+      return generatedDocuments.filter(doc=>doc.documentType===(kind==='inbound'?'其他入库单':'其他出库单'));
+    }
+    function queryOtherOrders(kind) {
+      const prefix=`other-${kind}`;
+      const no=value(`${prefix}-value`).trim();
+      const exact=value(`${prefix}-match`)==='精确';
+      const rows=otherOrderRows(kind).filter(doc=>(!no||(exact?doc.documentNo===no:doc.documentNo.includes(no)))&&(!value(`${prefix}-status`)||doc.status===value(`${prefix}-status`))&&(!value(`${prefix}-warehouse`)||doc.warehouse===value(`${prefix}-warehouse`))&&(!value(`${prefix}-first-scene`)||doc.firstScene===value(`${prefix}-first-scene`))&&(!value(`${prefix}-second-scene`)||doc.secondScene===value(`${prefix}-second-scene`)));
+      renderOtherOrders(kind,rows);
+      toast('查询完成','success');
+    }
+    function resetOtherOrders(kind) {
+      const prefix=`other-${kind}`;
+      [`${prefix}-value`,`${prefix}-status`,`${prefix}-warehouse`,`${prefix}-first-scene`,`${prefix}-second-scene`].forEach(id=>document.getElementById(id).value='');
+      document.getElementById(`${prefix}-match`).value='精确';
+      renderOtherOrders(kind);
+    }
+    function renderOtherOrders(kind, suppliedRows) {
+      const rows=suppliedRows||otherOrderRows(kind);
+      const body=document.getElementById(`other-${kind}-body`);
+      const orderLabel=kind==='inbound'?'入库':'出库';
+      body.innerHTML=rows.length?rows.map(doc=>`<tr><td class="center"><input type="checkbox" aria-label="选择${doc.documentNo}" /></td><td>${doc.documentNo}</td><td><span class="tag tag-success">${doc.status}</span></td><td>${doc.warehouse}</td><td class="right">${doc.items.reduce((sum,item)=>sum+item.quantity,0)}</td><td>${doc.documentDate}</td><td>${doc.firstScene||'--'}</td><td>${doc.secondScene||'--'}</td><td>${doc.businessNode}</td><td>${doc.relatedDocumentNo}</td><td>${doc.warehouseTime}</td><td>${doc.note}</td><td>${doc.createdBy}</td><td>${doc.createdAt}</td><td class="center"><button class="link" onclick="openOtherOrder('${doc.documentNo}')">查看</button>　<button class="link" onclick="toast('更多操作沿用中台现有${orderLabel}单能力','success')">更多</button></td></tr>`).join(''):`<tr><td colspan="15" class="center" style="padding:32px;color:#999">暂无${kind==='inbound'?'其他入库':'其他出库'}单</td></tr>`;
+      document.getElementById(`other-${kind}-total`).textContent=rows.length;
+    }
+    function openGeneratedDocument(documentNo) {
+      const doc=generatedDocuments.find(item=>item.documentNo===documentNo);
+      if(!doc) return;
+      const kind=doc.documentType==='其他入库单'?'inbound':'outbound';
+      showPage(`other-${kind}`);
+      document.getElementById(`other-${kind}-value`).value=documentNo;
+      queryOtherOrders(kind);
+    }
+    function openOtherOrder(documentNo) {
+      const doc=generatedDocuments.find(item=>item.documentNo===documentNo);
+      if(!doc) return;
+      const isInbound=doc.documentType==='其他入库单';
+      const ioLabel=isInbound?'入库':'出库';
+      const qtyLabel=isInbound?'入库数量':'出库数量';
+      document.getElementById('other-order-modal-title').textContent=`查看其他${ioLabel}单`;
+      document.getElementById('other-order-modal-content').innerHTML=`
+        <div class="modal-section-title">基本信息</div>
+        <div class="modal-form-grid">
+          <div class="modal-field"><label>${ioLabel}单号：</label><div class="modal-value">${doc.documentNo}</div></div>
+          <div class="modal-field"><label>${ioLabel}仓库：</label><div class="modal-value">${doc.warehouse}</div></div>
+          <div class="modal-field"><label>业务节点：</label><div class="modal-value">${doc.businessNode}</div></div>
+          <div class="modal-field"><label>一级库存场景：</label><div class="modal-value">${doc.firstScene||'--'}</div></div>
+          <div class="modal-field"><label>二级库存场景：</label><div class="modal-value">${doc.secondScene||'--'}</div></div>
+          <div class="modal-field"><label>仓库${ioLabel}时间：</label><div class="modal-value">${doc.warehouseTime}</div></div>
+          <div class="modal-field"><label>关联单号：</label><div class="modal-value">${doc.relatedDocumentNo}</div></div>
+          <div class="modal-field"><label>状态：</label><div class="modal-value">${doc.status}</div></div>
+        </div>
+        <div class="modal-field" style="margin:0 34px 8px"><label>备注：</label></div><div class="modal-note">${doc.note}</div>
+        <div class="modal-section-title">${ioLabel}明细</div>
+        <div class="table-wrap modal-table"><table><thead><tr><th><span style="color:#ff4d4f">*</span> SKU</th><th>产品名称</th><th class="right"><span style="color:#ff4d4f">*</span>${qtyLabel}</th><th><span style="color:#ff4d4f">*</span>库存体系</th><th>备注</th></tr></thead><tbody>${doc.items.map(item=>`<tr><td>${item.sku}</td><td>${item.name}</td><td class="right">${item.quantity}</td><td>${item.inventorySystem}</td><td>盘点差异调整</td></tr>`).join('')}</tbody></table></div>
+        <div class="modal-section-title">操作日志</div>
+        <div class="table-wrap modal-table"><table><thead><tr><th>操作时间</th><th>操作人</th><th>操作类型</th><th>操作详情</th></tr></thead><tbody><tr><td>${doc.createdAt}</td><td>${doc.createdBy}</td><td>审核</td><td></td></tr><tr><td>${doc.createdAt}</td><td>${doc.createdBy}</td><td>提交</td><td></td></tr><tr><td>${doc.createdAt}</td><td>${doc.createdBy}</td><td>新增</td><td>${doc.note}</td></tr></tbody></table></div>`;
+      document.getElementById('other-order-modal').classList.add('open');
+    }
+    function closeOtherOrderModal() { document.getElementById('other-order-modal').classList.remove('open'); }
+    function updateSiteSummaryCondition() {
+      if(detailResult) detailResult.siteSummaryCondition=value('site-summary-condition');
+    }
+    function finishGenerateDocs(result, siteSummary) {
+      const condition='按月汇总';
+      detailResult=result;
+      const documents=buildOtherInventoryDocuments(result);
+      generatedDocuments=generatedDocuments.concat(documents);
+      result.docGenCondition=condition; result.generated=hasDocumentsForResult(result); result.generationAttempt=true; result.generatedDocumentCount=(result.generatedDocumentCount||0)+documents.length;
+      const pendingRows=detailRows().filter(row=>row.diff!==0); const failures=generationFailureGroups(result).filter(group=>!group.resolved);
+      result.pending=pendingRows.length; result.status=failures.length?'生成失败':'已完成'; result.generationRunning=false; result.generationTotalRows=0;
+      renderDetail(); renderResults(); openTaskDrawer('generation'); toast(failures.length?`已生成 ${documents.length} 张其他出入库单；${failures.length} 张单据生成失败。`:`已生成 ${documents.length} 张其他出入库单`,failures.length?'error':'success');
+    }
+    function generateDocs() {
+      if(!detailResult||detailResult.pending===0) return;
+      if(detailResult.generationRunning) { openTaskDrawer('generation'); return; }
+      const siteSummary=value('site-summary-condition');
+      if(!siteSummary) { toast('请先选择是否按照站点汇总','error'); return; }
+      if(siteSummary!=='是') { toast('Coupang 盘点必须按站点汇总，请选择“是”后再生成单据','error'); return; }
+      const result=detailResult; const pendingRows=detailRows().filter(row=>row.diff!==0);
+      result.siteSummaryCondition=siteSummary; result.generationRunning=true; result.generationTotalRows=pendingRows.length;
+      renderDetail(); openTaskDrawer('generation');
+      setTimeout(()=>finishGenerateDocs(result,siteSummary),pendingRows.length*500);
+    }
+    function resolveGenerationFailures() {
+      if(!detailResult) return;
+      const failures=generationFailureGroups(detailResult);
+      if(!failures.length) { toast('当前没有待处理的生成异常','error'); return; }
+      detailResult.rows.forEach(row=>{ if(row.generationError) row.generationErrorResolved=true; });
+      detailResult.errorResolved=true;
+      renderTaskDrawer(); toast('演示：异常 SKU 已处理完成，当前失败状态及报错信息保留；请点击“再次生成”补生成失败单据','success');
+    }
+
+    ['stocktake-warehouse','stocktake-month','stocktake-sku'].forEach(id=>document.getElementById(id).addEventListener(id==='stocktake-sku'?'input':'change',()=>{ stocktakeQueried=false; stocktakeFormalQueried=false; renderStocktakeInitial(); }));
+    renderLocalInitial(); renderOverseasInitial(); renderConfig(); renderStocktakeInitial(); renderResults();
+  </script>
+</body>
+</html>
