@@ -912,7 +912,16 @@
         "找回": ["找回"],
         "Unknown Events": ["Unknown Events"]
       },
-      "docTypes": ["其他入库单", "其他出库单"]
+      "docTypes": ["其他入库单", "其他出库单"],
+      "warehouses": [
+        "英国谷仓", "法国谷仓", "法国谷仓售后仓",
+        "万邑通澳洲仓", "万邑通德国仓",
+        "筋斗云DWA仓", "筋斗云GLC仓", "筋斗云乐天仓",
+        "SPL仓", "新加坡待维修仓",
+        "JP-日本亚马逊仓", "SG-沙特亚马逊仓", "SG-沙特售后亚马逊仓",
+        "ST-Amazon US", "ST-Returns(Amazon US)",
+        "韩国Coupang本土店仓"
+      ]
     },
     "detailColumns": [
       { "key": "sellerid", "label": "sellerid", "group": "platform" },
@@ -993,6 +1002,7 @@
       { "key": "dbTable", "label": "数据库表名", "group": "common" },
       { "key": "siteLogic", "label": "站点", "group": "common" },
       { "key": "statusLogic", "label": "是否可售", "group": "common" },
+      { "key": "warehouse", "label": "仓库", "group": "common" },
       { "key": "skuField", "label": "货品SKU", "group": "common" },
       { "key": "dateField", "label": "平台日期", "group": "common" },
       { "key": "qtyLogic", "label": "货品数量", "group": "common" },
@@ -1096,6 +1106,7 @@
     "configRows": [
       {
         "id": "c1", "platform": "Amazon", "siteLogic": "统一规则，识别所有的站点",
+        "warehouse": "ST-Amazon US",
         "statusLogic": "统一规则，识别所有的状态", "scene": "备货", "bizType": "备货接收",
         "bizRule": "EventType = 'Receipts'", "skuField": "msku", "dateField": "Date and Time",
         "qtyLogic": "Quantity", "inventoryNoField": "记录流水 ID，需标记到单据",
@@ -1105,6 +1116,7 @@
       {
         "id": "c2", "platform": "Amazon",
         "siteLogic": "case when sellerid = 'A3U5E183ODUBBN' and country = 'JP' then Amazon_JP when sellerid = 'AHLP03EOC0SXS' and country = 'SA' then Amazon_SA end",
+        "warehouse": "JP-日本亚马逊仓",
         "statusLogic": "case when Disposition = 'sellable' then 'sellerable' else 'unsell' end",
         "scene": "找回", "bizType": "找回", "bizRule": "EventType = 'Adjustments' and reason in ('F','N')",
         "skuField": "msku", "dateField": "Date and Time", "qtyLogic": "Quantity",
@@ -1113,6 +1125,7 @@
       },
       {
         "id": "c3", "platform": "Amazon", "siteLogic": "统一规则，识别所有的站点",
+        "warehouse": "JP-日本亚马逊仓",
         "statusLogic": "统一规则，识别所有的状态", "scene": "报废", "bizType": "报废",
         "bizRule": "EventType = 'Adjustments' and reason in ('6','7','E','H','K','U','G')",
         "skuField": "msku", "dateField": "Date and Time", "qtyLogic": "Quantity",
@@ -1121,6 +1134,7 @@
       },
       {
         "id": "c4", "platform": "Amazon", "siteLogic": "统一规则，识别所有的站点",
+        "warehouse": "SG-沙特亚马逊仓",
         "statusLogic": "统一规则，识别所有的状态", "scene": "Unknown Events", "bizType": "Unknown Events",
         "bizRule": "StartingWarehouseBalance + ... - EndingWarehouseBalance <> 0",
         "skuField": "msku", "dateField": "Date", "qtyLogic": "Unknown Events",
@@ -1705,6 +1719,7 @@
     if (key === "actions") return 148;
     if (key === "docType") return 220;
     if (key === "docNo") return 220;
+    if (key === "warehouse") return 168;
     let w = textWidthPx(label);
     if (key === "dbTable") {
       (state.configRows || []).forEach(function (row) {
@@ -2181,6 +2196,10 @@
     return (MOCK.configLookups && MOCK.configLookups.docTypes) || ["其他入库单", "其他出库单"];
   }
 
+  function configWarehouseOptions() {
+    return (MOCK.configLookups && MOCK.configLookups.warehouses) || [];
+  }
+
   function configFirstSceneOptions() {
     return (MOCK.configLookups && MOCK.configLookups.firstScenes) || [];
   }
@@ -2385,14 +2404,14 @@
     const row = id ? state.configRows.find(function (r) { return r.id === id; }) : null;
     state.editingConfigId = viewOnly ? null : (id || null);
     const data = row || {
-      platform: "", siteLogic: "", statusLogic: "", scene: "", bizType: "",
+      platform: "", siteLogic: "", warehouse: "", statusLogic: "", scene: "", bizType: "",
       bizRule: "", skuField: "", dateField: "", qtyLogic: "",
       inventoryNoField: "", relatedNoField: "", docType: "", dbTable: "",
       dailySummary: ""
     };
     const fields = [
       ["platform", "平台"], ["dbTable", "数据库表名"],
-      ["siteLogic", "站点", true], ["statusLogic", "是否可售", true],
+      ["siteLogic", "站点", true], ["statusLogic", "是否可售", true], ["warehouse", "仓库"],
       ["skuField", "货品SKU"], ["dateField", "平台日期"], ["qtyLogic", "货品数量"],
       ["inventoryNoField", "库存流水单号"], ["relatedNoField", "关联单号"],
       ["scene", "大场景分类"], ["bizType", "业务类"], ["bizRule", "业务类配置规则", true],
@@ -2418,6 +2437,14 @@
         return (
           '<div class="form-item">' + formFieldLabel(label, true) +
           lookupSelectHtml("cfg-dbTable", list, val, viewOnly, ph, true) +
+          "</div>"
+        );
+      }
+      if (key === "warehouse") {
+        const list = withCurrentOption(configWarehouseOptions(), val);
+        return (
+          '<div class="form-item">' + formFieldLabel(label, true) +
+          lookupSelectHtml("cfg-warehouse", list, val, viewOnly, ph, true) +
           "</div>"
         );
       }
@@ -2497,7 +2524,7 @@
 
   function saveConfigForm() {
     const keys = [
-      "platform", "dbTable", "siteLogic", "statusLogic", "skuField", "dateField",
+      "platform", "dbTable", "siteLogic", "statusLogic", "warehouse", "skuField", "dateField",
       "qtyLogic", "inventoryNoField", "relatedNoField", "scene", "bizType", "bizRule",
       "docType", "dailySummary"
     ];
@@ -2509,6 +2536,7 @@
     const requiredSelects = [
       ["platform", "平台"],
       ["dbTable", "数据库表名"],
+      ["warehouse", "仓库"],
       ["docType", "生成单据类型"]
     ];
     for (let i = 0; i < requiredSelects.length; i++) {
