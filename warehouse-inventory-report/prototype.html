@@ -235,32 +235,44 @@
     }
 
     .search-bar {
-      min-height: 34px;
+      min-height: 32px;
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
       margin: 0 0 10px;
-      padding: 10px 10px 2px;
+      padding: 18px 18px 8px;
       background: #fff;
       border: 0;
       border-radius: 0;
     }
 
+    .sku-combo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-ops {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .control,
     .input-control {
-      height: 22px;
+      height: 32px;
       color: var(--regular);
       background-color: #fff;
       border: 1px solid var(--border-dark);
-      border-radius: 3px;
+      border-radius: 4px;
       font-size: 12px;
       outline: none;
     }
 
     .control {
-      width: 132px;
-      padding: 0 22px 0 8px;
+      width: 160px;
+      padding: 0 28px 0 12px;
     }
 
     select.control {
@@ -273,14 +285,34 @@
     }
 
     .control.short { width: 100px; }
+    .control.sku-type { width: 140px; }
+    .control.sku-mode { width: 100px; }
     .control.date { width: 120px; padding-right: 8px; }
 
     .input-control {
-      width: 140px;
-      padding: 0 8px;
+      width: 200px;
+      padding: 0 12px;
     }
 
     .input-control.wide { width: 180px; }
+
+    .search-bar select.control:required:invalid {
+      color: var(--placeholder);
+    }
+
+    .search-bar select.control option,
+    .form-item select option {
+      color: var(--text);
+      background: #fff;
+    }
+
+    .form-item select.is-empty {
+      color: var(--placeholder);
+    }
+
+    .form-item select option[value=""] {
+      color: var(--placeholder);
+    }
 
     .filter-label {
       color: var(--secondary);
@@ -429,6 +461,43 @@
     th.g-common { background: var(--th-common); }
     th.g-diff { background: var(--th-diff); }
     th.g-plain { background: var(--table-head); }
+
+    td.cell-wrap {
+      height: auto;
+      min-height: 28px;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      overflow: visible;
+      text-overflow: unset;
+      white-space: normal;
+      line-height: 20px;
+    }
+
+    .cell-capsules {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .capsule {
+      display: inline-block;
+      height: 22px;
+      padding: 0 8px;
+      color: var(--primary);
+      background: var(--primary-weak);
+      border: 1px solid var(--primary-border);
+      border-radius: 11px;
+      font-size: 12px;
+      line-height: 20px;
+      white-space: nowrap;
+    }
+
+    .capsule.out {
+      color: var(--warning);
+      background: var(--warning-weak);
+      border-color: #f3d19e;
+    }
 
     .header-help {
       position: relative;
@@ -872,11 +941,11 @@
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
       { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
+      { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
+      { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" },
       { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
       { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
-      { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" },
-      { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
-      { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" }
+      { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" }
     ],
     "summaryColumns": [
       { "key": "sellerid", "label": "sellerid", "group": "platform" },
@@ -913,11 +982,11 @@
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
       { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
+      { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
+      { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" },
       { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
       { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
-      { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" },
-      { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
-      { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" }
+      { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" }
     ],
     "configColumns": [
       { "key": "platform", "label": "平台", "group": "plain" },
@@ -943,7 +1012,7 @@
         "fulfillmentCenter": "KIX5", "reason": "K", "country": "JP", "disposition": "SELLABLE",
         "dateAndTime": "2026-05-31T00:00:00+0900", "newQuantity": "", "platform": "Amazon", "monthEnd": "否",
         "site": "Amazon_JP", "localDate": "2026-05-31", "systemSku": "C120-AN-BK-JP-000-AZB", "scene": "报废",
-        "bizType": "报废", "warehouse": "JP-日本亚马逊仓", "sellable": "是", "qty": -1, "docType": "其他出入库",
+        "bizType": "报废", "warehouse": "JP-日本亚马逊仓", "sellable": "是", "qty": -1, "docType": "其他出库单",
         "dailySummary": "否", "parsedDone": "是", "docNo": "IA202601", "hasUpdate": "否",
         "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
       },
@@ -963,7 +1032,7 @@
         "quantity": -2, "fulfillmentCenter": "SMN1", "reason": "", "country": "US", "disposition": "SELLABLE",
         "dateAndTime": "2026-05-31T00:00:00-0700", "newQuantity": "", "platform": "Amazon", "monthEnd": "否",
         "site": "Amazon_US", "localDate": "2026-05-31", "systemSku": "S710-ST-GY-US-326-AZB", "scene": "备货接收",
-        "bizType": "备货接收", "warehouse": "ST-Amazon US", "sellable": "是", "qty": -2, "docType": "收货列表",
+        "bizType": "备货接收", "warehouse": "ST-Amazon US", "sellable": "是", "qty": -2, "docType": "其他入库单,其他出库单",
         "dailySummary": "否", "parsedDone": "是", "docNo": "IR202601,IA202603,IA202604,IA202605",
         "hasUpdate": "是", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
       },
@@ -986,7 +1055,7 @@
         "disposed": 0, "otherEvents": 0, "endingBalance": 38, "location": "SA", "unknownEvents": -3,
         "newQuantity": "", "platform": "Amazon", "monthEnd": "是", "site": "Amazon_SA", "localDate": "2026-03-31",
         "systemSku": "T910-ST-BG-SA-623-B01", "scene": "Unknown Events", "bizType": "Unknown Events",
-        "warehouse": "SG-沙特亚马逊仓", "sellable": "否", "qty": -3, "docType": "其他出入库", "dailySummary": "是",
+        "warehouse": "SG-沙特亚马逊仓", "sellable": "否", "qty": -3, "docType": "其他出库单", "dailySummary": "是",
         "parsedDone": "是", "docNo": "IA202601", "hasUpdate": "否", "docAbnormal": "否",
         "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
       },
@@ -997,8 +1066,8 @@
         "disposed": 0, "otherEvents": 0, "endingBalance": 2448, "location": "JP", "unknownEvents": 0,
         "newQuantity": "", "platform": "Amazon", "monthEnd": "是", "site": "Amazon_JP", "localDate": "2026-03-31",
         "systemSku": "C120-AN-BK-JP-000-AZB", "scene": "Unknown Events", "bizType": "Unknown Events",
-        "warehouse": "JP-日本亚马逊仓", "sellable": "是", "qty": 0, "docType": "其他出入库", "dailySummary": "是",
-        "parsedDone": "是", "docNo": "IA202602", "hasUpdate": "否", "docAbnormal": "否",
+        "warehouse": "JP-日本亚马逊仓", "sellable": "是", "qty": 0, "docType": "其他入库单,其他出库单", "dailySummary": "是",
+        "parsedDone": "是", "docNo": "IR202610,IA202602", "hasUpdate": "否", "docAbnormal": "否",
         "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
       },
       {
@@ -1009,7 +1078,7 @@
         "endingBalance": 336, "location": "US", "unknownEvents": 1, "newQuantity": "", "platform": "Amazon",
         "monthEnd": "是", "site": "Amazon_US", "localDate": "2026-03-31", "systemSku": "S710-ST-GY-US-326-AZB",
         "scene": "Unknown Events", "bizType": "Unknown Events", "warehouse": "ST-Returns(Amazon US)",
-        "sellable": "是", "qty": 1, "docType": "其他出入库", "dailySummary": "是", "parsedDone": "是",
+        "sellable": "是", "qty": 1, "docType": "其他入库单,其他出库单", "dailySummary": "是", "parsedDone": "是",
         "docNo": "IA202603,AS202602", "hasUpdate": "是", "docAbnormal": "否",
         "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
       },
@@ -1090,11 +1159,11 @@
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
       { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
+      { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
+      { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" },
       { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
       { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
-      { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" },
-      { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
-      { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" }
+      { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" }
     ],
     "coupangGlobalColumns": [
       { "key": "viId", "label": "VI ID", "group": "platform" },
@@ -1113,18 +1182,18 @@
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
       { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
+      { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
+      { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" },
       { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
       { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
-      { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" },
-      { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
-      { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" }
+      { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" }
     ],
     "coupangDomesticRows": [],
     "coupangGlobalRows": [],
     "fieldNotes": {
       "newQuantity": "更新时数量不一致则写入此字段；未生成单据时可直接改 Quantity。",
       "monthEnd": "默认为否，解析时自动带出；月末汇总报告通过日期转为当月最后一天。",
-      "docType": "其他入库单、其他出库单。",
+      "docType": "其他入库单、其他出库单；同一行可有多个，逗号分隔，报告中按胶囊展示。",
       "parseFlow": [
         "监控缓存是否可解析",
         "校验数据库表名",
@@ -1163,7 +1232,7 @@
       systemSku: "E320-ST-WT-KR-608",
       warehouse: "韩国Coupang本土店仓",
       sellable: "",
-      docType: "其他出入库",
+      docType: "",
       dailySummary: "否",
       docNo: "",
       parsedDone: "是",
@@ -1174,13 +1243,13 @@
       parseAbnormalReason: ""
     };
     const domesticScenes = [
-      { id: "cdi1", scene: "期初", bizType: "", qty: 720 },
-      { id: "cdi2", scene: "发运", bizType: "出库", qty: -566 },
-      { id: "cdi3", scene: "发运", bizType: "重新配送", qty: -1 },
-      { id: "cdi4", scene: "退运", bizType: "顾客退货", qty: 35 },
-      { id: "cdi5", scene: "移除", bizType: "已移出库", qty: -11 },
-      { id: "cdi6", scene: "其他", bizType: "处理中", qty: -11 },
-      { id: "cdi7", scene: "期末", bizType: "", qty: 166 }
+      { id: "cdi1", scene: "期初", bizType: "", qty: 720, docType: "其他入库单", docNo: "IR202607" },
+      { id: "cdi2", scene: "发运", bizType: "出库", qty: -566, docType: "其他出库单", docNo: "IA202611" },
+      { id: "cdi3", scene: "发运", bizType: "重新配送", qty: -1, docType: "其他出库单,其他入库单", docNo: "IA202612,IR202608" },
+      { id: "cdi4", scene: "退运", bizType: "顾客退货", qty: 35, docType: "其他入库单", docNo: "IR202609" },
+      { id: "cdi5", scene: "移除", bizType: "已移出库", qty: -11, docType: "其他出库单", docNo: "IA202613,IA202614" },
+      { id: "cdi6", scene: "其他", bizType: "处理中", qty: -11, docType: "", docNo: "" },
+      { id: "cdi7", scene: "期末", bizType: "", qty: 166, docType: "其他入库单,其他出库单", docNo: "IR202615,IA202616" }
     ];
     MOCK.coupangDomesticRows = domesticScenes.map(function (item) {
       const row = {};
@@ -1189,6 +1258,8 @@
       row.scene = item.scene;
       row.bizType = item.bizType;
       row.qty = item.qty;
+      row.docType = item.docType;
+      row.docNo = item.docNo;
       return row;
     });
     function cleanSku(v) {
@@ -1209,9 +1280,9 @@
         warehouse: "韩国Coupang本土店仓",
         sellable: "",
         qty: 31,
-        docType: "其他出入库",
+        docType: "其他入库单,其他出库单",
         dailySummary: "否",
-        docNo: "",
+        docNo: "IR202701,IA202702",
         parsedDone: "是",
         hasUpdate: "否",
         docAbnormal: "否",
@@ -1233,9 +1304,9 @@
         warehouse: "韩国Coupang本土店仓",
         sellable: "",
         qty: 647,
-        docType: "其他出入库",
+        docType: "其他入库单",
         dailySummary: "否",
-        docNo: "",
+        docNo: "IR202703",
         parsedDone: "是",
         hasUpdate: "否",
         docAbnormal: "否",
@@ -1264,6 +1335,7 @@
     editingConfigId: null,
     deleteConfigId: null,
     importTarget: "detail",
+    batchInputId: "",
     toastTimer: null,
     menuOpen: { sales: true, coupang: true, amazon: false, finance: false },
     colWidths: {}
@@ -1390,14 +1462,14 @@
       .replace(/"/g, "&quot;");
   }
 
-  function showToast(msg, type) {
+  function showToast(msg, type, duration) {
     const el = $("toast");
     el.textContent = msg;
     el.className = "toast show" + (type ? " " + type : "");
     clearTimeout(state.toastTimer);
     state.toastTimer = setTimeout(function () {
       el.className = "toast";
-    }, 2200);
+    }, duration || 2000);
   }
 
   function closeOverlay() {
@@ -1493,7 +1565,19 @@
     const meta = EXISTING_REPORTS[page];
     if (!meta) return;
     const filters = meta.filters.map(function (label, i) {
-      return '<select class="control" id="ex-f' + i + '"><option value="">' + esc(label) + "</option></select>";
+      if (label === "SKU") {
+        return (
+          '<div class="sku-combo">' +
+            '<select class="control sku-type"><option>SKU</option></select>' +
+            '<select id="ex-skuMode" class="control sku-mode" data-sku-mode="ex-sku">' +
+              '<option value="1">精确</option>' +
+              '<option value="2">模糊</option>' +
+            "</select>" +
+            '<input id="ex-sku" class="input-control" data-sku-input="1" placeholder="双击批量查询" />' +
+          "</div>"
+        );
+      }
+      return '<select class="control" id="ex-f' + i + '" required>' + placeholderOption(label, false) + "</select>";
     }).join("");
     const cols = meta.columns.map(function (label, i) {
       return { key: "c" + i, label: label };
@@ -1509,8 +1593,10 @@
     $("page-existing").innerHTML =
       '<div class="search-bar">' +
         filters +
-        '<button class="btn primary" type="button" data-act="existing-search">搜索</button>' +
-        '<button class="btn" type="button" data-act="existing-reset">重置</button>' +
+        '<div class="search-ops">' +
+          '<button class="btn primary" type="button" data-act="existing-search">搜索</button>' +
+          '<button class="btn" type="button" data-act="existing-reset">重置</button>' +
+        "</div>" +
       "</div>" +
       '<section class="table-shell">' +
         '<div class="table-toolbar">' +
@@ -1534,6 +1620,10 @@
     }).join("");
   }
 
+  function placeholderOption(label, hasValue) {
+    return '<option value="" hidden' + (hasValue ? "" : " selected") + ">" + esc(label) + "</option>";
+  }
+
   function sitesFromRows(rows) {
     const set = {};
     rows.forEach(function (r) {
@@ -1542,11 +1632,17 @@
     return ["全部"].concat(Object.keys(set).sort());
   }
 
+  function splitCsv(v) {
+    return String(v == null ? "" : v)
+      .split(/[,，]/)
+      .map(function (s) { return s.trim(); })
+      .filter(Boolean);
+  }
+
   function uniqueFromRows(rows, key) {
     const set = {};
     (rows || []).forEach(function (r) {
-      const v = r[key];
-      if (v) set[v] = true;
+      splitCsv(r[key]).forEach(function (item) { set[item] = true; });
     });
     return Object.keys(set);
   }
@@ -1607,6 +1703,8 @@
 
   function autoColWidth(label, key) {
     if (key === "actions") return 148;
+    if (key === "docType") return 220;
+    if (key === "docNo") return 220;
     let w = textWidthPx(label);
     if (key === "dbTable") {
       (state.configRows || []).forEach(function (row) {
@@ -1669,6 +1767,19 @@
     const num = col.align === "right" ? " num" : "";
     let val = row[col.key];
     if (val == null) val = "";
+    if (col.key === "docType") {
+      const items = splitCsv(val);
+      const html = items.length
+        ? '<div class="cell-capsules">' + items.map(function (item) {
+            const tone = item.indexOf("出库") >= 0 ? " out" : "";
+            return '<span class="capsule' + tone + '">' + esc(item) + "</span>";
+          }).join("") + "</div>"
+        : "";
+      return '<td class="cell-wrap" title="' + esc(val) + '">' + html + "</td>";
+    }
+    if (col.key === "docNo") {
+      return '<td class="cell-wrap" title="' + esc(val) + '">' + esc(val) + "</td>";
+    }
     const isReason = col.key === "parseAbnormalReason" || col.key === "docAbnormalReason";
     const cls = isReason && val ? " text-danger" : "";
     return '<td class="' + num + cls + '" title="' + esc(val) + '">' + esc(val) + "</td>";
@@ -1702,78 +1813,184 @@
     return row.parseAbnormal === "是" || row.docAbnormal === "是";
   }
 
-  /* —— detail page —— */
-  function getDetailFilters() {
-    function norm(v, fallback) {
-      return (!v || v === "全部") ? (fallback || "全部") : v;
+  function defaultReportFilters() {
+    return {
+      skuType: "platform",
+      skuMode: "1",
+      sku: "",
+      scene: "",
+      bizType: "",
+      docType: "",
+      parsedDone: "",
+      hasUpdate: "",
+      docAbnormal: "",
+      parseAbnormal: ""
+    };
+  }
+
+  function readReportFilters(prefix) {
+    function val(id) {
+      return ($(prefix + "-" + id) || {}).value || "";
     }
     return {
-      abnormal: norm(($("d-abnormal") || {}).value),
-      sellable: norm(($("d-sellable") || {}).value),
-      site: norm(($("d-site") || {}).value),
-      docNo: ($("d-docNo") || {}).value || "",
-      msku: ($("d-msku") || {}).value || "",
-      systemSku: ($("d-systemSku") || {}).value || "",
-      scene: norm(($("d-scene") || {}).value),
-      bizType: norm(($("d-biz") || {}).value),
-      dateFrom: ($("d-dateFrom") || {}).value || "",
-      dateTo: ($("d-dateTo") || {}).value || ""
+      skuType: val("skuType") || "platform",
+      skuMode: val("skuMode") || "1",
+      sku: val("sku"),
+      scene: val("scene"),
+      bizType: val("biz"),
+      docType: val("docType"),
+      parsedDone: val("parsedDone"),
+      hasUpdate: val("hasUpdate"),
+      docAbnormal: val("docAbnormal"),
+      parseAbnormal: val("parseAbnormal")
     };
+  }
+
+  function matchSkuFilter(f, row, platformKeys) {
+    if (!f.sku) return true;
+    const keys = f.skuType === "system" ? ["systemSku"] : (platformKeys || ["msku"]);
+    const q = String(f.sku).trim();
+    if (f.skuMode === "1") {
+      const list = q.split(/[,，\s]+/).filter(Boolean);
+      return keys.some(function (k) {
+        const cell = String(row[k] == null ? "" : row[k]).trim();
+        return list.indexOf(cell) >= 0;
+      });
+    }
+    return keys.some(function (k) { return matchText(q, row[k]); });
+  }
+
+  function matchReportFilters(f, row, platformKeys) {
+    if (!matchSkuFilter(f, row, platformKeys)) return false;
+    if (f.scene && row.scene !== f.scene) return false;
+    if (f.bizType && row.bizType !== f.bizType) return false;
+    if (f.docType && splitCsv(row.docType).indexOf(f.docType) < 0) return false;
+    if (f.parsedDone && row.parsedDone !== f.parsedDone) return false;
+    if (f.hasUpdate && row.hasUpdate !== f.hasUpdate) return false;
+    if (f.docAbnormal && row.docAbnormal !== f.docAbnormal) return false;
+    if (f.parseAbnormal && row.parseAbnormal !== f.parseAbnormal) return false;
+    return true;
+  }
+
+  function reportSearchBarHtml(prefix, f, opts) {
+    opts = opts || {};
+    const skuPh = f.skuMode === "2" ? "仅支持单个查询" : "双击批量查询";
+    const searchAct = opts.searchAct || (prefix + "-search");
+    const resetAct = opts.resetAct || (prefix + "-reset");
+    return (
+      '<div class="search-bar" id="' + prefix + 'Filters">' +
+        '<div class="sku-combo">' +
+          '<select id="' + prefix + '-skuType" class="control sku-type">' +
+            '<option value="platform"' + (f.skuType !== "system" ? " selected" : "") + ">SKU</option>" +
+            '<option value="system"' + (f.skuType === "system" ? " selected" : "") + ">系统SKU</option>" +
+          "</select>" +
+          '<select id="' + prefix + '-skuMode" class="control sku-mode" data-sku-mode="' + prefix + '-sku">' +
+            '<option value="1"' + (f.skuMode !== "2" ? " selected" : "") + ">精确</option>" +
+            '<option value="2"' + (f.skuMode === "2" ? " selected" : "") + ">模糊</option>" +
+          "</select>" +
+          '<input id="' + prefix + '-sku" class="input-control" data-sku-input="1" placeholder="' + esc(skuPh) + '" value="' + esc(f.sku) + '" />' +
+        "</div>" +
+        '<select id="' + prefix + '-scene" class="control" required>' +
+          placeholderOption("大场景分类", !!f.scene) +
+          optionsHtml(opts.scenes || [], f.scene) +
+        "</select>" +
+        '<select id="' + prefix + '-biz" class="control" required>' +
+          placeholderOption("业务类", !!f.bizType) +
+          optionsHtml(opts.bizTypes || [], f.bizType) +
+        "</select>" +
+        '<select id="' + prefix + '-docType" class="control" required>' +
+          placeholderOption("生成单据类型", !!f.docType) +
+          optionsHtml(opts.docTypes || configDocTypeOptions(), f.docType) +
+        "</select>" +
+        '<select id="' + prefix + '-parsedDone" class="control" required>' +
+          placeholderOption("是否解析完成", !!f.parsedDone) +
+          optionsHtml(["是", "否"], f.parsedDone) +
+        "</select>" +
+        '<select id="' + prefix + '-parseAbnormal" class="control" required>' +
+          placeholderOption("报告解析是否异常", !!f.parseAbnormal) +
+          optionsHtml(["是", "否"], f.parseAbnormal) +
+        "</select>" +
+        '<select id="' + prefix + '-hasUpdate" class="control" required>' +
+          placeholderOption("是否存在更新", !!f.hasUpdate) +
+          optionsHtml(["是", "否"], f.hasUpdate) +
+        "</select>" +
+        '<select id="' + prefix + '-docAbnormal" class="control" required>' +
+          placeholderOption("单据生成是否异常", !!f.docAbnormal) +
+          optionsHtml(["是", "否"], f.docAbnormal) +
+        "</select>" +
+        '<div class="search-ops">' +
+          '<button class="btn primary" type="button" data-act="' + searchAct + '">搜索</button>' +
+          '<button class="btn" type="button" data-act="' + resetAct + '">重置</button>' +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function openBatchSearch(inputId) {
+    const input = $(inputId);
+    if (!input) return;
+    const modeEl = document.querySelector('[data-sku-mode="' + inputId + '"]');
+    if (modeEl && modeEl.value === "2") {
+      showToast("模糊查询仅支持单个查询", "warning");
+      return;
+    }
+    state.batchInputId = inputId;
+    const current = String(input.value || "").replace(/,/g, "\n");
+    openOverlay(
+      '<div class="dialog-header"><span>批量查询</span><button class="close" type="button" data-act="close">×</button></div>' +
+      '<div class="dialog-body">' +
+        '<div class="form-item"><textarea id="batchSearchInput" style="height:180px;">' + esc(current) + "</textarea></div>" +
+        '<div class="import-tip">最多一次性查询 500 个，请用英文逗号 / 换行符 / 空格 分隔</div>' +
+      "</div>" +
+      '<div class="dialog-footer">' +
+        '<button class="btn" type="button" data-act="close">取消</button>' +
+        '<button class="btn primary" type="button" data-act="batch-search-confirm">确定</button>' +
+      "</div>",
+      { cls: "narrow" }
+    );
+  }
+
+  function confirmBatchSearch() {
+    const raw = (($("batchSearchInput") || {}).value || "");
+    const value = raw
+      .trim()
+      .replace(/\s*\r\n\s*|\s*\n\s*|\s+/g, ",")
+      .replace(/,+/g, ",")
+      .replace(/^,|,$/g, "");
+    const list = value.split(",").filter(Boolean);
+    const limit = 500;
+    const cut = list.slice(0, limit);
+    const input = $(state.batchInputId);
+    if (input) input.value = cut.join(",");
+    closeOverlay();
+    if (list.length > limit) showToast("本次录入 500 条数据，最多一次性查询 500 条", "success");
+    else if (cut.length) showToast("本次录入数据 " + cut.length + " 条", "success");
+  }
+
+  /* —— detail page —— */
+  function getDetailFilters() {
+    return readReportFilters("d");
   }
 
   function filterDetailRows() {
     const f = getDetailFilters();
     return state.detailRows.filter(function (r) {
-      if (!matchYesNo(f.abnormal, isAbnormalRow(r) ? "是" : "否")) return false;
-      if (!matchYesNo(f.sellable, r.sellable)) return false;
-      if (f.site !== "全部" && r.site !== f.site) return false;
-      if (!matchText(f.docNo, r.docNo)) return false;
-      if (!matchText(f.msku, r.msku)) return false;
-      if (!matchText(f.systemSku, r.systemSku)) return false;
-      if (f.scene !== "全部" && r.scene !== f.scene) return false;
-      if (f.bizType !== "全部" && r.bizType !== f.bizType) return false;
-      if (f.dateFrom && String(r.localDate || "") < f.dateFrom) return false;
-      if (f.dateTo && String(r.localDate || "") > f.dateTo) return false;
-      return true;
+      return matchReportFilters(f, r, ["msku"]);
     });
   }
 
   function renderDetailPage(keepFilters) {
-    const f = keepFilters ? getDetailFilters() : {
-      abnormal: "全部", sellable: "全部", site: "全部", docNo: "",
-      msku: "", systemSku: "", scene: "全部", bizType: "全部", dateFrom: "", dateTo: ""
-    };
-    const sites = sitesFromRows(state.detailRows);
+    const f = keepFilters ? getDetailFilters() : defaultReportFilters();
     const html =
-      '<div class="search-bar" id="detailFilters">' +
-        '<select id="d-abnormal" class="control short">' +
-          '<option value="">是否异常</option>' +
-          optionsHtml(["是", "否"], f.abnormal === "全部" ? "" : f.abnormal) +
-        "</select>" +
-        '<select id="d-sellable" class="control short">' +
-          '<option value="">是否可售</option>' +
-          optionsHtml(["是", "否"], f.sellable === "全部" ? "" : f.sellable) +
-        "</select>" +
-        '<select id="d-site" class="control">' +
-          '<option value="">站点</option>' +
-          optionsHtml(sites.filter(function (v) { return v !== "全部"; }), f.site === "全部" ? "" : f.site) +
-        "</select>" +
-        '<input id="d-docNo" class="input-control" placeholder="生成单据号" value="' + esc(f.docNo) + '" />' +
-        '<input id="d-msku" class="input-control" placeholder="平台SKU" value="' + esc(f.msku) + '" />' +
-        '<input id="d-systemSku" class="input-control wide" placeholder="系统SKU" value="' + esc(f.systemSku) + '" />' +
-        '<select id="d-scene" class="control">' +
-          '<option value="">大场景分类</option>' +
-          optionsHtml(MOCK.filters.sceneOptions.filter(function (v) { return v !== "全部"; }), f.scene === "全部" ? "" : f.scene) +
-        "</select>" +
-        '<select id="d-biz" class="control">' +
-          '<option value="">业务类</option>' +
-          optionsHtml(MOCK.filters.bizOptions.filter(function (v) { return v !== "全部"; }), f.bizType === "全部" ? "" : f.bizType) +
-        "</select>" +
-        '<input id="d-dateFrom" class="control date" type="date" value="' + esc(f.dateFrom) + '" title="当地日期起" />' +
-        '<input id="d-dateTo" class="control date" type="date" value="' + esc(f.dateTo) + '" title="当地日期止" />' +
-        '<button class="btn primary" type="button" data-act="detail-search">搜索</button>' +
-        '<button class="btn" type="button" data-act="detail-reset">重置</button>' +
-      "</div>" +
+      reportSearchBarHtml("d", f, {
+        scenes: uniqueFromRows(state.detailRows, "scene"),
+        bizTypes: uniqueFromRows(state.detailRows, "bizType"),
+        docTypes: uniqueFromRows(state.detailRows, "docType").concat(configDocTypeOptions()).filter(function (v, i, arr) {
+          return arr.indexOf(v) === i;
+        }),
+        searchAct: "detail-search",
+        resetAct: "detail-reset"
+      }) +
       '<section class="table-shell">' +
         '<div class="table-toolbar">' +
           '<div class="toolbar-left">' +
@@ -1815,83 +2032,30 @@
 
   /* —— Coupang inventory pages —— */
   function getCoupangInvFilters() {
-    function norm(v) {
-      return (!v || v === "全部") ? "全部" : v;
-    }
-    return {
-      abnormal: norm(($("ci-abnormal") || {}).value),
-      sellable: norm(($("ci-sellable") || {}).value),
-      site: norm(($("ci-site") || {}).value),
-      docNo: ($("ci-docNo") || {}).value || "",
-      msku: ($("ci-msku") || {}).value || "",
-      systemSku: ($("ci-systemSku") || {}).value || "",
-      scene: norm(($("ci-scene") || {}).value),
-      bizType: norm(($("ci-biz") || {}).value),
-      dateFrom: ($("ci-dateFrom") || {}).value || "",
-      dateTo: ($("ci-dateTo") || {}).value || ""
-    };
+    return readReportFilters("ci");
   }
 
   function filterCoupangInvRows(ctx) {
     const f = getCoupangInvFilters();
     return state[ctx.rowsKey].filter(function (r) {
-      if (!matchYesNo(f.abnormal, isAbnormalRow(r) ? "是" : "否")) return false;
-      if (!matchYesNo(f.sellable, r.sellable)) return false;
-      if (f.site !== "全部" && r.site !== f.site) return false;
-      if (!matchText(f.docNo, r.docNo)) return false;
-      if (f.msku) {
-        const hit = ctx.skuKeys.some(function (k) { return matchText(f.msku, r[k]); });
-        if (!hit) return false;
-      }
-      if (!matchText(f.systemSku, r.systemSku)) return false;
-      if (f.scene !== "全部" && r.scene !== f.scene) return false;
-      if (f.bizType !== "全部" && r.bizType !== f.bizType) return false;
-      if (f.dateFrom && String(r.localDate || "") < f.dateFrom) return false;
-      if (f.dateTo && String(r.localDate || "") > f.dateTo) return false;
-      return true;
+      return matchReportFilters(f, r, ctx.skuKeys);
     });
   }
 
   function renderCoupangInvPage(keepFilters) {
     const ctx = coupangInvCtx(state.page);
     const rows = state[ctx.rowsKey];
-    const f = keepFilters ? getCoupangInvFilters() : {
-      abnormal: "全部", sellable: "全部", site: "全部", docNo: "",
-      msku: "", systemSku: "", scene: "全部", bizType: "全部", dateFrom: "", dateTo: ""
-    };
-    const sites = sitesFromRows(rows);
-    const scenes = uniqueFromRows(rows, "scene");
-    const bizTypes = uniqueFromRows(rows, "bizType");
+    const f = keepFilters ? getCoupangInvFilters() : defaultReportFilters();
     $("page-empty").innerHTML =
-      '<div class="search-bar" id="coupangInvFilters">' +
-        '<select id="ci-abnormal" class="control short">' +
-          '<option value="">是否异常</option>' +
-          optionsHtml(["是", "否"], f.abnormal === "全部" ? "" : f.abnormal) +
-        "</select>" +
-        '<select id="ci-sellable" class="control short">' +
-          '<option value="">是否可售</option>' +
-          optionsHtml(["是", "否"], f.sellable === "全部" ? "" : f.sellable) +
-        "</select>" +
-        '<select id="ci-site" class="control">' +
-          '<option value="">站点</option>' +
-          optionsHtml(sites.filter(function (v) { return v !== "全部"; }), f.site === "全部" ? "" : f.site) +
-        "</select>" +
-        '<input id="ci-docNo" class="input-control" placeholder="生成单据号" value="' + esc(f.docNo) + '" />' +
-        '<input id="ci-msku" class="input-control" placeholder="平台SKU" value="' + esc(f.msku) + '" />' +
-        '<input id="ci-systemSku" class="input-control wide" placeholder="系统SKU" value="' + esc(f.systemSku) + '" />' +
-        '<select id="ci-scene" class="control">' +
-          '<option value="">大场景分类</option>' +
-          optionsHtml(scenes, f.scene === "全部" ? "" : f.scene) +
-        "</select>" +
-        '<select id="ci-biz" class="control">' +
-          '<option value="">业务类</option>' +
-          optionsHtml(bizTypes, f.bizType === "全部" ? "" : f.bizType) +
-        "</select>" +
-        '<input id="ci-dateFrom" class="control date" type="date" value="' + esc(f.dateFrom) + '" title="当地日期起" />' +
-        '<input id="ci-dateTo" class="control date" type="date" value="' + esc(f.dateTo) + '" title="当地日期止" />' +
-        '<button class="btn primary" type="button" data-act="ci-search">搜索</button>' +
-        '<button class="btn" type="button" data-act="ci-reset">重置</button>' +
-      "</div>" +
+      reportSearchBarHtml("ci", f, {
+        scenes: uniqueFromRows(rows, "scene"),
+        bizTypes: uniqueFromRows(rows, "bizType"),
+        docTypes: uniqueFromRows(rows, "docType").concat(configDocTypeOptions()).filter(function (v, i, arr) {
+          return arr.indexOf(v) === i;
+        }),
+        searchAct: "ci-search",
+        resetAct: "ci-reset"
+      }) +
       '<section class="table-shell">' +
         '<div class="table-toolbar">' +
           '<div class="toolbar-left">' +
@@ -1933,76 +2097,28 @@
 
   /* —— summary page —— */
   function getSummaryFilters() {
-    function norm(v) {
-      return (!v || v === "全部") ? "全部" : v;
-    }
-    return {
-      abnormal: norm(($("s-abnormal") || {}).value),
-      sellable: norm(($("s-sellable") || {}).value),
-      site: norm(($("s-site") || {}).value),
-      docNo: ($("s-docNo") || {}).value || "",
-      msku: ($("s-msku") || {}).value || "",
-      systemSku: ($("s-systemSku") || {}).value || "",
-      scene: norm(($("s-scene") || {}).value),
-      bizType: norm(($("s-biz") || {}).value),
-      dateFrom: ($("s-dateFrom") || {}).value || "",
-      dateTo: ($("s-dateTo") || {}).value || ""
-    };
+    return readReportFilters("s");
   }
 
   function filterSummaryRows() {
     const f = getSummaryFilters();
     return state.summaryRows.filter(function (r) {
-      if (!matchYesNo(f.abnormal, isAbnormalRow(r) ? "是" : "否")) return false;
-      if (!matchYesNo(f.sellable, r.sellable)) return false;
-      if (f.site !== "全部" && r.site !== f.site) return false;
-      if (!matchText(f.docNo, r.docNo)) return false;
-      if (!matchText(f.msku, r.msku)) return false;
-      if (!matchText(f.systemSku, r.systemSku)) return false;
-      if (f.scene !== "全部" && r.scene !== f.scene) return false;
-      if (f.bizType !== "全部" && r.bizType !== f.bizType) return false;
-      if (f.dateFrom && String(r.localDate || "") < f.dateFrom) return false;
-      if (f.dateTo && String(r.localDate || "") > f.dateTo) return false;
-      return true;
+      return matchReportFilters(f, r, ["msku"]);
     });
   }
 
   function renderSummaryPage(keepFilters) {
-    const f = keepFilters ? getSummaryFilters() : {
-      abnormal: "全部", sellable: "全部", site: "全部", docNo: "",
-      msku: "", systemSku: "", scene: "全部", bizType: "全部", dateFrom: "", dateTo: ""
-    };
-    const sites = sitesFromRows(state.summaryRows);
+    const f = keepFilters ? getSummaryFilters() : defaultReportFilters();
     $("page-summary").innerHTML =
-      '<div class="search-bar">' +
-        '<select id="s-abnormal" class="control short">' +
-          '<option value="">是否异常</option>' +
-          optionsHtml(["是", "否"], f.abnormal === "全部" ? "" : f.abnormal) +
-        "</select>" +
-        '<select id="s-sellable" class="control short">' +
-          '<option value="">是否可售</option>' +
-          optionsHtml(["是", "否"], f.sellable === "全部" ? "" : f.sellable) +
-        "</select>" +
-        '<select id="s-site" class="control">' +
-          '<option value="">站点</option>' +
-          optionsHtml(sites.filter(function (v) { return v !== "全部"; }), f.site === "全部" ? "" : f.site) +
-        "</select>" +
-        '<input id="s-docNo" class="input-control" placeholder="生成单据号" value="' + esc(f.docNo) + '" />' +
-        '<input id="s-msku" class="input-control" placeholder="平台SKU" value="' + esc(f.msku) + '" />' +
-        '<input id="s-systemSku" class="input-control wide" placeholder="系统SKU" value="' + esc(f.systemSku) + '" />' +
-        '<select id="s-scene" class="control">' +
-          '<option value="">大场景分类</option>' +
-          optionsHtml(MOCK.filters.sceneOptions.filter(function (v) { return v !== "全部"; }), f.scene === "全部" ? "" : f.scene) +
-        "</select>" +
-        '<select id="s-biz" class="control">' +
-          '<option value="">业务类</option>' +
-          optionsHtml(MOCK.filters.bizOptions.filter(function (v) { return v !== "全部"; }), f.bizType === "全部" ? "" : f.bizType) +
-        "</select>" +
-        '<input id="s-dateFrom" class="control date" type="date" value="' + esc(f.dateFrom) + '" title="当地日期起" />' +
-        '<input id="s-dateTo" class="control date" type="date" value="' + esc(f.dateTo) + '" title="当地日期止" />' +
-        '<button class="btn primary" type="button" data-act="summary-search">搜索</button>' +
-        '<button class="btn" type="button" data-act="summary-reset">重置</button>' +
-      "</div>" +
+      reportSearchBarHtml("s", f, {
+        scenes: uniqueFromRows(state.summaryRows, "scene"),
+        bizTypes: uniqueFromRows(state.summaryRows, "bizType"),
+        docTypes: uniqueFromRows(state.summaryRows, "docType").concat(configDocTypeOptions()).filter(function (v, i, arr) {
+          return arr.indexOf(v) === i;
+        }),
+        searchAct: "summary-search",
+        resetAct: "summary-reset"
+      }) +
       '<section class="table-shell">' +
         '<div class="table-toolbar">' +
           '<div class="toolbar-left">' +
@@ -2087,16 +2203,38 @@
     return out;
   }
 
-  function lookupSelectHtml(id, list, selected, disabled, placeholder) {
+  function lookupSelectHtml(id, list, selected, disabled, placeholder, required) {
     const emptyOpt = placeholder === false
       ? ""
-      : '<option value="">' + esc(placeholder || "请选择") + "</option>";
+      : '<option value=""' + (selected ? "" : " selected") + ">" + esc(placeholder || "请选择") + "</option>";
+    const emptyClass = placeholder !== false && !selected ? " is-empty" : "";
     return (
-      '<select id="' + id + '"' + (disabled ? " disabled" : "") + ">" +
+      '<select id="' + id + '"' +
+        (disabled ? " disabled" : "") +
+        (required ? " required" : "") +
+        (emptyClass ? ' class="' + emptyClass.trim() + '"' : "") +
+      ">" +
         emptyOpt +
         optionsHtml(list, selected) +
       "</select>"
     );
+  }
+
+  function bindFormSelectPlaceholders() {
+    const root = $("dialogRoot");
+    if (!root) return;
+    root.querySelectorAll(".form-item select").forEach(function (el) {
+      function sync() {
+        if (el.value) el.classList.remove("is-empty");
+        else el.classList.add("is-empty");
+      }
+      el.addEventListener("change", sync);
+      sync();
+    });
+  }
+
+  function formFieldLabel(label, required) {
+    return '<label>' + (required ? '<span class="req">*</span>' : "") + esc(label) + "</label>";
   }
 
   function filterConfigRows() {
@@ -2113,16 +2251,16 @@
     const f = keepFilters ? getConfigFilters() : { platform: "全部", scene: "全部", bizType: "全部" };
     $("page-config").innerHTML =
       '<div class="search-bar">' +
-        '<select id="c-platform" class="control">' +
-          '<option value="">平台</option>' +
+        '<select id="c-platform" class="control" required>' +
+          placeholderOption("平台", f.platform && f.platform !== "全部") +
           optionsHtml(configPlatformOptions(), f.platform === "全部" ? "" : f.platform) +
         "</select>" +
-        '<select id="c-scene" class="control">' +
-          '<option value="">大场景分类</option>' +
+        '<select id="c-scene" class="control" required>' +
+          placeholderOption("大场景分类", f.scene && f.scene !== "全部") +
           optionsHtml(configFirstSceneOptions(), f.scene === "全部" ? "" : f.scene) +
         "</select>" +
-        '<select id="c-biz" class="control">' +
-          '<option value="">业务类</option>' +
+        '<select id="c-biz" class="control" required>' +
+          placeholderOption("业务类", f.bizType && f.bizType !== "全部") +
           optionsHtml(configSecondSceneOptions(""), f.bizType === "全部" ? "" : f.bizType) +
         "</select>" +
         '<button class="btn primary" type="button" data-act="config-search">搜索</button>' +
@@ -2231,7 +2369,8 @@
     rows.forEach(function (r) {
       if (r.parsedDone === "是" && r.parseAbnormal !== "是" && !r.docNo) {
         state.docSeq += 1;
-        const prefix = r.docType === "收货列表" ? "IR" : "IA";
+        const types = splitCsv(r.docType);
+        const prefix = types.indexOf("其他入库单") >= 0 || types.indexOf("收货列表") >= 0 ? "IR" : "IA";
         r.docNo = prefix + "2026" + state.docSeq;
         n += 1;
       }
@@ -2242,13 +2381,14 @@
 
   function openConfigForm(id, mode) {
     const viewOnly = mode === "view";
+    const isAdd = !id && !viewOnly;
     const row = id ? state.configRows.find(function (r) { return r.id === id; }) : null;
     state.editingConfigId = viewOnly ? null : (id || null);
     const data = row || {
-      platform: "Amazon", siteLogic: "", statusLogic: "", scene: "备货", bizType: "备货接收",
-      bizRule: "", skuField: "msku", dateField: "Date and Time", qtyLogic: "Quantity",
-      inventoryNoField: "", relatedNoField: "", docType: "其他入库单", dbTable: "Inventory Detail",
-      dailySummary: "否"
+      platform: "", siteLogic: "", statusLogic: "", scene: "", bizType: "",
+      bizRule: "", skuField: "", dateField: "", qtyLogic: "",
+      inventoryNoField: "", relatedNoField: "", docType: "", dbTable: "",
+      dailySummary: ""
     };
     const fields = [
       ["platform", "平台"], ["dbTable", "数据库表名"],
@@ -2260,59 +2400,67 @@
       ["dailySummary", "单据生成是否按天汇总"]
     ];
     const disabled = viewOnly ? " disabled" : "";
+    const ph = isAdd ? "请选择" : false;
     const form = fields.map(function (f) {
       const key = f[0];
       const label = f[1];
-      const area = f[2];
       const val = data[key] == null ? "" : data[key];
       if (key === "platform") {
+        const list = withCurrentOption(configPlatformOptions(), val);
         return (
-          '<div class="form-item"><label>' + esc(label) + "</label>" +
-          lookupSelectHtml("cfg-platform", withCurrentOption(configPlatformOptions(), val), val, viewOnly, "请选择平台") +
+          '<div class="form-item">' + formFieldLabel(label, true) +
+          lookupSelectHtml("cfg-platform", list, val, viewOnly, ph, true) +
           "</div>"
         );
       }
       if (key === "dbTable") {
+        const list = withCurrentOption(configDbTableOptions(), val);
         return (
-          '<div class="form-item"><label>' + esc(label) + "</label>" +
-          lookupSelectHtml("cfg-dbTable", withCurrentOption(configDbTableOptions(), val), val, viewOnly, "请选择数据库表名") +
+          '<div class="form-item">' + formFieldLabel(label, true) +
+          lookupSelectHtml("cfg-dbTable", list, val, viewOnly, ph, true) +
           "</div>"
         );
       }
       if (key === "scene") {
+        const list = withCurrentOption(configFirstSceneOptions(), val);
         return (
-          '<div class="form-item"><label>' + esc(label) + "</label>" +
-          lookupSelectHtml("cfg-scene", withCurrentOption(configFirstSceneOptions(), val), val, viewOnly, "请选择大场景分类") +
+          '<div class="form-item">' + formFieldLabel(label, false) +
+          lookupSelectHtml("cfg-scene", list, val, viewOnly, ph, false) +
           "</div>"
         );
       }
       if (key === "bizType") {
+        const list = withCurrentOption(configSecondSceneOptions(data.scene), val);
         return (
-          '<div class="form-item"><label>' + esc(label) + "</label>" +
-          lookupSelectHtml("cfg-biz", withCurrentOption(configSecondSceneOptions(data.scene), val), val, viewOnly, "请选择业务类") +
+          '<div class="form-item">' + formFieldLabel(label, false) +
+          lookupSelectHtml("cfg-biz", list, val, viewOnly, ph, false) +
           "</div>"
         );
       }
       if (key === "docType") {
         const docTypes = withCurrentOption(configDocTypeOptions(), val);
-        const docVal = val || docTypes[0] || "";
         return (
-          '<div class="form-item"><label>' + esc(label) + "</label>" +
-          lookupSelectHtml("cfg-docType", docTypes, docVal, viewOnly, false) +
+          '<div class="form-item">' + formFieldLabel(label, true) +
+          lookupSelectHtml("cfg-docType", docTypes, val, viewOnly, ph, true) +
           "</div>"
         );
       }
       if (key === "dailySummary") {
+        const emptyOpt = isAdd
+          ? '<option value=""' + (val ? "" : " selected") + ">请选择</option>"
+          : "";
+        const emptyClass = isAdd && !val ? " class=\"is-empty\"" : "";
         return (
-          '<div class="form-item"><label>' + esc(label) + "</label>" +
-          '<select id="cfg-' + key + '"' + disabled + '>' +
+          '<div class="form-item">' + formFieldLabel(label, false) +
+          '<select id="cfg-' + key + '"' + disabled + emptyClass + '>' +
+            emptyOpt +
             '<option value="是"' + (val === "是" ? " selected" : "") + ">是</option>" +
-            '<option value="否"' + (val !== "是" ? " selected" : "") + ">否</option>" +
+            '<option value="否"' + (val === "否" || (!isAdd && val !== "是") ? " selected" : "") + ">否</option>" +
           "</select></div>"
         );
       }
       return (
-        '<div class="form-item"><label>' + esc(label) + "</label>" +
+        '<div class="form-item">' + formFieldLabel(label, false) +
         '<textarea id="cfg-' + key + '"' + disabled + '>' + esc(val) + "</textarea></div>"
       );
     }).join("");
@@ -2330,13 +2478,19 @@
       '<div class="dialog-footer">' + footer + "</div>",
       { drawer: true }
     );
+    bindFormSelectPlaceholders();
     const sceneEl = $("cfg-scene");
     const bizEl = $("cfg-biz");
     if (sceneEl && bizEl && !viewOnly) {
       sceneEl.addEventListener("change", function () {
         const next = configSecondSceneOptions(sceneEl.value);
-        const keep = next.indexOf(bizEl.value) >= 0 ? bizEl.value : "";
-        bizEl.innerHTML = '<option value="">请选择业务类</option>' + optionsHtml(next, keep);
+        if (isAdd) {
+          bizEl.innerHTML = '<option value="" selected>请选择</option>' + optionsHtml(next, "");
+          bizEl.classList.add("is-empty");
+        } else {
+          const keep = next.indexOf(bizEl.value) >= 0 ? bizEl.value : (next[0] || "");
+          bizEl.innerHTML = optionsHtml(next, keep);
+        }
       });
     }
   }
@@ -2352,9 +2506,18 @@
       const el = $("cfg-" + k);
       payload[k] = el ? el.value : "";
     });
-    if (!payload.platform || !payload.scene || !payload.bizType) {
-      showToast("请至少填写平台、大场景分类、业务类", "warning");
-      return;
+    const requiredSelects = [
+      ["platform", "平台"],
+      ["dbTable", "数据库表名"],
+      ["docType", "生成单据类型"]
+    ];
+    for (let i = 0; i < requiredSelects.length; i++) {
+      const key = requiredSelects[i][0];
+      const name = requiredSelects[i][1];
+      if (!payload[key]) {
+        showToast("【" + name + "】必填", "warning", 2000);
+        return;
+      }
     }
     if (state.editingConfigId) {
       const row = state.configRows.find(function (r) { return r.id === state.editingConfigId; });
@@ -2489,6 +2652,7 @@
         closeOverlay();
         showToast("批量导入更新成功", "success");
         break;
+      case "batch-search-confirm": confirmBatchSearch(); break;
       case "config-search": renderConfigTable(); break;
       case "config-reset": renderConfigPage(false); break;
       case "config-export": showToast("已导出 " + state.configView.length + " 条"); break;
@@ -2507,6 +2671,19 @@
         break;
       default: break;
     }
+  });
+
+  document.addEventListener("change", function (e) {
+    const modeEl = e.target.closest("[data-sku-mode]");
+    if (!modeEl) return;
+    const input = $(modeEl.getAttribute("data-sku-mode"));
+    if (input) input.placeholder = modeEl.value === "2" ? "仅支持单个查询" : "双击批量查询";
+  });
+
+  document.addEventListener("dblclick", function (e) {
+    const input = e.target.closest("[data-sku-input]");
+    if (!input || !input.id) return;
+    openBatchSearch(input.id);
   });
 
   /* init */
