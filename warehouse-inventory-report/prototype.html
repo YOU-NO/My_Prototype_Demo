@@ -29,6 +29,7 @@
       --th-parsed: rgba(255, 255, 128, 0.45);
       --th-doc: rgba(149, 242, 4, 0.35);
       --th-exception: rgba(236, 128, 141, 0.35);
+      --th-process: rgba(149, 242, 4, 0.45);
       --th-common: rgba(128, 255, 255, 0.35);
       --th-diff: rgba(255, 255, 128, 0.45);
     }
@@ -300,6 +301,12 @@
       color: var(--placeholder);
     }
 
+    .search-bar select.control:disabled {
+      color: var(--placeholder);
+      background-color: #f5f7fa;
+      cursor: not-allowed;
+    }
+
     .search-bar select.control option,
     .form-item select option {
       color: var(--text);
@@ -403,6 +410,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      text-align: center;
       border-right: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
     }
@@ -412,7 +420,7 @@
       color: var(--regular);
       background: var(--table-head);
       font-weight: 600;
-      text-align: left;
+      text-align: center;
       position: sticky;
       top: 0;
       z-index: 1;
@@ -424,7 +432,34 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      text-align: center;
       padding-right: 6px;
+    }
+
+    .th-fold {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      transform: translateY(-50%);
+      color: #c0c4cc;
+      font-size: 10px;
+      line-height: 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .th-fold:hover {
+      color: var(--primary);
+    }
+
+    th.has-fold .th-text {
+      padding-right: 18px;
     }
 
     .col-resizer {
@@ -452,12 +487,26 @@
       cursor: col-resize !important;
     }
 
-    td.num, th.num { text-align: right; }
+    td.num, th.num { text-align: center; }
+
+    th.cell-left,
+    td.cell-left {
+      text-align: left;
+    }
+
+    th.cell-left .th-text {
+      text-align: left;
+    }
+
+    td.cell-left .cell-capsules {
+      justify-content: flex-start;
+    }
 
     th.g-platform { background: var(--th-platform); }
     th.g-parsed { background: var(--th-parsed); }
     th.g-docNo { background: var(--th-doc); }
     th.g-exception { background: var(--th-exception); }
+    th.g-process { background: var(--th-process); }
     th.g-common { background: var(--th-common); }
     th.g-diff { background: var(--th-diff); }
     th.g-plain { background: var(--table-head); }
@@ -478,6 +527,7 @@
       flex-wrap: wrap;
       gap: 4px;
       align-items: center;
+      justify-content: center;
     }
 
     .capsule {
@@ -801,7 +851,7 @@
     }
 
     .form-item textarea {
-      height: 64px;
+      height: 40px;
       padding: 6px 8px;
       resize: vertical;
     }
@@ -885,6 +935,12 @@
         { "key": "parsed", "label": "报告解析字段", "color": "#ffff80" },
         { "key": "exception", "label": "报告状态字段", "color": "#ec808d" }
       ],
+      "reportDomestic": [
+        { "key": "platform", "label": "报告原始字段", "color": "#81d3f8" },
+        { "key": "process", "label": "报告加工字段", "color": "#95f204" },
+        { "key": "parsed", "label": "报告解析字段", "color": "#ffff80" },
+        { "key": "exception", "label": "报告状态字段", "color": "#ec808d" }
+      ],
       "config": [
         { "key": "common", "label": "同一平台共用逻辑字段", "color": "#80ffff" },
         { "key": "diff", "label": "同一平台差异逻辑字段", "color": "#ffff80" }
@@ -941,8 +997,8 @@
       { "key": "site", "label": "站点", "group": "parsed" },
       { "key": "localDate", "label": "当地日期", "group": "parsed" },
       { "key": "systemSku", "label": "系统sku", "group": "parsed" },
-      { "key": "scene", "label": "大场景分类", "group": "parsed" },
-      { "key": "bizType", "label": "业务类", "group": "parsed" },
+      { "key": "scene", "label": "一级场景", "group": "parsed" },
+      { "key": "bizType", "label": "二级场景", "group": "parsed" },
       { "key": "warehouse", "label": "仓库", "group": "parsed" },
       { "key": "sellable", "label": "是否可售", "group": "parsed" },
       { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
@@ -982,8 +1038,8 @@
       { "key": "site", "label": "站点", "group": "parsed" },
       { "key": "localDate", "label": "当地日期", "group": "parsed" },
       { "key": "systemSku", "label": "系统sku", "group": "parsed" },
-      { "key": "scene", "label": "大场景分类", "group": "parsed" },
-      { "key": "bizType", "label": "业务类", "group": "parsed" },
+      { "key": "scene", "label": "一级场景", "group": "parsed" },
+      { "key": "bizType", "label": "二级场景", "group": "parsed" },
       { "key": "warehouse", "label": "仓库", "group": "parsed" },
       { "key": "sellable", "label": "是否可售", "group": "parsed" },
       { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
@@ -999,7 +1055,7 @@
     ],
     "configColumns": [
       { "key": "platform", "label": "平台", "group": "plain" },
-      { "key": "dbTable", "label": "数据库表名", "group": "common" },
+      { "key": "dbTable", "label": "数据库表名", "group": "plain" },
       { "key": "siteLogic", "label": "站点", "group": "common" },
       { "key": "statusLogic", "label": "是否可售", "group": "common" },
       { "key": "warehouse", "label": "仓库", "group": "common" },
@@ -1008,8 +1064,8 @@
       { "key": "qtyLogic", "label": "货品数量", "group": "common" },
       { "key": "inventoryNoField", "label": "库存流水单号", "group": "common" },
       { "key": "relatedNoField", "label": "关联单号", "group": "common" },
-      { "key": "scene", "label": "大场景分类", "group": "diff" },
-      { "key": "bizType", "label": "业务类", "group": "diff" },
+      { "key": "scene", "label": "一级场景", "group": "diff" },
+      { "key": "bizType", "label": "二级场景", "group": "diff" },
       { "key": "bizRule", "label": "业务类配置规则", "group": "diff" },
       { "key": "docType", "label": "生成单据类型", "group": "diff" },
       { "key": "dailySummary", "label": "单据生成是否按天汇总", "group": "diff" },
@@ -1105,9 +1161,10 @@
     ],
     "configRows": [
       {
-        "id": "c1", "platform": "Amazon", "siteLogic": "统一规则，识别所有的站点",
+        "id": "c1", "platform": "Amazon",
+        "siteLogic": "case when sellerid = 'A3U5E183ODUBBN' and country = 'JP' then Amazon_JP when sellerid = 'AHLP03EOC0SXS' and country = 'SA' then Amazon_SA end",
         "warehouse": "ST-Amazon US",
-        "statusLogic": "统一规则，识别所有的状态", "scene": "备货", "bizType": "备货接收",
+        "statusLogic": "case when Disposition = 'sellable' then 'sellerable' else 'unsell' end", "scene": "备货", "bizType": "备货接收",
         "bizRule": "EventType = 'Receipts'", "skuField": "msku", "dateField": "Date and Time",
         "qtyLogic": "Quantity", "inventoryNoField": "记录流水 ID，需标记到单据",
         "relatedNoField": "货件计划、退货 RMA 等上游单号", "docType": "其他入库单",
@@ -1115,9 +1172,9 @@
       },
       {
         "id": "c2", "platform": "Amazon",
-        "siteLogic": "case when sellerid = 'A3U5E183ODUBBN' and country = 'JP' then Amazon_JP when sellerid = 'AHLP03EOC0SXS' and country = 'SA' then Amazon_SA end",
+        "siteLogic": "统一规则，识别所有的站点",
         "warehouse": "JP-日本亚马逊仓",
-        "statusLogic": "case when Disposition = 'sellable' then 'sellerable' else 'unsell' end",
+        "statusLogic": "统一规则，识别所有的状态",
         "scene": "找回", "bizType": "找回", "bizRule": "EventType = 'Adjustments' and reason in ('F','N')",
         "skuField": "msku", "dateField": "Date and Time", "qtyLogic": "Quantity",
         "inventoryNoField": "ReferenceID", "relatedNoField": "ReferenceID", "docType": "其他入库单",
@@ -1160,12 +1217,14 @@
       { "key": "processingQty", "label": "处理中数量", "group": "platform", "align": "right" },
       { "key": "lostDamagedQty", "label": "确认丢失/损坏数量", "group": "platform", "align": "right" },
       { "key": "qtyAfter", "label": "变更后数量", "group": "platform", "align": "right" },
+      { "key": "processType", "label": "Type", "group": "process" },
+      { "key": "processQty", "label": "Quantity", "group": "process", "align": "right" },
       { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
       { "key": "site", "label": "站点", "group": "parsed" },
       { "key": "localDate", "label": "当地日期", "group": "parsed" },
       { "key": "systemSku", "label": "系统SKU", "group": "parsed" },
-      { "key": "scene", "label": "大场景分类", "group": "parsed" },
-      { "key": "bizType", "label": "业务类", "group": "parsed" },
+      { "key": "scene", "label": "一级场景", "group": "parsed" },
+      { "key": "bizType", "label": "二级场景", "group": "parsed" },
       { "key": "warehouse", "label": "仓库", "group": "parsed" },
       { "key": "sellable", "label": "是否可售", "group": "parsed" },
       { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
@@ -1187,8 +1246,8 @@
       { "key": "site", "label": "站点", "group": "parsed" },
       { "key": "localDate", "label": "当地日期", "group": "parsed" },
       { "key": "systemSku", "label": "系统SKU", "group": "parsed" },
-      { "key": "scene", "label": "大场景分类", "group": "parsed" },
-      { "key": "bizType", "label": "业务类", "group": "parsed" },
+      { "key": "scene", "label": "一级场景", "group": "parsed" },
+      { "key": "bizType", "label": "二级场景", "group": "parsed" },
       { "key": "warehouse", "label": "仓库", "group": "parsed" },
       { "key": "sellable", "label": "是否可售", "group": "parsed" },
       { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
@@ -1206,6 +1265,7 @@
     "coupangGlobalRows": [],
     "fieldNotes": {
       "newQuantity": "更新时数量不一致则写入此字段；未生成单据时可直接改 Quantity。",
+      "processType": "由报告原始【XX数量】字段展开得到，共 13 类。",
       "monthEnd": "默认为否，解析时自动带出；月末汇总报告通过日期转为当月最后一天。",
       "docType": "其他入库单、其他出库单；同一行可有多个，逗号分隔，报告中按胶囊展示。",
       "parseFlow": [
@@ -1227,19 +1287,19 @@
       attrId: "95393260616",
       skuId: "73369384",
       productName: productName,
-      qtyBefore: 0,
+      qtyBefore: 720,
       transferDoneQty: 0,
       inboundApplyQty: 0,
       sellableQty: 0,
       transferringQty: 0,
       delaySaleQty: 0,
-      outboundQty: 0,
-      redistribQty: 0,
-      customerReturnQty: 0,
-      removedQty: 0,
-      processingQty: 0,
+      outboundQty: -566,
+      redistribQty: -1,
+      customerReturnQty: 35,
+      removedQty: -11,
+      processingQty: -11,
       lostDamagedQty: 0,
-      qtyAfter: 0,
+      qtyAfter: 166,
       newQuantity: 0,
       site: "Coupang本土-KR",
       localDate: "2026-07-31",
@@ -1256,22 +1316,30 @@
       parseAbnormal: "否",
       parseAbnormalReason: ""
     };
-    const domesticScenes = [
-      { id: "cdi1", scene: "期初", bizType: "", qty: 720, docType: "其他入库单", docNo: "IR202607" },
-      { id: "cdi2", scene: "发运", bizType: "出库", qty: -566, docType: "其他出库单", docNo: "IA202611" },
-      { id: "cdi3", scene: "发运", bizType: "重新配送", qty: -1, docType: "其他出库单,其他入库单", docNo: "IA202612,IR202608" },
-      { id: "cdi4", scene: "退运", bizType: "顾客退货", qty: 35, docType: "其他入库单", docNo: "IR202609" },
-      { id: "cdi5", scene: "移除", bizType: "已移出库", qty: -11, docType: "其他出库单", docNo: "IA202613,IA202614" },
-      { id: "cdi6", scene: "其他", bizType: "处理中", qty: -11, docType: "", docNo: "" },
-      { id: "cdi7", scene: "期末", bizType: "", qty: 166, docType: "其他入库单,其他出库单", docNo: "IR202615,IA202616" }
+    const domesticQtyTypes = [
+      { key: "qtyBefore", type: "变更前", scene: "期初", bizType: "", docType: "其他入库单", docNo: "IR202607" },
+      { key: "transferDoneQty", type: "调拨完成", scene: "", bizType: "", docType: "", docNo: "" },
+      { key: "inboundApplyQty", type: "入库申请", scene: "", bizType: "", docType: "", docNo: "" },
+      { key: "sellableQty", type: "可售", scene: "", bizType: "", docType: "", docNo: "" },
+      { key: "transferringQty", type: "调拨中", scene: "", bizType: "", docType: "", docNo: "" },
+      { key: "delaySaleQty", type: "延迟开始销售", scene: "", bizType: "", docType: "", docNo: "" },
+      { key: "outboundQty", type: "出库", scene: "发运", bizType: "出库", docType: "其他出库单", docNo: "IA202611" },
+      { key: "redistribQty", type: "重新配送", scene: "发运", bizType: "重新配送", docType: "其他出库单,其他入库单", docNo: "IA202612,IR202608" },
+      { key: "customerReturnQty", type: "顾客退货", scene: "退运", bizType: "顾客退货", docType: "其他入库单", docNo: "IR202609" },
+      { key: "removedQty", type: "已移出库", scene: "移除", bizType: "已移出库", docType: "其他出库单", docNo: "IA202613,IA202614" },
+      { key: "processingQty", type: "处理中", scene: "其他", bizType: "处理中", docType: "", docNo: "" },
+      { key: "lostDamagedQty", type: "确认丢失/损坏", scene: "", bizType: "", docType: "", docNo: "" },
+      { key: "qtyAfter", type: "变更后", scene: "期末", bizType: "", docType: "其他入库单,其他出库单", docNo: "IR202615,IA202616" }
     ];
-    MOCK.coupangDomesticRows = domesticScenes.map(function (item) {
+    MOCK.coupangDomesticRows = domesticQtyTypes.map(function (item, i) {
       const row = {};
       Object.keys(domesticBase).forEach(function (k) { row[k] = domesticBase[k]; });
-      row.id = item.id;
+      row.id = "cdi" + (i + 1);
+      row.processType = item.type;
+      row.processQty = domesticBase[item.key];
       row.scene = item.scene;
       row.bizType = item.bizType;
-      row.qty = item.qty;
+      row.qty = domesticBase[item.key];
       row.docType = item.docType;
       row.docNo = item.docNo;
       return row;
@@ -1352,7 +1420,8 @@
     batchInputId: "",
     toastTimer: null,
     menuOpen: { sales: true, coupang: true, amazon: false, finance: false },
-    colWidths: {}
+    colWidths: {},
+    cdiQtyExpanded: false
   };
 
   const PAGE_META = {
@@ -1661,6 +1730,25 @@
     return Object.keys(set);
   }
 
+  function uniqueChildFromRows(rows, parentKey, parentVal, childKey) {
+    if (!parentVal) return [];
+    return uniqueFromRows((rows || []).filter(function (r) {
+      return r[parentKey] === parentVal;
+    }), childKey);
+  }
+
+  function bindSceneBizCascade(sceneId, bizId, getChildren) {
+    const sceneEl = $(sceneId);
+    const bizEl = $(bizId);
+    if (!sceneEl || !bizEl) return;
+    sceneEl.addEventListener("change", function () {
+      const scene = sceneEl.value;
+      bizEl.disabled = !scene;
+      const list = scene ? (getChildren(scene) || []) : [];
+      bizEl.innerHTML = placeholderOption("二级场景", false) + optionsHtml(list, "");
+    });
+  }
+
   function coupangInvCtx(page) {
     if (page === "coupangGlobalInventory") {
       return {
@@ -1668,7 +1756,8 @@
         cols: MOCK.coupangGlobalColumns,
         rowsKey: "cgiRows",
         viewKey: "cgiView",
-        skuKeys: ["viId", "productId"]
+        skuKeys: ["viId", "productId"],
+        legendKind: "report"
       };
     }
     return {
@@ -1676,7 +1765,8 @@
       cols: MOCK.coupangDomesticColumns,
       rowsKey: "cdiRows",
       viewKey: "cdiView",
-      skuKeys: ["skuId"]
+      skuKeys: ["skuId"],
+      legendKind: "reportDomestic"
     };
   }
 
@@ -1715,10 +1805,38 @@
     return w + 28;
   }
 
-  function autoColWidth(label, key) {
+  function rowsForTable(tableKey) {
+    if (tableKey === "detail") return state.detailRows;
+    if (tableKey === "summary") return state.summaryRows;
+    if (tableKey === "coupangDomesticInventory") return state.cdiRows;
+    if (tableKey === "coupangGlobalInventory") return state.cgiRows;
+    if (tableKey === "config") return state.configRows;
+    return [];
+  }
+
+  function autoDocColWidth(label, key, tableKey) {
+    let w = textWidthPx(label);
+    (rowsForTable(tableKey) || []).forEach(function (row) {
+      const val = row[key];
+      if (key === "docType") {
+        const items = splitCsv(val);
+        let rowW = 20;
+        items.forEach(function (item, i) {
+          rowW += 18 + (item ? textWidthPx(item) - 28 : 0);
+          if (i) rowW += 4;
+        });
+        w = Math.max(w, rowW);
+      } else {
+        w = Math.max(w, textWidthPx(val));
+      }
+    });
+    return Math.min(COL_MAX_DRAG, Math.max(COL_MIN, Math.round(w)));
+  }
+
+  function autoColWidth(label, key, tableKey) {
     if (key === "actions") return 148;
-    if (key === "docType") return 220;
-    if (key === "docNo") return 220;
+    if (key === "docType" || key === "docNo") return autoDocColWidth(label, key, tableKey);
+    if (key === "processType") return 148;
     if (key === "warehouse") return 168;
     let w = textWidthPx(label);
     if (key === "dbTable") {
@@ -1733,7 +1851,7 @@
   function getColWidth(tableKey, colKey, label) {
     const saved = state.colWidths[tableKey] && state.colWidths[tableKey][colKey];
     if (saved) return saved;
-    return autoColWidth(label, colKey);
+    return autoColWidth(label, colKey, tableKey);
   }
 
   function setColWidth(tableKey, colKey, width) {
@@ -1760,19 +1878,43 @@
     table.style.minWidth = total + "px";
   }
 
+  const CDI_QTY_KEYS = [
+    "qtyBefore", "transferDoneQty", "inboundApplyQty", "sellableQty", "transferringQty",
+    "delaySaleQty", "outboundQty", "redistribQty", "customerReturnQty", "removedQty",
+    "processingQty", "lostDamagedQty", "qtyAfter"
+  ];
+
+  function visibleCoupangDomesticCols() {
+    const cols = MOCK.coupangDomesticColumns || [];
+    if (state.cdiQtyExpanded) return cols.slice();
+    return cols.filter(function (c) {
+      return CDI_QTY_KEYS.indexOf(c.key) < 0;
+    });
+  }
+
   function thHtml(col, tableKey) {
     const num = col.align === "right" ? " num" : "";
+    const left = (col.key === "docType" || col.key === "docNo") ? " cell-left" : "";
     const help = col.key === "newQuantity" ? " help-th" : "";
     const sticky = col.key === "actions" ? " col-sticky-right" : "";
     const group = col.group || "plain";
     const w = getColWidth(tableKey, col.key, col.label);
     let label = esc(col.label);
+    let extraCls = "";
+    let fold = "";
     if (col.key === "newQuantity") {
       label = '<span class="header-help">' + label + tipIcon(col.key) + "</span>";
     }
+    if (tableKey === "coupangDomesticInventory" && col.key === "productName") {
+      extraCls = " has-fold";
+      const open = state.cdiQtyExpanded;
+      fold = '<span class="th-fold" data-act="cdi-qty-toggle" title="' +
+        (open ? "收起数量字段" : "展开数量字段") + '">' + (open ? "◂" : "▸") + "</span>";
+    }
     return (
-      '<th class="g-' + group + num + help + sticky + '" style="width:' + w + 'px;" title="' + esc(col.label) + '" data-col="' + esc(col.key) + '">' +
-        '<span class="th-text">' + label + "</span>" +
+      '<th class="g-' + group + num + left + help + sticky + extraCls + '" style="width:' + w + 'px;" title="' +
+        esc(col.label) + '" data-col="' + esc(col.key) + '">' +
+        '<span class="th-text">' + label + "</span>" + fold +
         '<span class="col-resizer" data-resize-table="' + esc(tableKey) + '" data-resize-col="' + esc(col.key) + '"></span>' +
       "</th>"
     );
@@ -1790,10 +1932,10 @@
             return '<span class="capsule' + tone + '">' + esc(item) + "</span>";
           }).join("") + "</div>"
         : "";
-      return '<td class="cell-wrap" title="' + esc(val) + '">' + html + "</td>";
+      return '<td class="cell-wrap cell-left" title="' + esc(val) + '">' + html + "</td>";
     }
     if (col.key === "docNo") {
-      return '<td class="cell-wrap" title="' + esc(val) + '">' + esc(val) + "</td>";
+      return '<td class="cell-wrap cell-left" title="' + esc(val) + '">' + esc(val) + "</td>";
     }
     const isReason = col.key === "parseAbnormalReason" || col.key === "docAbnormalReason";
     const cls = isReason && val ? " text-danger" : "";
@@ -1906,12 +2048,12 @@
           '<input id="' + prefix + '-sku" class="input-control" data-sku-input="1" placeholder="' + esc(skuPh) + '" value="' + esc(f.sku) + '" />' +
         "</div>" +
         '<select id="' + prefix + '-scene" class="control" required>' +
-          placeholderOption("大场景分类", !!f.scene) +
+          placeholderOption("一级场景", !!f.scene) +
           optionsHtml(opts.scenes || [], f.scene) +
         "</select>" +
-        '<select id="' + prefix + '-biz" class="control" required>' +
-          placeholderOption("业务类", !!f.bizType) +
-          optionsHtml(opts.bizTypes || [], f.bizType) +
+        '<select id="' + prefix + '-biz" class="control" required' + (f.scene ? "" : " disabled") + '>' +
+          placeholderOption("二级场景", !!f.bizType) +
+          optionsHtml(f.scene ? (opts.bizTypes || []) : [], f.bizType) +
         "</select>" +
         '<select id="' + prefix + '-docType" class="control" required>' +
           placeholderOption("生成单据类型", !!f.docType) +
@@ -1999,7 +2141,7 @@
     const html =
       reportSearchBarHtml("d", f, {
         scenes: uniqueFromRows(state.detailRows, "scene"),
-        bizTypes: uniqueFromRows(state.detailRows, "bizType"),
+        bizTypes: uniqueChildFromRows(state.detailRows, "scene", f.scene, "bizType"),
         docTypes: uniqueFromRows(state.detailRows, "docType").concat(configDocTypeOptions()).filter(function (v, i, arr) {
           return arr.indexOf(v) === i;
         }),
@@ -2019,6 +2161,9 @@
         '<div id="detailPager"></div>' +
       "</section>";
     $("page-detail").innerHTML = html;
+    bindSceneBizCascade("d-scene", "d-biz", function (scene) {
+      return uniqueChildFromRows(state.detailRows, "scene", scene, "bizType");
+    });
     renderDetailTable();
   }
 
@@ -2064,7 +2209,7 @@
     $("page-empty").innerHTML =
       reportSearchBarHtml("ci", f, {
         scenes: uniqueFromRows(rows, "scene"),
-        bizTypes: uniqueFromRows(rows, "bizType"),
+        bizTypes: uniqueChildFromRows(rows, "scene", f.scene, "bizType"),
         docTypes: uniqueFromRows(rows, "docType").concat(configDocTypeOptions()).filter(function (v, i, arr) {
           return arr.indexOf(v) === i;
         }),
@@ -2078,17 +2223,20 @@
             '<button class="btn light" type="button" data-act="ci-import">批量导入更新</button>' +
             '<button class="btn light" type="button" data-act="ci-gen-doc">更新后报告生成单据</button>' +
           "</div>" +
-          '<div class="toolbar-right">' + legendHtml("report") + "</div>" +
+          '<div class="toolbar-right">' + legendHtml(ctx.legendKind || "report") + "</div>" +
         "</div>" +
         '<div class="table-wrap" id="coupangInvTableWrap"></div>' +
         '<div id="coupangInvPager"></div>' +
       "</section>";
+    bindSceneBizCascade("ci-scene", "ci-biz", function (scene) {
+      return uniqueChildFromRows(state[ctx.rowsKey], "scene", scene, "bizType");
+    });
     renderCoupangInvTable();
   }
 
   function renderCoupangInvTable() {
     const ctx = coupangInvCtx(state.page);
-    const cols = ctx.cols;
+    const cols = ctx.page === "coupangDomesticInventory" ? visibleCoupangDomesticCols() : ctx.cols;
     const rows = filterCoupangInvRows(ctx);
     state[ctx.viewKey] = rows;
     let body;
@@ -2127,7 +2275,7 @@
     $("page-summary").innerHTML =
       reportSearchBarHtml("s", f, {
         scenes: uniqueFromRows(state.summaryRows, "scene"),
-        bizTypes: uniqueFromRows(state.summaryRows, "bizType"),
+        bizTypes: uniqueChildFromRows(state.summaryRows, "scene", f.scene, "bizType"),
         docTypes: uniqueFromRows(state.summaryRows, "docType").concat(configDocTypeOptions()).filter(function (v, i, arr) {
           return arr.indexOf(v) === i;
         }),
@@ -2146,6 +2294,9 @@
         '<div class="table-wrap" id="summaryTableWrap"></div>' +
         '<div id="summaryPager"></div>' +
       "</section>";
+    bindSceneBizCascade("s-scene", "s-biz", function (scene) {
+      return uniqueChildFromRows(state.summaryRows, "scene", scene, "bizType");
+    });
     renderSummaryTable();
   }
 
@@ -2206,14 +2357,9 @@
 
   function configSecondSceneOptions(firstScene) {
     const map = (MOCK.configLookups && MOCK.configLookups.secondScenesByFirst) || {};
-    if (firstScene && map[firstScene]) return map[firstScene].slice();
-    const all = [];
-    Object.keys(map).forEach(function (k) {
-      map[k].forEach(function (v) {
-        if (all.indexOf(v) < 0) all.push(v);
-      });
-    });
-    return all;
+    if (!firstScene) return [];
+    if (map[firstScene]) return map[firstScene].slice();
+    return [];
   }
 
   function withCurrentOption(list, current) {
@@ -2275,12 +2421,12 @@
           optionsHtml(configPlatformOptions(), f.platform === "全部" ? "" : f.platform) +
         "</select>" +
         '<select id="c-scene" class="control" required>' +
-          placeholderOption("大场景分类", f.scene && f.scene !== "全部") +
+          placeholderOption("一级场景", f.scene && f.scene !== "全部") +
           optionsHtml(configFirstSceneOptions(), f.scene === "全部" ? "" : f.scene) +
         "</select>" +
-        '<select id="c-biz" class="control" required>' +
-          placeholderOption("业务类", f.bizType && f.bizType !== "全部") +
-          optionsHtml(configSecondSceneOptions(""), f.bizType === "全部" ? "" : f.bizType) +
+        '<select id="c-biz" class="control" required' + (f.scene && f.scene !== "全部" ? "" : " disabled") + '>' +
+          placeholderOption("二级场景", f.bizType && f.bizType !== "全部") +
+          optionsHtml(f.scene && f.scene !== "全部" ? configSecondSceneOptions(f.scene) : [], f.bizType === "全部" ? "" : f.bizType) +
         "</select>" +
         '<button class="btn primary" type="button" data-act="config-search">搜索</button>' +
         '<button class="btn" type="button" data-act="config-reset">重置</button>' +
@@ -2296,6 +2442,7 @@
         '<div class="table-wrap" id="configTableWrap"></div>' +
         '<div id="configPager"></div>' +
       "</section>";
+    bindSceneBizCascade("c-scene", "c-biz", configSecondSceneOptions);
     renderConfigTable();
   }
 
@@ -2414,7 +2561,7 @@
       ["siteLogic", "站点", true], ["statusLogic", "是否可售", true], ["warehouse", "仓库"],
       ["skuField", "货品SKU"], ["dateField", "平台日期"], ["qtyLogic", "货品数量"],
       ["inventoryNoField", "库存流水单号"], ["relatedNoField", "关联单号"],
-      ["scene", "大场景分类"], ["bizType", "业务类"], ["bizRule", "业务类配置规则", true],
+      ["scene", "一级场景"], ["bizType", "二级场景"], ["bizRule", "业务类配置规则", true],
       ["docType", "生成单据类型"],
       ["dailySummary", "单据生成是否按天汇总"]
     ];
@@ -2457,18 +2604,21 @@
         );
       }
       if (key === "bizType") {
-        const list = withCurrentOption(configSecondSceneOptions(data.scene), val);
+        const hasScene = !!data.scene;
+        const list = hasScene ? withCurrentOption(configSecondSceneOptions(data.scene), val) : [];
+        const bizDisabled = viewOnly || !hasScene;
+        const bizPh = viewOnly ? false : "请选择";
         return (
           '<div class="form-item">' + formFieldLabel(label, false) +
-          lookupSelectHtml("cfg-biz", list, val, viewOnly, ph, false) +
+          lookupSelectHtml("cfg-biz", list, val, bizDisabled, bizPh, false) +
           "</div>"
         );
       }
       if (key === "docType") {
         const docTypes = withCurrentOption(configDocTypeOptions(), val);
         return (
-          '<div class="form-item">' + formFieldLabel(label, true) +
-          lookupSelectHtml("cfg-docType", docTypes, val, viewOnly, ph, true) +
+          '<div class="form-item">' + formFieldLabel(label, false) +
+          lookupSelectHtml("cfg-docType", docTypes, val, viewOnly, ph, false) +
           "</div>"
         );
       }
@@ -2510,14 +2660,11 @@
     const bizEl = $("cfg-biz");
     if (sceneEl && bizEl && !viewOnly) {
       sceneEl.addEventListener("change", function () {
-        const next = configSecondSceneOptions(sceneEl.value);
-        if (isAdd) {
-          bizEl.innerHTML = '<option value="" selected>请选择</option>' + optionsHtml(next, "");
-          bizEl.classList.add("is-empty");
-        } else {
-          const keep = next.indexOf(bizEl.value) >= 0 ? bizEl.value : (next[0] || "");
-          bizEl.innerHTML = optionsHtml(next, keep);
-        }
+        const scene = sceneEl.value;
+        bizEl.disabled = !scene;
+        const next = scene ? configSecondSceneOptions(scene) : [];
+        bizEl.innerHTML = '<option value="" selected>请选择</option>' + optionsHtml(next, "");
+        bizEl.classList.add("is-empty");
       });
     }
   }
@@ -2536,8 +2683,7 @@
     const requiredSelects = [
       ["platform", "平台"],
       ["dbTable", "数据库表名"],
-      ["warehouse", "仓库"],
-      ["docType", "生成单据类型"]
+      ["warehouse", "仓库"]
     ];
     for (let i = 0; i < requiredSelects.length; i++) {
       const key = requiredSelects[i][0];
@@ -2671,6 +2817,10 @@
         break;
       case "ci-import": openImportDialog(state.page); break;
       case "ci-gen-doc": runGenDoc(state.page); break;
+      case "cdi-qty-toggle":
+        state.cdiQtyExpanded = !state.cdiQtyExpanded;
+        renderCoupangInvTable();
+        break;
       case "summary-search": renderSummaryTable(); break;
       case "summary-reset": renderSummaryPage(false); break;
       case "summary-export": showToast("已导出 " + state.summaryView.length + " 条"); break;
