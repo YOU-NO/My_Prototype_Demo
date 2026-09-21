@@ -321,6 +321,10 @@
       color: var(--placeholder);
     }
 
+    .form-item select[required] option[value=""] {
+      display: none;
+    }
+
     .filter-label {
       color: var(--secondary);
       white-space: nowrap;
@@ -1015,6 +1019,7 @@
       { "key": "sellable", "label": "是否可售", "group": "parsed" },
       { "key": "scene", "label": "一级场景", "group": "parsed" },
       { "key": "bizType", "label": "二级场景", "group": "parsed" },
+      { "key": "generateDoc", "label": "是否生成单据", "group": "parsed" },
       { "key": "docType", "label": "生成单据类型", "group": "parsed" },
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
@@ -1056,6 +1061,7 @@
       { "key": "sellable", "label": "是否可售", "group": "parsed" },
       { "key": "scene", "label": "一级场景", "group": "parsed" },
       { "key": "bizType", "label": "二级场景", "group": "parsed" },
+      { "key": "generateDoc", "label": "是否生成单据", "group": "parsed" },
       { "key": "docType", "label": "生成单据类型", "group": "parsed" },
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
@@ -1080,6 +1086,7 @@
       { "key": "scene", "label": "一级场景", "group": "diff" },
       { "key": "bizType", "label": "二级场景", "group": "diff" },
       { "key": "bizRule", "label": "业务类配置规则", "group": "diff" },
+      { "key": "generateDoc", "label": "是否生成单据", "group": "diff" },
       { "key": "docType", "label": "生成单据类型", "group": "diff" },
       { "key": "dailySummary", "label": "单据生成是否按天汇总", "group": "diff" },
       { "key": "actions", "label": "操作", "group": "plain" }
@@ -1091,7 +1098,7 @@
         "fulfillmentCenter": "KIX5", "reason": "K", "country": "JP", "disposition": "SELLABLE",
         "dateAndTime": "2026-05-31T00:00:00+0900", "newQuantity": "", "platform": "Amazon", "monthEnd": "否",
         "site": "Amazon_JP", "localDate": "2026-05-31", "systemSku": "C120-AN-BK-JP-000-AZB", "scene": "报废",
-        "bizType": "报废", "warehouse": "JP-日本亚马逊仓", "sellable": "是", "qty": -1, "docType": "其他出库单",
+        "bizType": "报废", "warehouse": "JP-日本亚马逊仓", "sellable": "是", "qty": -1, "generateDoc": "是", "docType": "其他出库单",
         "dailySummary": "否", "parsedDone": "是", "docNo": "IA202601", "hasUpdate": "否",
         "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
       },
@@ -1101,7 +1108,7 @@
         "fulfillmentCenter": "JED4", "reason": "", "country": "SA", "disposition": "SELLABLE",
         "dateAndTime": "2026-05-31T01:00:00+0100", "newQuantity": "", "platform": "Amazon", "monthEnd": "否",
         "site": "Amazon_SA", "localDate": "2026-05-31", "systemSku": "", "scene": "", "bizType": "",
-        "warehouse": "", "sellable": "", "qty": "", "docType": "", "dailySummary": "", "parsedDone": "否",
+        "warehouse": "", "sellable": "", "qty": "", "generateDoc": "", "docType": "", "dailySummary": "", "parsedDone": "否",
         "docNo": "", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "",
         "parseAbnormal": "是", "parseAbnormalReason": "Amazon_SA站点T910BG-SA未维护货品映射"
       },
@@ -1111,7 +1118,7 @@
         "quantity": -2, "fulfillmentCenter": "SMN1", "reason": "", "country": "US", "disposition": "SELLABLE",
         "dateAndTime": "2026-05-31T00:00:00-0700", "newQuantity": "", "platform": "Amazon", "monthEnd": "否",
         "site": "Amazon_US", "localDate": "2026-05-31", "systemSku": "S710-ST-GY-US-326-AZB", "scene": "备货接收",
-        "bizType": "备货接收", "warehouse": "ST-Amazon US", "sellable": "是", "qty": -2, "docType": "其他入库单,其他出库单",
+        "bizType": "备货接收", "warehouse": "ST-Amazon US", "sellable": "是", "qty": -2, "generateDoc": "是", "docType": "其他入库单,其他出库单",
         "dailySummary": "否", "parsedDone": "是", "docNo": "IR202601,IA202603,IA202604,IA202605",
         "hasUpdate": "是", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
       },
@@ -1121,7 +1128,7 @@
         "fulfillmentCenter": "KIX5", "reason": "F", "country": "JP", "disposition": "SELLABLE",
         "dateAndTime": "2026-05-30T08:00:00+0900", "newQuantity": "", "platform": "Amazon", "monthEnd": "否",
         "site": "Amazon_JP", "localDate": "2026-05-30", "systemSku": "", "scene": "", "bizType": "",
-        "warehouse": "", "sellable": "", "qty": "", "docType": "", "dailySummary": "", "parsedDone": "否",
+        "warehouse": "", "sellable": "", "qty": "", "generateDoc": "", "docType": "", "dailySummary": "", "parsedDone": "否",
         "docNo": "", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "",
         "parseAbnormal": "否", "parseAbnormalReason": ""
       }
@@ -1134,7 +1141,7 @@
         "disposed": 0, "otherEvents": 0, "endingBalance": 38, "location": "SA", "unknownEvents": -3,
         "newQuantity": "", "platform": "Amazon", "monthEnd": "是", "site": "Amazon_SA", "localDate": "2026-03-31",
         "systemSku": "T910-ST-BG-SA-623-B01", "scene": "Unknown Events", "bizType": "Unknown Events",
-        "warehouse": "SG-沙特亚马逊仓", "sellable": "否", "qty": -3, "docType": "其他出库单", "dailySummary": "是",
+        "warehouse": "SG-沙特亚马逊仓", "sellable": "否", "qty": -3, "generateDoc": "是", "docType": "其他出库单", "dailySummary": "是",
         "parsedDone": "是", "docNo": "IA202601", "hasUpdate": "否", "docAbnormal": "否",
         "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
       },
@@ -1145,7 +1152,7 @@
         "disposed": 0, "otherEvents": 0, "endingBalance": 2448, "location": "JP", "unknownEvents": 0,
         "newQuantity": "", "platform": "Amazon", "monthEnd": "是", "site": "Amazon_JP", "localDate": "2026-03-31",
         "systemSku": "C120-AN-BK-JP-000-AZB", "scene": "Unknown Events", "bizType": "Unknown Events",
-        "warehouse": "JP-日本亚马逊仓", "sellable": "是", "qty": 0, "docType": "其他入库单,其他出库单", "dailySummary": "是",
+        "warehouse": "JP-日本亚马逊仓", "sellable": "是", "qty": 0, "generateDoc": "是", "docType": "其他入库单,其他出库单", "dailySummary": "是",
         "parsedDone": "是", "docNo": "IR202610,IA202602", "hasUpdate": "否", "docAbnormal": "否",
         "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
       },
@@ -1157,7 +1164,7 @@
         "endingBalance": 336, "location": "US", "unknownEvents": 1, "newQuantity": "", "platform": "Amazon",
         "monthEnd": "是", "site": "Amazon_US", "localDate": "2026-03-31", "systemSku": "S710-ST-GY-US-326-AZB",
         "scene": "Unknown Events", "bizType": "Unknown Events", "warehouse": "ST-Returns(Amazon US)",
-        "sellable": "是", "qty": 1, "docType": "其他入库单,其他出库单", "dailySummary": "是", "parsedDone": "是",
+        "sellable": "是", "qty": 1, "generateDoc": "是", "docType": "其他入库单,其他出库单", "dailySummary": "是", "parsedDone": "是",
         "docNo": "IA202603,AS202602", "hasUpdate": "是", "docAbnormal": "否",
         "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
       },
@@ -1167,7 +1174,7 @@
         "customerReturns": 0, "vendorReturns": 0, "warehouseTransfer": 0, "found": 0, "lost": 0, "damaged": 0,
         "disposed": 0, "otherEvents": 0, "endingBalance": 12, "location": "US", "unknownEvents": 2,
         "newQuantity": "", "platform": "Amazon", "monthEnd": "是", "site": "Amazon_US", "localDate": "2026-03-31",
-        "systemSku": "", "scene": "", "bizType": "", "warehouse": "", "sellable": "", "qty": "", "docType": "",
+        "systemSku": "", "scene": "", "bizType": "", "warehouse": "", "sellable": "", "qty": "", "generateDoc": "", "docType": "",
         "dailySummary": "", "parsedDone": "否", "docNo": "", "hasUpdate": "否", "docAbnormal": "否",
         "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
       }
@@ -1180,7 +1187,7 @@
         "statusLogic": "case when Disposition = 'sellable' then 'sellerable' else 'unsell' end", "scene": "备货", "bizType": "备货接收",
         "bizRule": "EventType = 'Receipts'", "skuField": "msku", "dateField": "Date and Time",
         "qtyLogic": "Quantity", "inventoryNoField": "记录流水 ID，需标记到单据",
-        "relatedNoField": "货件计划、退货 RMA 等上游单号", "docType": "其他入库单",
+        "relatedNoField": "货件计划、退货 RMA 等上游单号", "generateDoc": "是", "docType": "其他入库单",
         "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": ""
       },
       {
@@ -1190,7 +1197,7 @@
         "statusLogic": "统一规则，识别所有的状态",
         "scene": "找回", "bizType": "找回", "bizRule": "EventType = 'Adjustments' and reason in ('F','N')",
         "skuField": "msku", "dateField": "Date and Time", "qtyLogic": "Quantity",
-        "inventoryNoField": "ReferenceID", "relatedNoField": "ReferenceID", "docType": "其他入库单",
+        "inventoryNoField": "ReferenceID", "relatedNoField": "ReferenceID", "generateDoc": "是", "docType": "其他入库单",
         "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": ""
       },
       {
@@ -1199,7 +1206,7 @@
         "statusLogic": "统一规则，识别所有的状态", "scene": "报废", "bizType": "报废",
         "bizRule": "EventType = 'Adjustments' and reason in ('6','7','E','H','K','U','G')",
         "skuField": "msku", "dateField": "Date and Time", "qtyLogic": "Quantity",
-        "inventoryNoField": "ReferenceID", "relatedNoField": "ReferenceID", "docType": "其他出库单",
+        "inventoryNoField": "ReferenceID", "relatedNoField": "ReferenceID", "generateDoc": "是", "docType": "其他出库单",
         "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": ""
       },
       {
@@ -1208,7 +1215,7 @@
         "statusLogic": "统一规则，识别所有的状态", "scene": "Unknown Events", "bizType": "Unknown Events",
         "bizRule": "StartingWarehouseBalance + ... - EndingWarehouseBalance <> 0",
         "skuField": "msku", "dateField": "Date", "qtyLogic": "Unknown Events",
-        "inventoryNoField": "", "relatedNoField": "", "docType": "其他入库单",
+        "inventoryNoField": "", "relatedNoField": "", "generateDoc": "是", "docType": "其他入库单",
         "dbTable": "Inventory Summary", "dailySummary": "是", "summaryCondition": "按站点+MSKU+Disposition 按天汇总"
       }
     ],
@@ -1241,6 +1248,7 @@
       { "key": "sellable", "label": "是否可售", "group": "parsed" },
       { "key": "scene", "label": "一级场景", "group": "parsed" },
       { "key": "bizType", "label": "二级场景", "group": "parsed" },
+      { "key": "generateDoc", "label": "是否生成单据", "group": "parsed" },
       { "key": "docType", "label": "生成单据类型", "group": "parsed" },
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
@@ -1264,6 +1272,7 @@
       { "key": "sellable", "label": "是否可售", "group": "parsed" },
       { "key": "scene", "label": "一级场景", "group": "parsed" },
       { "key": "bizType", "label": "二级场景", "group": "parsed" },
+      { "key": "generateDoc", "label": "是否生成单据", "group": "parsed" },
       { "key": "docType", "label": "生成单据类型", "group": "parsed" },
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
@@ -1319,6 +1328,7 @@
       systemSku: "E320-ST-WT-KR-608",
       warehouse: "韩国Coupang本土店仓",
       sellable: "",
+      generateDoc: "否",
       docType: "",
       dailySummary: "否",
       docNo: "",
@@ -1355,6 +1365,7 @@
       row.qty = domesticBase[item.key];
       row.docType = item.docType;
       row.docNo = item.docNo;
+      row.generateDoc = item.docType ? "是" : "否";
       return row;
     });
     function cleanSku(v) {
@@ -1375,6 +1386,7 @@
         warehouse: "韩国Coupang本土店仓",
         sellable: "",
         qty: 31,
+        generateDoc: "是",
         docType: "其他入库单,其他出库单",
         dailySummary: "否",
         docNo: "IR202701,IA202702",
@@ -1399,6 +1411,7 @@
         warehouse: "韩国Coupang本土店仓",
         sellable: "",
         qty: 647,
+        generateDoc: "是",
         docType: "其他入库单",
         dailySummary: "否",
         docNo: "IR202703",
@@ -2001,6 +2014,7 @@
       sku: "",
       scene: "",
       bizType: "",
+      generateDoc: "",
       docType: "",
       parsedDone: "",
       hasUpdate: "",
@@ -2019,6 +2033,7 @@
       sku: val("sku"),
       scene: val("scene"),
       bizType: val("biz"),
+      generateDoc: val("generateDoc"),
       docType: val("docType"),
       parsedDone: val("parsedDone"),
       hasUpdate: val("hasUpdate"),
@@ -2045,6 +2060,7 @@
     if (!matchSkuFilter(f, row, platformKeys)) return false;
     if (f.scene && row.scene !== f.scene) return false;
     if (f.bizType && row.bizType !== f.bizType) return false;
+    if (f.generateDoc && row.generateDoc !== f.generateDoc) return false;
     if (f.docType && splitCsv(row.docType).indexOf(f.docType) < 0) return false;
     if (f.parsedDone && row.parsedDone !== f.parsedDone) return false;
     if (f.hasUpdate && row.hasUpdate !== f.hasUpdate) return false;
@@ -2078,6 +2094,10 @@
         '<select id="' + prefix + '-biz" class="control" required' + (f.scene ? "" : " disabled") + '>' +
           placeholderOption("二级场景", !!f.bizType) +
           optionsHtml(f.scene ? (opts.bizTypes || []) : [], f.bizType) +
+        "</select>" +
+        '<select id="' + prefix + '-generateDoc" class="control" required>' +
+          placeholderOption("是否生成单据", !!f.generateDoc) +
+          optionsHtml(["是", "否"], f.generateDoc) +
         "</select>" +
         '<select id="' + prefix + '-docType" class="control" required>' +
           placeholderOption("生成单据类型", !!f.docType) +
@@ -2395,7 +2415,8 @@
   function lookupSelectHtml(id, list, selected, disabled, placeholder, required) {
     const emptyOpt = placeholder === false
       ? ""
-      : '<option value=""' + (selected ? "" : " selected") + ">" + esc(placeholder || "请选择") + "</option>";
+      : '<option value=""' + (selected ? "" : " selected") + (required ? " hidden disabled" : "") + ">" +
+          esc(placeholder || "请选择") + "</option>";
     const emptyClass = placeholder !== false && !selected ? " is-empty" : "";
     return (
       '<select id="' + id + '"' +
@@ -2557,7 +2578,7 @@
     }
     let n = 0;
     rows.forEach(function (r) {
-      if (r.parsedDone === "是" && r.parseAbnormal !== "是" && !r.docNo) {
+      if (r.parsedDone === "是" && r.parseAbnormal !== "是" && r.generateDoc === "是" && !r.docNo) {
         state.docSeq += 1;
         const types = splitCsv(r.docType);
         const prefix = types.indexOf("其他入库单") >= 0 || types.indexOf("收货列表") >= 0 ? "IR" : "IA";
@@ -2577,7 +2598,7 @@
     const data = row || {
       platform: "", siteLogic: "", warehouse: "", statusLogic: "", scene: "", bizType: "",
       bizRule: "", skuField: "", dateField: "", qtyLogic: "",
-      inventoryNoField: "", relatedNoField: "", docType: "", dbTable: "",
+      inventoryNoField: "", relatedNoField: "", generateDoc: "", docType: "", dbTable: "",
       dailySummary: ""
     };
     const fields = [
@@ -2587,12 +2608,13 @@
       ["statusLogic", "是否可售", true],
       ["inventoryNoField", "库存流水单号"], ["relatedNoField", "关联单号"],
       ["scene", "一级场景"], ["bizType", "二级场景"], ["bizRule", "业务类配置规则", true],
+      ["generateDoc", "是否生成单据"],
       ["docType", "生成单据类型"],
       ["dailySummary", "单据生成是否按天汇总"]
     ];
     const requiredFields = {
       platform: true, dbTable: true, siteLogic: true, warehouse: true,
-      skuField: true, dateField: true, qtyLogic: true, scene: true, bizRule: true
+      skuField: true, dateField: true, qtyLogic: true, scene: true, bizRule: true, generateDoc: true
     };
     const disabled = viewOnly ? " disabled" : "";
     const ph = isAdd ? "请选择" : false;
@@ -2644,26 +2666,29 @@
           "</div>"
         );
       }
+      if (key === "generateDoc") {
+        return (
+          '<div class="form-item">' + formFieldLabel(label, true) +
+          lookupSelectHtml("cfg-generateDoc", ["是", "否"], val, viewOnly, ph, true) +
+          "</div>"
+        );
+      }
       if (key === "docType") {
         const docTypes = withCurrentOption(configDocTypeOptions(), val);
+        const lockDocFields = viewOnly || data.generateDoc !== "是";
         return (
           '<div class="form-item">' + formFieldLabel(label, false) +
-          lookupSelectHtml("cfg-docType", docTypes, val, viewOnly, ph, false) +
+          lookupSelectHtml("cfg-docType", docTypes, val, lockDocFields, ph, false) +
           "</div>"
         );
       }
       if (key === "dailySummary") {
-        const emptyOpt = isAdd
-          ? '<option value=""' + (val ? "" : " selected") + ">请选择</option>"
-          : "";
-        const emptyClass = isAdd && !val ? " class=\"is-empty\"" : "";
+        const lockDocFields = viewOnly || data.generateDoc !== "是";
+        const sumPh = viewOnly ? false : "请选择";
         return (
           '<div class="form-item">' + formFieldLabel(label, false) +
-          '<select id="cfg-' + key + '"' + disabled + emptyClass + '>' +
-            emptyOpt +
-            '<option value="是"' + (val === "是" ? " selected" : "") + ">是</option>" +
-            '<option value="否"' + (val === "否" || (!isAdd && val !== "是") ? " selected" : "") + ">否</option>" +
-          "</select></div>"
+          lookupSelectHtml("cfg-dailySummary", ["是", "否"], val, lockDocFields, sumPh, false) +
+          "</div>"
         );
       }
       return (
@@ -2697,13 +2722,35 @@
         bizEl.classList.add("is-empty");
       });
     }
+    const genEl = $("cfg-generateDoc");
+    if (genEl && !viewOnly) {
+      function syncGenerateDocDependents(reset) {
+        const on = genEl.value === "是";
+        ["cfg-docType", "cfg-dailySummary"].forEach(function (id) {
+          const el = $(id);
+          if (!el) return;
+          el.disabled = !on;
+          if (reset && !on) {
+            el.value = "";
+            el.classList.add("is-empty");
+          } else if (el.value) {
+            el.classList.remove("is-empty");
+          } else {
+            el.classList.add("is-empty");
+          }
+        });
+      }
+      genEl.addEventListener("change", function () {
+        syncGenerateDocDependents(true);
+      });
+    }
   }
 
   function saveConfigForm() {
     const keys = [
       "platform", "dbTable", "siteLogic", "warehouse", "dateField", "skuField",
       "qtyLogic", "statusLogic", "inventoryNoField", "relatedNoField", "scene", "bizType", "bizRule",
-      "docType", "dailySummary"
+      "generateDoc", "docType", "dailySummary"
     ];
     const payload = {};
     keys.forEach(function (k) {
@@ -2719,7 +2766,8 @@
       ["skuField", "货品SKU"],
       ["qtyLogic", "货品数量"],
       ["scene", "一级场景"],
-      ["bizRule", "业务类配置规则"]
+      ["bizRule", "业务类配置规则"],
+      ["generateDoc", "是否生成单据"]
     ];
     for (let i = 0; i < requiredFields.length; i++) {
       const key = requiredFields[i][0];
