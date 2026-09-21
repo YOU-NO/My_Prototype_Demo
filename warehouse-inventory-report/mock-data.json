@@ -104,6 +104,7 @@
     { "key": "sellable", "label": "是否可售", "group": "parsed" },
     { "key": "scene", "label": "一级场景", "group": "parsed" },
     { "key": "bizType", "label": "二级场景", "group": "parsed" },
+    { "key": "generateDoc", "label": "是否生成单据", "group": "parsed" },
     { "key": "docType", "label": "生成单据类型", "group": "parsed" },
     { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
     { "key": "docNo", "label": "生成单据号", "group": "parsed" },
@@ -145,6 +146,7 @@
     { "key": "sellable", "label": "是否可售", "group": "parsed" },
     { "key": "scene", "label": "一级场景", "group": "parsed" },
     { "key": "bizType", "label": "二级场景", "group": "parsed" },
+    { "key": "generateDoc", "label": "是否生成单据", "group": "parsed" },
     { "key": "docType", "label": "生成单据类型", "group": "parsed" },
     { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
     { "key": "docNo", "label": "生成单据号", "group": "parsed" },
@@ -169,6 +171,7 @@
     { "key": "scene", "label": "一级场景", "group": "diff" },
     { "key": "bizType", "label": "二级场景", "group": "diff" },
     { "key": "bizRule", "label": "业务类配置规则", "group": "diff" },
+    { "key": "generateDoc", "label": "是否生成单据", "group": "diff" },
     { "key": "docType", "label": "生成单据类型", "group": "diff" },
     { "key": "dailySummary", "label": "单据生成是否按天汇总", "group": "diff" },
     { "key": "actions", "label": "操作", "group": "plain" }
@@ -199,6 +202,7 @@
       "warehouse": "JP-日本亚马逊仓",
       "sellable": "是",
       "qty": -1,
+      "generateDoc": "是",
       "docType": "其他出库单",
       "dailySummary": "否",
       "parsedDone": "是",
@@ -234,6 +238,7 @@
       "warehouse": "",
       "sellable": "",
       "qty": "",
+      "generateDoc": "",
       "docType": "",
       "dailySummary": "",
       "parsedDone": "否",
@@ -269,6 +274,7 @@
       "warehouse": "ST-Amazon US",
       "sellable": "是",
       "qty": -2,
+      "generateDoc": "是",
       "docType": "其他入库单,其他出库单",
       "dailySummary": "否",
       "parsedDone": "是",
@@ -314,6 +320,7 @@
       "warehouse": "SG-沙特亚马逊仓",
       "sellable": "否",
       "qty": -3,
+      "generateDoc": "是",
       "docType": "其他出库单",
       "dailySummary": "是",
       "parsedDone": "是",
@@ -357,6 +364,7 @@
       "warehouse": "JP-日本亚马逊仓",
       "sellable": "是",
       "qty": 0,
+      "generateDoc": "是",
       "docType": "其他入库单,其他出库单",
       "dailySummary": "是",
       "parsedDone": "是",
@@ -400,6 +408,7 @@
       "warehouse": "ST-Returns(Amazon US)",
       "sellable": "是",
       "qty": 1,
+      "generateDoc": "是",
       "docType": "其他入库单,其他出库单",
       "dailySummary": "是",
       "parsedDone": "是",
@@ -426,6 +435,7 @@
       "qtyLogic": "Quantity",
       "inventoryNoField": "记录流水 ID，需标记到单据",
       "relatedNoField": "货件计划、退货 RMA 等上游单号",
+      "generateDoc": "是",
       "docType": "其他入库单",
       "dbTable": "Inventory Detail",
       "dailySummary": "否",
@@ -445,6 +455,7 @@
       "qtyLogic": "Quantity",
       "inventoryNoField": "ReferenceID",
       "relatedNoField": "ReferenceID",
+      "generateDoc": "是",
       "docType": "其他入库单",
       "dbTable": "Inventory Detail",
       "dailySummary": "否",
@@ -464,6 +475,7 @@
       "qtyLogic": "Quantity",
       "inventoryNoField": "ReferenceID",
       "relatedNoField": "ReferenceID",
+      "generateDoc": "是",
       "docType": "其他出库单",
       "dbTable": "Inventory Detail",
       "dailySummary": "否",
@@ -483,6 +495,7 @@
       "qtyLogic": "Unknown Events",
       "inventoryNoField": "",
       "relatedNoField": "",
+      "generateDoc": "是",
       "docType": "其他入库单",
       "dbTable": "Inventory Summary",
       "dailySummary": "是",
@@ -518,6 +531,7 @@
     { "key": "sellable", "label": "是否可售", "group": "parsed" },
     { "key": "scene", "label": "一级场景", "group": "parsed" },
     { "key": "bizType", "label": "二级场景", "group": "parsed" },
+    { "key": "generateDoc", "label": "是否生成单据", "group": "parsed" },
     { "key": "docType", "label": "生成单据类型", "group": "parsed" },
     { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
     { "key": "docNo", "label": "生成单据号", "group": "parsed" },
@@ -541,6 +555,7 @@
     { "key": "sellable", "label": "是否可售", "group": "parsed" },
     { "key": "scene", "label": "一级场景", "group": "parsed" },
     { "key": "bizType", "label": "二级场景", "group": "parsed" },
+    { "key": "generateDoc", "label": "是否生成单据", "group": "parsed" },
     { "key": "docType", "label": "生成单据类型", "group": "parsed" },
     { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
     { "key": "docNo", "label": "生成单据号", "group": "parsed" },
@@ -559,7 +574,7 @@
       "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
       "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
       "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
-      "scene": "期初", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 720, "docType": "其他入库单", "dailySummary": "否",
+      "scene": "期初", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 720, "generateDoc": "是", "docType": "其他入库单", "dailySummary": "否",
       "docNo": "IR202607", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
     },
     {
@@ -568,7 +583,7 @@
       "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
       "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
       "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
-      "scene": "发运", "bizType": "出库", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -566, "docType": "其他出库单", "dailySummary": "否",
+      "scene": "发运", "bizType": "出库", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -566, "generateDoc": "是", "docType": "其他出库单", "dailySummary": "否",
       "docNo": "IA202611", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
     },
     {
@@ -577,7 +592,7 @@
       "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
       "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
       "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
-      "scene": "发运", "bizType": "重新配送", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -1, "docType": "其他出库单,其他入库单", "dailySummary": "否",
+      "scene": "发运", "bizType": "重新配送", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -1, "generateDoc": "是", "docType": "其他出库单,其他入库单", "dailySummary": "否",
       "docNo": "IA202612,IR202608", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
     },
     {
@@ -586,7 +601,7 @@
       "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
       "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
       "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
-      "scene": "退运", "bizType": "顾客退货", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 35, "docType": "其他入库单", "dailySummary": "否",
+      "scene": "退运", "bizType": "顾客退货", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 35, "generateDoc": "是", "docType": "其他入库单", "dailySummary": "否",
       "docNo": "IR202609", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
     },
     {
@@ -595,7 +610,7 @@
       "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
       "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
       "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
-      "scene": "移除", "bizType": "已移出库", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -11, "docType": "其他出库单", "dailySummary": "否",
+      "scene": "移除", "bizType": "已移出库", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -11, "generateDoc": "是", "docType": "其他出库单", "dailySummary": "否",
       "docNo": "IA202613,IA202614", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
     },
     {
@@ -604,7 +619,7 @@
       "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
       "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
       "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
-      "scene": "其他", "bizType": "处理中", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -11, "docType": "", "dailySummary": "否",
+      "scene": "其他", "bizType": "处理中", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -11, "generateDoc": "否", "docType": "", "dailySummary": "否",
       "docNo": "", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
     },
     {
@@ -613,7 +628,7 @@
       "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
       "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
       "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
-      "scene": "期末", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 166, "docType": "其他入库单,其他出库单", "dailySummary": "否",
+      "scene": "期末", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 166, "generateDoc": "是", "docType": "其他入库单,其他出库单", "dailySummary": "否",
       "docNo": "IR202615,IA202616", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
     }
   ],
@@ -621,13 +636,13 @@
     {
       "id": "cgi1", "viId": "92529096184", "productId": "92529096184", "quantity": 31, "newQuantity": "",
       "site": "Coupang-CGF1", "localDate": "2026-07-31", "systemSku": "S700-ST-BL-KR-615-REF",
-      "scene": "", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 31, "docType": "其他入库单,其他出库单", "dailySummary": "否",
+      "scene": "", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 31, "generateDoc": "是", "docType": "其他入库单,其他出库单", "dailySummary": "否",
       "docNo": "IR202701,IA202702", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
     },
     {
       "id": "cgi2", "viId": "93316832936", "productId": "8991797344", "quantity": 647, "newQuantity": "",
       "site": "Coupang-CGF2", "localDate": "2026-07-31", "systemSku": "E310-ST-GY-KR-646",
-      "scene": "", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 647, "docType": "其他入库单", "dailySummary": "否",
+      "scene": "", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 647, "generateDoc": "是", "docType": "其他入库单", "dailySummary": "否",
       "docNo": "IR202703", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
     }
   ],
