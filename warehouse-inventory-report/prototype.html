@@ -667,22 +667,35 @@
       left: 50%;
       z-index: 3000;
       display: none;
+      align-items: center;
+      gap: 8px;
       transform: translateX(-50%);
-      padding: 10px 16px;
-      color: #fff;
-      background: rgba(0, 0, 0, 0.75);
+      padding: 10px 19px;
+      color: #303133;
+      background: #fff;
+      border: 1px solid #ebeef5;
       border-radius: 4px;
-      font-size: 13px;
-      line-height: 18px;
+      font-size: 14px;
+      line-height: 20px;
       white-space: nowrap;
-      box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+      box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
       pointer-events: none;
     }
 
-    .toast.show { display: block; }
+    .toast.show { display: flex; }
 
-    .toast.success { background: rgba(103, 194, 58, 0.95); }
-    .toast.warning { background: rgba(230, 162, 60, 0.95); }
+    .toast-icon {
+      display: inline-flex;
+      flex: none;
+      width: 16px;
+      height: 16px;
+    }
+
+    .toast-icon svg {
+      display: block;
+      width: 16px;
+      height: 16px;
+    }
 
     .overlay {
       position: fixed;
@@ -995,13 +1008,13 @@
       { "key": "dateAndTime", "label": "Date and Time", "group": "platform" },
       { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
       { "key": "site", "label": "站点", "group": "parsed" },
+      { "key": "warehouse", "label": "仓库", "group": "parsed" },
       { "key": "localDate", "label": "当地日期", "group": "parsed" },
       { "key": "systemSku", "label": "系统sku", "group": "parsed" },
+      { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
+      { "key": "sellable", "label": "是否可售", "group": "parsed" },
       { "key": "scene", "label": "一级场景", "group": "parsed" },
       { "key": "bizType", "label": "二级场景", "group": "parsed" },
-      { "key": "warehouse", "label": "仓库", "group": "parsed" },
-      { "key": "sellable", "label": "是否可售", "group": "parsed" },
-      { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
       { "key": "docType", "label": "生成单据类型", "group": "parsed" },
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
@@ -1036,13 +1049,13 @@
       { "key": "unknownEvents", "label": "Unknown Events", "group": "platform", "align": "right" },
       { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
       { "key": "site", "label": "站点", "group": "parsed" },
+      { "key": "warehouse", "label": "仓库", "group": "parsed" },
       { "key": "localDate", "label": "当地日期", "group": "parsed" },
       { "key": "systemSku", "label": "系统sku", "group": "parsed" },
+      { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
+      { "key": "sellable", "label": "是否可售", "group": "parsed" },
       { "key": "scene", "label": "一级场景", "group": "parsed" },
       { "key": "bizType", "label": "二级场景", "group": "parsed" },
-      { "key": "warehouse", "label": "仓库", "group": "parsed" },
-      { "key": "sellable", "label": "是否可售", "group": "parsed" },
-      { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
       { "key": "docType", "label": "生成单据类型", "group": "parsed" },
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
@@ -1057,11 +1070,11 @@
       { "key": "platform", "label": "平台", "group": "plain" },
       { "key": "dbTable", "label": "数据库表名", "group": "plain" },
       { "key": "siteLogic", "label": "站点", "group": "common" },
-      { "key": "statusLogic", "label": "是否可售", "group": "common" },
       { "key": "warehouse", "label": "仓库", "group": "common" },
-      { "key": "skuField", "label": "货品SKU", "group": "common" },
       { "key": "dateField", "label": "平台日期", "group": "common" },
+      { "key": "skuField", "label": "货品SKU", "group": "common" },
       { "key": "qtyLogic", "label": "货品数量", "group": "common" },
+      { "key": "statusLogic", "label": "是否可售", "group": "common" },
       { "key": "inventoryNoField", "label": "库存流水单号", "group": "common" },
       { "key": "relatedNoField", "label": "关联单号", "group": "common" },
       { "key": "scene", "label": "一级场景", "group": "diff" },
@@ -1221,13 +1234,13 @@
       { "key": "processQty", "label": "Quantity", "group": "process", "align": "right" },
       { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
       { "key": "site", "label": "站点", "group": "parsed" },
+      { "key": "warehouse", "label": "仓库", "group": "parsed" },
       { "key": "localDate", "label": "当地日期", "group": "parsed" },
       { "key": "systemSku", "label": "系统SKU", "group": "parsed" },
+      { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
+      { "key": "sellable", "label": "是否可售", "group": "parsed" },
       { "key": "scene", "label": "一级场景", "group": "parsed" },
       { "key": "bizType", "label": "二级场景", "group": "parsed" },
-      { "key": "warehouse", "label": "仓库", "group": "parsed" },
-      { "key": "sellable", "label": "是否可售", "group": "parsed" },
-      { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
       { "key": "docType", "label": "生成单据类型", "group": "parsed" },
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
@@ -1244,13 +1257,13 @@
       { "key": "quantity", "label": "Quantity", "group": "platform", "align": "right" },
       { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
       { "key": "site", "label": "站点", "group": "parsed" },
+      { "key": "warehouse", "label": "仓库", "group": "parsed" },
       { "key": "localDate", "label": "当地日期", "group": "parsed" },
       { "key": "systemSku", "label": "系统SKU", "group": "parsed" },
+      { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
+      { "key": "sellable", "label": "是否可售", "group": "parsed" },
       { "key": "scene", "label": "一级场景", "group": "parsed" },
       { "key": "bizType", "label": "二级场景", "group": "parsed" },
-      { "key": "warehouse", "label": "仓库", "group": "parsed" },
-      { "key": "sellable", "label": "是否可售", "group": "parsed" },
-      { "key": "qty", "label": "数量", "group": "parsed", "align": "right" },
       { "key": "docType", "label": "生成单据类型", "group": "parsed" },
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
@@ -1545,13 +1558,24 @@
       .replace(/"/g, "&quot;");
   }
 
+  function toastIconHtml(type) {
+    if (type === "success") {
+      return '<span class="toast-icon" aria-hidden="true"><svg viewBox="0 0 1024 1024"><path fill="#67c23a" d="M512 64a448 448 0 1 1 0 896 448 448 0 0 1 0-896zm-55.808 536.384-99.52-99.584a38.4 38.4 0 1 0-54.336 54.336l126.72 126.72a38.272 38.272 0 0 0 54.336 0l262.4-262.464a38.4 38.4 0 1 0-54.272-54.336L456.192 600.384z"/></svg></span>';
+    }
+    if (type === "warning" || type === "error") {
+      return '<span class="toast-icon" aria-hidden="true"><svg viewBox="0 0 1024 1024"><path fill="#f56c6c" d="M512 64a448 448 0 1 1 0 896 448 448 0 0 1 0-896zm0 393.664L407.936 353.6a38.4 38.4 0 1 0-54.336 54.336L457.664 512 353.6 616.064a38.4 38.4 0 1 0 54.336 54.336L512 566.336 616.064 670.4a38.4 38.4 0 1 0 54.336-54.336L566.336 512 670.4 407.936a38.4 38.4 0 1 0-54.336-54.336L512 457.664z"/></svg></span>';
+    }
+    return "";
+  }
+
   function showToast(msg, type, duration) {
     const el = $("toast");
-    el.textContent = msg;
+    el.innerHTML = toastIconHtml(type) + '<span class="toast-text">' + esc(msg) + "</span>";
     el.className = "toast show" + (type ? " " + type : "");
     clearTimeout(state.toastTimer);
     state.toastTimer = setTimeout(function () {
       el.className = "toast";
+      el.innerHTML = "";
     }, duration || 2000);
   }
 
@@ -2558,19 +2582,25 @@
     };
     const fields = [
       ["platform", "平台"], ["dbTable", "数据库表名"],
-      ["siteLogic", "站点", true], ["statusLogic", "是否可售", true], ["warehouse", "仓库"],
-      ["skuField", "货品SKU"], ["dateField", "平台日期"], ["qtyLogic", "货品数量"],
+      ["siteLogic", "站点", true], ["warehouse", "仓库"],
+      ["dateField", "平台日期"], ["skuField", "货品SKU"], ["qtyLogic", "货品数量"],
+      ["statusLogic", "是否可售", true],
       ["inventoryNoField", "库存流水单号"], ["relatedNoField", "关联单号"],
       ["scene", "一级场景"], ["bizType", "二级场景"], ["bizRule", "业务类配置规则", true],
       ["docType", "生成单据类型"],
       ["dailySummary", "单据生成是否按天汇总"]
     ];
+    const requiredFields = {
+      platform: true, dbTable: true, siteLogic: true, warehouse: true,
+      skuField: true, dateField: true, qtyLogic: true, scene: true, bizRule: true
+    };
     const disabled = viewOnly ? " disabled" : "";
     const ph = isAdd ? "请选择" : false;
     const form = fields.map(function (f) {
       const key = f[0];
       const label = f[1];
       const val = data[key] == null ? "" : data[key];
+      const required = !!requiredFields[key];
       if (key === "platform") {
         const list = withCurrentOption(configPlatformOptions(), val);
         return (
@@ -2598,8 +2628,8 @@
       if (key === "scene") {
         const list = withCurrentOption(configFirstSceneOptions(), val);
         return (
-          '<div class="form-item">' + formFieldLabel(label, false) +
-          lookupSelectHtml("cfg-scene", list, val, viewOnly, ph, false) +
+          '<div class="form-item">' + formFieldLabel(label, required) +
+          lookupSelectHtml("cfg-scene", list, val, viewOnly, ph, required) +
           "</div>"
         );
       }
@@ -2637,7 +2667,7 @@
         );
       }
       return (
-        '<div class="form-item">' + formFieldLabel(label, false) +
+        '<div class="form-item">' + formFieldLabel(label, required) +
         '<textarea id="cfg-' + key + '"' + disabled + '>' + esc(val) + "</textarea></div>"
       );
     }).join("");
@@ -2671,8 +2701,8 @@
 
   function saveConfigForm() {
     const keys = [
-      "platform", "dbTable", "siteLogic", "statusLogic", "warehouse", "skuField", "dateField",
-      "qtyLogic", "inventoryNoField", "relatedNoField", "scene", "bizType", "bizRule",
+      "platform", "dbTable", "siteLogic", "warehouse", "dateField", "skuField",
+      "qtyLogic", "statusLogic", "inventoryNoField", "relatedNoField", "scene", "bizType", "bizRule",
       "docType", "dailySummary"
     ];
     const payload = {};
@@ -2680,16 +2710,22 @@
       const el = $("cfg-" + k);
       payload[k] = el ? el.value : "";
     });
-    const requiredSelects = [
+    const requiredFields = [
       ["platform", "平台"],
       ["dbTable", "数据库表名"],
-      ["warehouse", "仓库"]
+      ["siteLogic", "站点"],
+      ["warehouse", "仓库"],
+      ["dateField", "平台日期"],
+      ["skuField", "货品SKU"],
+      ["qtyLogic", "货品数量"],
+      ["scene", "一级场景"],
+      ["bizRule", "业务类配置规则"]
     ];
-    for (let i = 0; i < requiredSelects.length; i++) {
-      const key = requiredSelects[i][0];
-      const name = requiredSelects[i][1];
-      if (!payload[key]) {
-        showToast("【" + name + "】必填", "warning", 2000);
+    for (let i = 0; i < requiredFields.length; i++) {
+      const key = requiredFields[i][0];
+      const name = requiredFields[i][1];
+      if (!String(payload[key] || "").trim()) {
+        showToast(name + "必填", "error", 2000);
         return;
       }
     }
