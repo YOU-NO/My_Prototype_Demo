@@ -422,6 +422,26 @@
   ],
   "configRows": [
     {
+      "id": "c5",
+      "platform": "Coupang",
+      "siteLogic": "CASE WHEN shop_id = 10 THEN Coupang-本土-KR",
+      "warehouse": "韩国Coupang本土店仓",
+      "statusLogic": "",
+      "scene": "报废",
+      "bizType": "报废",
+      "bizRule": "TYPE IN ('处理中','确认丢失/损坏')",
+      "skuField": "item",
+      "dateField": "Date",
+      "qtyLogic": "quantity",
+      "inventoryNoField": "",
+      "relatedNoField": "",
+      "generateDoc": "是",
+      "docType": "其他入库单",
+      "dbTable": "Coupang_KR_Inventory_Daily",
+      "dailySummary": "否",
+      "summaryCondition": ""
+    },
+    {
       "id": "c1",
       "platform": "Amazon",
       "siteLogic": "case when sellerid = 'A3U5E183ODUBBN' and country = 'JP' then Amazon_JP when sellerid = 'AHLP03EOC0SXS' and country = 'SA' then Amazon_SA end",
