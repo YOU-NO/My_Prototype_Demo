@@ -2030,6 +2030,7 @@
     const skuPh = f.skuMode === "2" ? "仅支持单个查询" : "双击批量查询";
     const searchAct = opts.searchAct || (prefix + "-search");
     const resetAct = opts.resetAct || (prefix + "-reset");
+    const hideDocFilters = !!opts.hideDocFilters;
     return (
       '<div class="search-bar" id="' + prefix + 'Filters">' +
         '<div class="sku-combo">' +
@@ -2051,6 +2052,7 @@
           placeholderOption("二级场景", !!f.bizType) +
           optionsHtml(f.scene ? (opts.bizTypes || []) : [], f.bizType) +
         "</select>" +
+        (hideDocFilters ? "" :
         '<select id="' + prefix + '-generateDoc" class="control" required>' +
           placeholderOption("是否生成单据", !!f.generateDoc) +
           optionsHtml(["是", "否"], f.generateDoc) +
@@ -2058,7 +2060,7 @@
         '<select id="' + prefix + '-docType" class="control" required>' +
           placeholderOption("生成单据类型", !!f.docType) +
           optionsHtml(opts.docTypes || configDocTypeOptions(), f.docType) +
-        "</select>" +
+        "</select>") +
         '<select id="' + prefix + '-parsedDone" class="control" required>' +
           placeholderOption("是否解析完成", !!f.parsedDone) +
           optionsHtml(["是", "否"], f.parsedDone) +
@@ -2071,10 +2073,11 @@
           placeholderOption("是否存在更新", !!f.hasUpdate) +
           optionsHtml(["是", "否"], f.hasUpdate) +
         "</select>" +
+        (hideDocFilters ? "" :
         '<select id="' + prefix + '-docAbnormal" class="control" required>' +
           placeholderOption("单据生成是否异常", !!f.docAbnormal) +
           optionsHtml(["是", "否"], f.docAbnormal) +
-        "</select>" +
+        "</select>") +
         '<div class="search-ops">' +
           '<button class="btn primary" type="button" data-act="' + searchAct + '">搜索</button>' +
           '<button class="btn" type="button" data-act="' + resetAct + '">重置</button>' +
@@ -2211,6 +2214,7 @@
         docTypes: uniqueFromRows(rows, "docType").concat(configDocTypeOptions()).filter(function (v, i, arr) {
           return arr.indexOf(v) === i;
         }),
+        hideDocFilters: state.page === "coupangGlobalInventory",
         searchAct: "ci-search",
         resetAct: "ci-reset"
       }) +
@@ -2339,10 +2343,6 @@
 
   function configDocTypeOptions() {
     return (MOCK.configLookups && MOCK.configLookups.docTypes) || ["其他入库单", "其他出库单"];
-  }
-
-  function configWarehouseOptions() {
-    return (MOCK.configLookups && MOCK.configLookups.warehouses) || [];
   }
 
   function configFirstSceneOptions() {
@@ -2521,14 +2521,6 @@
         return (
           '<div class="form-item">' + formFieldLabel(label, true) +
           lookupSelectHtml("cfg-dbTable", list, val, viewOnly, ph, true) +
-          "</div>"
-        );
-      }
-      if (key === "warehouse") {
-        const list = withCurrentOption(configWarehouseOptions(), val);
-        return (
-          '<div class="form-item">' + formFieldLabel(label, true) +
-          lookupSelectHtml("cfg-warehouse", list, val, viewOnly, ph, true) +
           "</div>"
         );
       }
