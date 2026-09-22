@@ -781,48 +781,6 @@
       flex: none;
     }
 
-    .import-upload {
-      min-height: 160px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      color: var(--regular);
-      background: #fff;
-      border: 1px dashed #dcdfe6;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: border-color 0.2s;
-      text-align: center;
-    }
-
-    .import-upload:hover,
-    .import-upload.dragover { border-color: var(--primary); }
-
-    .import-upload-icon {
-      width: 48px;
-      height: 40px;
-      margin-bottom: 10px;
-      color: #c0c4cc;
-    }
-
-    .import-upload-icon svg {
-      width: 48px;
-      height: 40px;
-      fill: currentColor;
-    }
-
-    .import-upload-text {
-      font-size: 14px;
-      line-height: 22px;
-    }
-
-    .import-upload-text em {
-      color: var(--primary);
-      font-style: normal;
-    }
-
     .import-tip {
       margin-top: 8px;
       color: var(--secondary);
@@ -1438,11 +1396,9 @@
     configView: [],
     cdiView: [],
     cgiView: [],
-    docSeq: 700,
     configSeq: 5,
     editingConfigId: null,
     deleteConfigId: null,
-    importTarget: "detail",
     batchInputId: "",
     toastTimer: null,
     menuOpen: { sales: true, coupang: true, amazon: false, finance: false },
@@ -2196,8 +2152,6 @@
         '<div class="table-toolbar">' +
           '<div class="toolbar-left">' +
             '<button class="btn light" type="button" data-act="detail-export">导出</button>' +
-            '<button class="btn light" type="button" data-act="detail-import">批量导入更新</button>' +
-            '<button class="btn light" type="button" data-act="detail-gen-doc">更新后报告生成单据</button>' +
           "</div>" +
           '<div class="toolbar-right">' + legendHtml("report") + "</div>" +
         "</div>" +
@@ -2264,8 +2218,6 @@
         '<div class="table-toolbar">' +
           '<div class="toolbar-left">' +
             '<button class="btn light" type="button" data-act="ci-export">导出</button>' +
-            '<button class="btn light" type="button" data-act="ci-import">批量导入更新</button>' +
-            '<button class="btn light" type="button" data-act="ci-gen-doc">更新后报告生成单据</button>' +
           "</div>" +
           '<div class="toolbar-right">' + legendHtml(ctx.legendKind || "report") + "</div>" +
         "</div>" +
@@ -2330,8 +2282,6 @@
         '<div class="table-toolbar">' +
           '<div class="toolbar-left">' +
             '<button class="btn light" type="button" data-act="summary-export">导出</button>' +
-            '<button class="btn light" type="button" data-act="summary-import">批量导入更新</button>' +
-            '<button class="btn light" type="button" data-act="summary-gen-doc">更新单据生成</button>' +
           "</div>" +
           '<div class="toolbar-right">' + legendHtml("report") + "</div>" +
         "</div>" +
@@ -2525,71 +2475,6 @@
   }
 
   /* —— dialogs —— */
-  function openImportDialog(target) {
-    state.importTarget = target;
-    openOverlay(
-      '<div class="dialog-header"><span>批量导入更新</span><button class="close" type="button" data-act="close">×</button></div>' +
-      '<div class="dialog-body">' +
-        '<div class="import-upload" id="importDrop">' +
-          '<div class="import-upload-icon"><svg viewBox="0 0 67 50"><path d="M33.5 6l12 14h-8v14h-8V20h-8l12-14zm-22 36h44v4H11.5z"/></svg></div>' +
-          '<div class="import-upload-text">将文件拖到此处，或 <em>点击上传</em></div>' +
-          '<div class="import-tip">支持 .xlsx / .csv，单次不超过 10MB（原型演示）</div>' +
-        "</div>" +
-      "</div>" +
-      '<div class="dialog-footer">' +
-        '<button class="btn" type="button" data-act="close">取消</button>' +
-        '<button class="btn primary" type="button" data-act="import-confirm">确认导入</button>' +
-      "</div>",
-      { cls: "narrow" }
-    );
-    const drop = $("importDrop");
-    if (drop) {
-      drop.addEventListener("dragover", function (e) {
-        e.preventDefault();
-        drop.classList.add("dragover");
-      });
-      drop.addEventListener("dragleave", function () { drop.classList.remove("dragover"); });
-      drop.addEventListener("drop", function (e) {
-        e.preventDefault();
-        drop.classList.remove("dragover");
-        showToast("已选择文件（原型）");
-      });
-      drop.addEventListener("click", function () { showToast("已选择文件（原型）"); });
-    }
-  }
-
-  function runGenDoc(target) {
-    let rows;
-    let refresh;
-    let successMsg;
-    if (target === "summary") {
-      rows = state.summaryRows;
-      refresh = renderSummaryTable;
-      successMsg = "更新单据生成完成：新生成 ";
-    } else if (isCoupangInvPage(target)) {
-      const ctx = coupangInvCtx(target);
-      rows = state[ctx.rowsKey];
-      refresh = renderCoupangInvTable;
-      successMsg = "更新后报告生成单据完成：新生成 ";
-    } else {
-      rows = state.detailRows;
-      refresh = renderDetailTable;
-      successMsg = "更新后报告生成单据完成：新生成 ";
-    }
-    let n = 0;
-    rows.forEach(function (r) {
-      if (r.parsedDone === "是" && r.parseAbnormal !== "是" && r.generateDoc === "是" && !r.docNo) {
-        state.docSeq += 1;
-        const types = splitCsv(r.docType);
-        const prefix = types.indexOf("其他入库单") >= 0 || types.indexOf("收货列表") >= 0 ? "IR" : "IA";
-        r.docNo = prefix + "2026" + state.docSeq;
-        n += 1;
-      }
-    });
-    refresh();
-    showToast(successMsg + n + " 条", "success");
-  }
-
   function openConfigForm(id, mode) {
     const viewOnly = mode === "view";
     const isAdd = !id && !viewOnly;
@@ -2890,8 +2775,6 @@
       case "detail-search": renderDetailTable(); break;
       case "detail-reset": renderDetailPage(false); break;
       case "detail-export": showToast("已导出 " + state.detailView.length + " 条"); break;
-      case "detail-import": openImportDialog("detail"); break;
-      case "detail-gen-doc": runGenDoc("detail"); break;
       case "ci-search": renderCoupangInvTable(); break;
       case "ci-reset": renderCoupangInvPage(false); break;
       case "ci-export":
@@ -2899,8 +2782,6 @@
           ? state[coupangInvCtx(state.page).viewKey]
           : []).length) + " 条");
         break;
-      case "ci-import": openImportDialog(state.page); break;
-      case "ci-gen-doc": runGenDoc(state.page); break;
       case "cdi-qty-toggle":
         state.cdiQtyExpanded = !state.cdiQtyExpanded;
         renderCoupangInvTable();
@@ -2908,12 +2789,6 @@
       case "summary-search": renderSummaryTable(); break;
       case "summary-reset": renderSummaryPage(false); break;
       case "summary-export": showToast("已导出 " + state.summaryView.length + " 条"); break;
-      case "summary-import": openImportDialog("summary"); break;
-      case "summary-gen-doc": runGenDoc("summary"); break;
-      case "import-confirm":
-        closeOverlay();
-        showToast("批量导入更新成功", "success");
-        break;
       case "batch-search-confirm": confirmBatchSearch(); break;
       case "config-search": renderConfigTable(); break;
       case "config-reset": renderConfigPage(false); break;
