@@ -1047,6 +1047,7 @@
       { "key": "generateDoc", "label": "是否生成单据", "group": "diff" },
       { "key": "docType", "label": "生成单据类型", "group": "diff" },
       { "key": "dailySummary", "label": "单据生成是否按天汇总", "group": "diff" },
+      { "key": "remark", "label": "备注", "group": "diff" },
       { "key": "actions", "label": "操作", "group": "plain" }
     ],
     "detailRows": [
@@ -1146,7 +1147,7 @@
         "bizRule": "TYPE IN ('处理中','确认丢失/损坏')", "skuField": "item", "dateField": "Date",
         "qtyLogic": "quantity", "inventoryNoField": "",
         "relatedNoField": "", "generateDoc": "是", "docType": "其他入库单",
-        "dbTable": "Coupang_KR_Inventory_Daily", "dailySummary": "否", "summaryCondition": ""
+        "dbTable": "Coupang_KR_Inventory_Daily", "dailySummary": "否", "summaryCondition": "", "remark": ""
       },
       {
         "id": "c1", "platform": "Amazon",
@@ -1156,7 +1157,7 @@
         "bizRule": "EventType = 'Receipts'", "skuField": "msku", "dateField": "Date and Time",
         "qtyLogic": "Quantity", "inventoryNoField": "记录流水 ID，需标记到单据",
         "relatedNoField": "货件计划、退货 RMA 等上游单号", "generateDoc": "是", "docType": "其他入库单",
-        "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": ""
+        "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": "", "remark": ""
       },
       {
         "id": "c2", "platform": "Amazon",
@@ -1166,7 +1167,7 @@
         "scene": "找回", "bizType": "找回", "bizRule": "EventType = 'Adjustments' and reason in ('F','N')",
         "skuField": "msku", "dateField": "Date and Time", "qtyLogic": "Quantity",
         "inventoryNoField": "ReferenceID", "relatedNoField": "ReferenceID", "generateDoc": "是", "docType": "其他入库单",
-        "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": ""
+        "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": "", "remark": ""
       },
       {
         "id": "c3", "platform": "Amazon", "siteLogic": "统一规则，识别所有的站点",
@@ -1175,7 +1176,7 @@
         "bizRule": "EventType = 'Adjustments' and reason in ('6','7','E','H','K','U','G')",
         "skuField": "msku", "dateField": "Date and Time", "qtyLogic": "Quantity",
         "inventoryNoField": "ReferenceID", "relatedNoField": "ReferenceID", "generateDoc": "是", "docType": "其他出库单",
-        "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": ""
+        "dbTable": "Inventory Detail", "dailySummary": "否", "summaryCondition": "", "remark": ""
       },
       {
         "id": "c4", "platform": "Amazon", "siteLogic": "统一规则，识别所有的站点",
@@ -1184,7 +1185,7 @@
         "bizRule": "StartingWarehouseBalance + ... - EndingWarehouseBalance <> 0",
         "skuField": "msku", "dateField": "Date", "qtyLogic": "Unknown Events",
         "inventoryNoField": "", "relatedNoField": "", "generateDoc": "是", "docType": "其他入库单",
-        "dbTable": "Inventory Summary", "dailySummary": "是", "summaryCondition": "按站点+MSKU+Disposition 按天汇总"
+        "dbTable": "Inventory Summary", "dailySummary": "是", "summaryCondition": "按站点+MSKU+Disposition 按天汇总", "remark": ""
       }
     ],
     "coupangDomesticColumns": [
@@ -1288,9 +1289,9 @@
       customerReturnQty: 35,
       removedQty: -11,
       processingQty: -11,
-      lostDamagedQty: 0,
+      lostDamagedQty: 10,
       qtyAfter: 166,
-      newQuantity: 0,
+      newQuantity: "-",
       site: "Coupang本土-KR",
       localDate: "2026-07-31",
       systemSku: "E320-ST-WT-KR-608",
@@ -1320,17 +1321,20 @@
       { key: "removedQty", type: "已移出库", scene: "移除", bizType: "已移出库", docType: "其他出库单", docNo: "IA202613,IA202614" },
       { key: "processingQty", type: "处理中", scene: "其他", bizType: "处理中", docType: "", docNo: "" },
       { key: "lostDamagedQty", type: "确认丢失/损坏", scene: "", bizType: "", docType: "", docNo: "" },
+      { qty: 10, type: "确认丢失/损坏：平台仓待调查调整", scene: "", bizType: "", docType: "", docNo: "" },
+      { qty: -10, type: "确认丢失/损坏：平台仓库内调整有索赔", scene: "", bizType: "", docType: "", docNo: "" },
       { key: "qtyAfter", type: "变更后", scene: "期末", bizType: "", docType: "其他入库单,其他出库单", docNo: "IR202615,IA202616" }
     ];
     MOCK.coupangDomesticRows = domesticQtyTypes.map(function (item, i) {
       const row = {};
       Object.keys(domesticBase).forEach(function (k) { row[k] = domesticBase[k]; });
       row.id = "cdi" + (i + 1);
+      const qty = item.key ? domesticBase[item.key] : item.qty;
       row.processType = item.type;
-      row.processQty = domesticBase[item.key];
+      row.processQty = qty;
       row.scene = item.scene;
       row.bizType = item.bizType;
-      row.qty = domesticBase[item.key];
+      row.qty = qty;
       row.docType = item.docType;
       row.docNo = item.docNo;
       row.generateDoc = item.docType ? "是" : "否";
@@ -1406,6 +1410,7 @@
     configView: [],
     cdiView: [],
     cgiView: [],
+    docSeq: 700,
     configSeq: 6,
     editingConfigId: null,
     deleteConfigId: null,
@@ -1415,6 +1420,31 @@
     colWidths: {},
     cdiQtyExpanded: false
   };
+
+  const CONFIG_STORE_KEY = "evaWarehouseInvReport.configRows.v1";
+
+  function persistConfigRows() {
+    try {
+      localStorage.setItem(CONFIG_STORE_KEY, JSON.stringify({
+        rows: state.configRows,
+        configSeq: state.configSeq
+      }));
+    } catch (e) {}
+  }
+
+  function restoreConfigRows() {
+    try {
+      const raw = localStorage.getItem(CONFIG_STORE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (saved && Array.isArray(saved.rows)) {
+        state.configRows = saved.rows;
+        if (typeof saved.configSeq === "number") state.configSeq = saved.configSeq;
+      }
+    } catch (e) {}
+  }
+
+  restoreConfigRows();
 
   const PAGE_META = {
     detail: {
@@ -1688,6 +1718,7 @@
         '<div class="table-toolbar">' +
           '<div class="toolbar-left">' +
             '<button class="btn light" type="button" data-act="existing-export">导出</button>' +
+            '<button class="btn light" type="button" data-act="existing-gen-doc">生成单据</button>' +
           "</div>" +
         "</div>" +
         '<div class="table-wrap" id="existingTableWrap">' +
@@ -1838,8 +1869,7 @@
 
   function autoColWidth(label, key, tableKey) {
     if (key === "actions") return 148;
-    if (key === "docType" || key === "docNo") return autoDocColWidth(label, key, tableKey);
-    if (key === "processType") return 148;
+    if (key === "docType" || key === "docNo" || key === "processType") return autoDocColWidth(label, key, tableKey);
     if (key === "warehouse") return 168;
     let w = textWidthPx(label);
     if (key === "dbTable") {
@@ -2165,6 +2195,7 @@
         '<div class="table-toolbar">' +
           '<div class="toolbar-left">' +
             '<button class="btn light" type="button" data-act="detail-export">导出</button>' +
+            '<button class="btn light" type="button" data-act="detail-gen-doc">生成单据</button>' +
           "</div>" +
           '<div class="toolbar-right">' + legendHtml("report") + "</div>" +
         "</div>" +
@@ -2232,6 +2263,7 @@
         '<div class="table-toolbar">' +
           '<div class="toolbar-left">' +
             '<button class="btn light" type="button" data-act="ci-export">导出</button>' +
+            '<button class="btn light" type="button" data-act="ci-gen-doc">生成单据</button>' +
           "</div>" +
           '<div class="toolbar-right">' + legendHtml(ctx.legendKind || "report") + "</div>" +
         "</div>" +
@@ -2296,6 +2328,7 @@
         '<div class="table-toolbar">' +
           '<div class="toolbar-left">' +
             '<button class="btn light" type="button" data-act="summary-export">导出</button>' +
+            '<button class="btn light" type="button" data-act="summary-gen-doc">生成单据</button>' +
           "</div>" +
           '<div class="toolbar-right">' + legendHtml("report") + "</div>" +
         "</div>" +
@@ -2494,7 +2527,7 @@
       platform: "", siteLogic: "", warehouse: "", statusLogic: "", scene: "", bizType: "",
       bizRule: "", skuField: "", dateField: "", qtyLogic: "",
       inventoryNoField: "", relatedNoField: "", generateDoc: "", docType: "", dbTable: "",
-      dailySummary: ""
+      dailySummary: "", remark: ""
     };
     const fields = [
       ["platform", "平台"], ["dbTable", "数据库表名"],
@@ -2505,11 +2538,12 @@
       ["scene", "一级场景"], ["bizType", "二级场景"], ["bizRule", "业务类配置规则", true],
       ["generateDoc", "是否生成单据"],
       ["docType", "生成单据类型"],
-      ["dailySummary", "单据生成是否按天汇总"]
+      ["dailySummary", "单据生成是否按天汇总"],
+      ["remark", "备注"]
     ];
     const requiredFields = {
       platform: true, dbTable: true, siteLogic: true, warehouse: true,
-      skuField: true, dateField: true, qtyLogic: true, scene: true, bizRule: true, generateDoc: true
+      skuField: true, dateField: true, qtyLogic: true, bizRule: true, generateDoc: true
     };
     const disabled = viewOnly ? " disabled" : "";
     const ph = isAdd ? "请选择" : false;
@@ -2536,9 +2570,10 @@
       }
       if (key === "scene") {
         const list = withCurrentOption(configFirstSceneOptions(), val);
+        const scenePh = viewOnly ? false : "请选择";
         return (
-          '<div class="form-item">' + formFieldLabel(label, required) +
-          lookupSelectHtml("cfg-scene", list, val, viewOnly, ph, required) +
+          '<div class="form-item">' + formFieldLabel(label, false) +
+          lookupSelectHtml("cfg-scene", list, val, viewOnly, scenePh, false) +
           "</div>"
         );
       }
@@ -2637,7 +2672,7 @@
     const keys = [
       "platform", "dbTable", "siteLogic", "warehouse", "dateField", "skuField",
       "qtyLogic", "statusLogic", "inventoryNoField", "relatedNoField", "scene", "bizType", "bizRule",
-      "generateDoc", "docType", "dailySummary"
+      "generateDoc", "docType", "dailySummary", "remark"
     ];
     const payload = {};
     keys.forEach(function (k) {
@@ -2652,7 +2687,6 @@
       ["dateField", "平台日期"],
       ["skuField", "货品SKU"],
       ["qtyLogic", "货品数量"],
-      ["scene", "一级场景"],
       ["bizRule", "业务类配置规则"],
       ["generateDoc", "是否生成单据"]
     ];
@@ -2675,6 +2709,7 @@
       showToast("配置已新增", "success");
     }
     closeOverlay();
+    persistConfigRows();
     renderConfigTable();
   }
 
@@ -2698,8 +2733,40 @@
     const id = state.deleteConfigId;
     state.configRows = state.configRows.filter(function (r) { return r.id !== id; });
     closeOverlay();
+    persistConfigRows();
     renderConfigTable();
     showToast("已删除配置", "success");
+  }
+
+  function runGenDoc(target) {
+    let rows;
+    let refresh;
+    if (target === "summary") {
+      rows = state.summaryRows;
+      refresh = renderSummaryTable;
+    } else if (isCoupangInvPage(target)) {
+      const ctx = coupangInvCtx(target);
+      rows = state[ctx.rowsKey];
+      refresh = renderCoupangInvTable;
+    } else if (target === "existing") {
+      showToast("生成单据完成：新生成 0 条", "success");
+      return;
+    } else {
+      rows = state.detailRows;
+      refresh = renderDetailTable;
+    }
+    let n = 0;
+    rows.forEach(function (r) {
+      if (r.parsedDone === "是" && r.parseAbnormal !== "是" && r.generateDoc === "是" && !r.docNo) {
+        state.docSeq += 1;
+        const types = splitCsv(r.docType);
+        const prefix = types.indexOf("其他入库单") >= 0 || types.indexOf("收货列表") >= 0 ? "IR" : "IA";
+        r.docNo = prefix + "2026" + state.docSeq;
+        n += 1;
+      }
+    });
+    refresh();
+    showToast("生成单据完成：新生成 " + n + " 条", "success");
   }
 
   /* —— navigation —— */
@@ -2766,7 +2833,7 @@
 
     const actEl = e.target.closest("[data-act]");
     if (!actEl) {
-      if (e.target.id === "overlay") closeOverlay();
+      if (e.target.id === "overlay" && !$("overlay").classList.contains("drawer-mode")) closeOverlay();
       return;
     }
     const act = actEl.getAttribute("data-act");
@@ -2777,6 +2844,7 @@
       case "detail-search": renderDetailTable(); break;
       case "detail-reset": renderDetailPage(false); break;
       case "detail-export": showToast("已导出 " + state.detailView.length + " 条"); break;
+      case "detail-gen-doc": runGenDoc("detail"); break;
       case "ci-search": renderCoupangInvTable(); break;
       case "ci-reset": renderCoupangInvPage(false); break;
       case "ci-export":
@@ -2784,6 +2852,7 @@
           ? state[coupangInvCtx(state.page).viewKey]
           : []).length) + " 条");
         break;
+      case "ci-gen-doc": runGenDoc(state.page); break;
       case "cdi-qty-toggle":
         state.cdiQtyExpanded = !state.cdiQtyExpanded;
         renderCoupangInvTable();
@@ -2791,6 +2860,7 @@
       case "summary-search": renderSummaryTable(); break;
       case "summary-reset": renderSummaryPage(false); break;
       case "summary-export": showToast("已导出 " + state.summaryView.length + " 条"); break;
+      case "summary-gen-doc": runGenDoc("summary"); break;
       case "batch-search-confirm": confirmBatchSearch(); break;
       case "config-search": renderConfigTable(); break;
       case "config-reset": renderConfigPage(false); break;
@@ -2808,6 +2878,7 @@
       case "existing-export":
         showToast("已导出 " + ((EXISTING_REPORTS[state.page] && EXISTING_REPORTS[state.page].rows.length) || 0) + " 条");
         break;
+      case "existing-gen-doc": runGenDoc("existing"); break;
       default: break;
     }
   });
