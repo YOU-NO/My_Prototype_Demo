@@ -174,6 +174,7 @@
     { "key": "generateDoc", "label": "是否生成单据", "group": "diff" },
     { "key": "docType", "label": "生成单据类型", "group": "diff" },
     { "key": "dailySummary", "label": "单据生成是否按天汇总", "group": "diff" },
+    { "key": "remark", "label": "备注", "group": "diff" },
     { "key": "actions", "label": "操作", "group": "plain" }
   ],
   "detailRows": [
@@ -439,7 +440,8 @@
       "docType": "其他入库单",
       "dbTable": "Coupang_KR_Inventory_Daily",
       "dailySummary": "否",
-      "summaryCondition": ""
+      "summaryCondition": "",
+      "remark": ""
     },
     {
       "id": "c1",
@@ -459,7 +461,8 @@
       "docType": "其他入库单",
       "dbTable": "Inventory Detail",
       "dailySummary": "否",
-      "summaryCondition": ""
+      "summaryCondition": "",
+      "remark": ""
     },
     {
       "id": "c2",
@@ -479,7 +482,8 @@
       "docType": "其他入库单",
       "dbTable": "Inventory Detail",
       "dailySummary": "否",
-      "summaryCondition": ""
+      "summaryCondition": "",
+      "remark": ""
     },
     {
       "id": "c3",
@@ -499,7 +503,8 @@
       "docType": "其他出库单",
       "dbTable": "Inventory Detail",
       "dailySummary": "否",
-      "summaryCondition": ""
+      "summaryCondition": "",
+      "remark": ""
     },
     {
       "id": "c4",
@@ -519,7 +524,8 @@
       "docType": "其他入库单",
       "dbTable": "Inventory Summary",
       "dailySummary": "是",
-      "summaryCondition": "按站点+MSKU+Disposition 按天汇总"
+      "summaryCondition": "按站点+MSKU+Disposition 按天汇总",
+      "remark": ""
     }
   ],
   "coupangDomesticColumns": [
@@ -592,7 +598,7 @@
       "id": "cdi1", "productId": "16194119404", "attrId": "95393260616", "skuId": "73369384",
       "productName": "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320",
       "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
-      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
+      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": "-",
       "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
       "scene": "期初", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 720, "generateDoc": "是", "docType": "其他入库单", "dailySummary": "否",
       "docNo": "IR202607", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
@@ -601,7 +607,7 @@
       "id": "cdi2", "productId": "16194119404", "attrId": "95393260616", "skuId": "73369384",
       "productName": "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320",
       "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
-      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
+      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": "-",
       "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
       "scene": "发运", "bizType": "出库", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -566, "generateDoc": "是", "docType": "其他出库单", "dailySummary": "否",
       "docNo": "IA202611", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
@@ -610,7 +616,7 @@
       "id": "cdi3", "productId": "16194119404", "attrId": "95393260616", "skuId": "73369384",
       "productName": "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320",
       "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
-      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
+      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": "-",
       "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
       "scene": "发运", "bizType": "重新配送", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -1, "generateDoc": "是", "docType": "其他出库单,其他入库单", "dailySummary": "否",
       "docNo": "IA202612,IR202608", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
@@ -619,7 +625,7 @@
       "id": "cdi4", "productId": "16194119404", "attrId": "95393260616", "skuId": "73369384",
       "productName": "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320",
       "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
-      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
+      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": "-",
       "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
       "scene": "退运", "bizType": "顾客退货", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 35, "generateDoc": "是", "docType": "其他入库单", "dailySummary": "否",
       "docNo": "IR202609", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
@@ -628,7 +634,7 @@
       "id": "cdi5", "productId": "16194119404", "attrId": "95393260616", "skuId": "73369384",
       "productName": "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320",
       "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
-      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
+      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": "-",
       "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
       "scene": "移除", "bizType": "已移出库", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -11, "generateDoc": "是", "docType": "其他出库单", "dailySummary": "否",
       "docNo": "IA202613,IA202614", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
@@ -637,7 +643,7 @@
       "id": "cdi6", "productId": "16194119404", "attrId": "95393260616", "skuId": "73369384",
       "productName": "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320",
       "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
-      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
+      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": "-",
       "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
       "scene": "其他", "bizType": "处理中", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": -11, "generateDoc": "否", "docType": "", "dailySummary": "否",
       "docNo": "", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
@@ -646,7 +652,7 @@
       "id": "cdi7", "productId": "16194119404", "attrId": "95393260616", "skuId": "73369384",
       "productName": "샥즈 신제품 오픈닷 2 OpenDots 2 E320 이어클립형 오픈형 블루투스 이어폰, 펄 화이트-WT E320",
       "qtyBefore": 0, "transferDoneQty": 0, "inboundApplyQty": 0, "sellableQty": 0, "transferringQty": 0, "delaySaleQty": 0,
-      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": 0,
+      "outboundQty": 0, "redistribQty": 0, "customerReturnQty": 0, "removedQty": 0, "processingQty": 0, "lostDamagedQty": 0, "qtyAfter": 0, "newQuantity": "-",
       "site": "Coupang本土-KR", "localDate": "2026-07-31", "systemSku": "E320-ST-WT-KR-608",
       "scene": "期末", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 166, "generateDoc": "是", "docType": "其他入库单,其他出库单", "dailySummary": "否",
       "docNo": "IR202615,IA202616", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
