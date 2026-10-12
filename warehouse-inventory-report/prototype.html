@@ -1283,13 +1283,13 @@
       inboundApplyQty: 0,
       sellableQty: 0,
       transferringQty: 0,
-      delaySaleQty: 0,
       outboundQty: -566,
       redistribQty: -1,
       customerReturnQty: 35,
       removedQty: -11,
-      processingQty: -11,
+      processingQty: 20,
       lostDamagedQty: 10,
+      delaySaleQty: -10,
       qtyAfter: 166,
       newQuantity: "-",
       site: "Coupang本土-KR",
@@ -1314,15 +1314,15 @@
       { key: "inboundApplyQty", type: "入库申请", scene: "", bizType: "", docType: "", docNo: "" },
       { key: "sellableQty", type: "可售", scene: "", bizType: "", docType: "", docNo: "" },
       { key: "transferringQty", type: "调拨中", scene: "", bizType: "", docType: "", docNo: "" },
-      { key: "delaySaleQty", type: "延迟开始销售", scene: "", bizType: "", docType: "", docNo: "" },
       { key: "outboundQty", type: "出库", scene: "发运", bizType: "出库", docType: "其他出库单", docNo: "IA202611" },
       { key: "redistribQty", type: "重新配送", scene: "发运", bizType: "重新配送", docType: "其他出库单,其他入库单", docNo: "IA202612,IR202608" },
       { key: "customerReturnQty", type: "顾客退货", scene: "退运", bizType: "顾客退货", docType: "其他入库单", docNo: "IR202609" },
       { key: "removedQty", type: "已移出库", scene: "移除", bizType: "已移出库", docType: "其他出库单", docNo: "IA202613,IA202614" },
-      { key: "processingQty", type: "处理中", scene: "其他", bizType: "处理中", docType: "", docNo: "" },
-      { key: "lostDamagedQty", type: "确认丢失/损坏", scene: "", bizType: "", docType: "", docNo: "" },
-      { qty: 10, type: "确认丢失/损坏：平台仓待调查调整", scene: "", bizType: "", docType: "", docNo: "" },
-      { qty: -10, type: "确认丢失/损坏：平台仓库内调整有索赔", scene: "", bizType: "", docType: "", docNo: "" },
+      { key: "processingQty", type: "处理中", scene: "库内调整", bizType: "平台仓待调查调整", generateDoc: "是", docType: "", docNo: "" },
+      { key: "lostDamagedQty", type: "确认丢失/损坏", scene: "库内调整", bizType: "平台仓待调查调整", generateDoc: "是", docType: "", docNo: "" },
+      { qty: 10, type: "确认丢失/损坏：平台仓待调查调整", scene: "库内调整", bizType: "平台仓待调查调整", generateDoc: "是", docType: "", docNo: "" },
+      { qty: -10, type: "确认丢失/损坏：平台仓库内调整有索赔", scene: "库内调整", bizType: "平台仓库内调整有索赔", generateDoc: "是", docType: "", docNo: "" },
+      { key: "delaySaleQty", type: "延迟开始销售", scene: "其他", bizType: "待调查调整", generateDoc: "是", docType: "", docNo: "" },
       { key: "qtyAfter", type: "变更后", scene: "期末", bizType: "", docType: "其他入库单,其他出库单", docNo: "IR202615,IA202616" }
     ];
     MOCK.coupangDomesticRows = domesticQtyTypes.map(function (item, i) {
@@ -1337,7 +1337,7 @@
       row.qty = qty;
       row.docType = item.docType;
       row.docNo = item.docNo;
-      row.generateDoc = item.docType ? "是" : "否";
+      row.generateDoc = item.generateDoc || (item.docType ? "是" : "否");
       return row;
     });
     function cleanSku(v) {
