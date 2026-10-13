@@ -999,6 +999,7 @@
       { "key": "country", "label": "Country", "group": "platform" },
       { "key": "disposition", "label": "Disposition", "group": "platform" },
       { "key": "dateAndTime", "label": "Date and Time", "group": "platform" },
+      { "key": "matchRuleId", "label": "匹配规则ID", "group": "parsed" },
       { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
       { "key": "site", "label": "站点", "group": "parsed" },
       { "key": "warehouse", "label": "仓库", "group": "parsed" },
@@ -1013,7 +1014,6 @@
       { "key": "docType", "label": "生成单据类型", "group": "parsed" },
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
-      { "key": "matchRuleId", "label": "匹配规则ID", "group": "parsed" },
       { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
       { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
       { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" },
@@ -1043,6 +1043,7 @@
       { "key": "endingBalance", "label": "Ending Warehouse Balance", "group": "platform", "align": "right" },
       { "key": "location", "label": "Location", "group": "platform" },
       { "key": "unknownEvents", "label": "Unknown Events", "group": "platform", "align": "right" },
+      { "key": "matchRuleId", "label": "匹配规则ID", "group": "parsed" },
       { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
       { "key": "site", "label": "站点", "group": "parsed" },
       { "key": "warehouse", "label": "仓库", "group": "parsed" },
@@ -1057,7 +1058,6 @@
       { "key": "docType", "label": "生成单据类型", "group": "parsed" },
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
-      { "key": "matchRuleId", "label": "匹配规则ID", "group": "parsed" },
       { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
       { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
       { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" },
@@ -1246,6 +1246,7 @@
       { "key": "qtyAfter", "label": "变更后数量", "group": "platform", "align": "right" },
       { "key": "processType", "label": "Type", "group": "process" },
       { "key": "processQty", "label": "Quantity", "group": "process", "align": "right" },
+      { "key": "matchRuleId", "label": "匹配规则ID", "group": "parsed" },
       { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
       { "key": "site", "label": "站点", "group": "parsed" },
       { "key": "warehouse", "label": "仓库", "group": "parsed" },
@@ -1260,7 +1261,6 @@
       { "key": "docType", "label": "生成单据类型", "group": "parsed" },
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
-      { "key": "matchRuleId", "label": "匹配规则ID", "group": "parsed" },
       { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
       { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
       { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" },
@@ -1272,6 +1272,7 @@
       { "key": "viId", "label": "VI ID", "group": "platform" },
       { "key": "productId", "label": "Product ID", "group": "platform" },
       { "key": "quantity", "label": "Quantity", "group": "platform", "align": "right" },
+      { "key": "matchRuleId", "label": "匹配规则ID", "group": "parsed" },
       { "key": "newQuantity", "label": "New Quantity", "group": "parsed", "align": "right" },
       { "key": "site", "label": "站点", "group": "parsed" },
       { "key": "warehouse", "label": "仓库", "group": "parsed" },
@@ -1286,7 +1287,6 @@
       { "key": "docType", "label": "生成单据类型", "group": "parsed" },
       { "key": "dailySummary", "label": "是否按天汇总", "group": "parsed" },
       { "key": "docNo", "label": "生成单据号", "group": "parsed" },
-      { "key": "matchRuleId", "label": "匹配规则ID", "group": "parsed" },
       { "key": "parsedDone", "label": "是否解析完成", "group": "exception" },
       { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
       { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" },
@@ -1362,9 +1362,9 @@
       { key: "removedQty", type: "已移出库", scene: "移除", bizType: "已移出库", docType: "其他出库单", docNo: "IA202613,IA202614" },
       { key: "processingQty", type: "处理中", scene: "库内调整", bizType: "平台仓待调查调整", generateDoc: "是", docType: "", docNo: "" },
       { key: "lostDamagedQty", type: "确认丢失/损坏", scene: "库内调整", bizType: "平台仓待调查调整", generateDoc: "是", docType: "", docNo: "" },
-      { qty: 10, type: "确认丢失/损坏：平台仓待调查调整", scene: "库内调整", bizType: "平台仓待调查调整", generateDoc: "是", docType: "", docNo: "" },
-      { qty: -10, type: "确认丢失/损坏：平台仓库内调整有索赔", scene: "库内调整", bizType: "平台仓库内调整有索赔", generateDoc: "是", docType: "", docNo: "" },
-      { key: "delaySaleQty", type: "延迟开始销售", scene: "其他", bizType: "待调查调整", generateDoc: "是", docType: "", docNo: "" },
+      { qty: 10, type: "确认丢失/损坏：平台仓待调查调整", scene: "库内调整", bizType: "平台仓待调查调整", generateDoc: "是", docType: "", docNo: "", matchRuleId: "Coupang_1" },
+      { qty: -10, type: "确认丢失/损坏：平台仓库内调整有索赔", scene: "库内调整", bizType: "平台仓库内调整有索赔", generateDoc: "是", docType: "", docNo: "", matchRuleId: "Coupang_2" },
+      { key: "delaySaleQty", type: "延迟开始销售", scene: "其他", bizType: "待调查调整", generateDoc: "是", docType: "", docNo: "", matchRuleId: "Coupang_3" },
       { key: "qtyAfter", type: "变更后", scene: "期末", bizType: "", docType: "其他入库单,其他出库单", docNo: "IR202615,IA202616" }
     ];
     MOCK.coupangDomesticRows = domesticQtyTypes.map(function (item, i) {
@@ -1379,6 +1379,7 @@
       row.qty = qty;
       row.docType = item.docType;
       row.docNo = item.docNo;
+      row.matchRuleId = item.matchRuleId || "";
       row.generateDoc = item.generateDoc || (item.docType ? "是" : "否");
       row.docCategory = row.generateDoc === "是" ? "其他出入库单" : "";
       return row;
@@ -2045,6 +2046,7 @@
   }
 
   function matchRuleIdForRow(row) {
+    if (row && row.matchRuleId) return row.matchRuleId;
     const platform = reportPlatformOf(row);
     if (!platform) return "";
     const rules = (state.configRows || []).filter(function (r) {
@@ -2067,7 +2069,7 @@
       found = rules.find(function (r) {
         const br = String(r.bizRule || "");
         if (br.indexOf("处理中") < 0 && br.indexOf("确认丢失/损坏") < 0) return false;
-        return processType === "处理中" || processType.indexOf("确认丢失/损坏") === 0;
+        return processType === "处理中" || processType === "确认丢失/损坏";
       });
       if (found) return found.ruleId;
     }
