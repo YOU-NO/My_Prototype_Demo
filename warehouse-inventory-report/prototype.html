@@ -46,10 +46,55 @@
 
     .layout {
       display: grid;
-      grid-template-columns: var(--sidebar-width) 1fr;
+      grid-template-columns: 70px var(--sidebar-width) 1fr;
       min-height: 100vh;
       background: var(--page-bg);
     }
+
+    .module-rail {
+      width: 70px;
+      background: #fff;
+      border-right: 1px solid #e4e7ed;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      z-index: 9;
+    }
+
+    .module-item {
+      height: 70px;
+      color: #303133;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .module-item svg {
+      width: 22px;
+      height: 22px;
+      display: block;
+      fill: currentColor;
+    }
+
+    .module-item .yen {
+      height: 22px;
+      font-size: 20px;
+      line-height: 22px;
+      font-weight: 500;
+    }
+
+    .module-item .title {
+      margin-top: 6px;
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .module-item:hover { color: #6d5bd0; }
+    .module-item.active,
+    .module-item.active:hover { color: #fff; background: #6d5bd0; }
 
     .layout.is-resizing {
       cursor: col-resize;
@@ -296,6 +341,47 @@
     }
 
     .input-control.wide { width: 180px; }
+
+    .search-bar input[type="month"] {
+      width: 160px;
+      height: 32px;
+      padding: 0 8px;
+      color: var(--regular);
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 32px;
+    }
+
+    .search-bar input[type="month"]::-webkit-datetime-edit,
+    .search-bar input[type="month"]::-webkit-datetime-edit-fields-wrapper,
+    .search-bar input[type="month"]::-webkit-datetime-edit-text,
+    .search-bar input[type="month"]::-webkit-datetime-edit-month-field,
+    .search-bar input[type="month"]::-webkit-datetime-edit-year-field {
+      padding: 0;
+      color: var(--regular);
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 32px;
+    }
+
+    .stk-filter-panel {
+      margin: 0 0 10px;
+      padding: 18px 18px 8px;
+      background: #fff;
+    }
+
+    .stk-filter-panel .search-bar {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+    }
+
+    .stk-filter-panel .stk-actions {
+      margin-top: 10px;
+      padding-bottom: 8px;
+    }
 
     .search-bar select.control:required:invalid {
       color: var(--placeholder);
@@ -655,6 +741,55 @@
       border-top: 1px solid var(--border);
     }
 
+    .el-pagination {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 12px;
+      color: #606266;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .pg-btn {
+      min-width: 30px;
+      height: 28px;
+      padding: 0 6px;
+      color: #606266;
+      background: #f0f2f5;
+      border: 0;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+
+    .pg-btn.active {
+      color: #fff;
+      background: var(--primary);
+    }
+
+    .pg-btn:disabled {
+      color: #c0c4cc;
+      background: #f5f7fa;
+      cursor: not-allowed;
+    }
+
+    .pg-size,
+    .pg-input {
+      height: 28px;
+      color: #606266;
+      background: #fff;
+      border: 1px solid #dcdfe6;
+      border-radius: 3px;
+      font-size: 13px;
+    }
+
+    .pg-size { width: 100px; padding: 0 8px; }
+    .pg-input { width: 46px; text-align: center; }
+
     .pager-right {
       display: flex;
       align-items: center;
@@ -762,6 +897,131 @@
 
     .dialog.narrow { width: 420px; }
     .dialog.wide { width: 760px; }
+    .dialog.xwide { width: min(1080px, calc(100vw - 96px)); }
+
+    .stk-tag {
+      display: inline-block;
+      padding: 0 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      line-height: 20px;
+      white-space: nowrap;
+    }
+    .stk-tag.warn { color: #d48806; background: #fffbe6; }
+    .stk-tag.ok { color: #389e0d; background: #f6ffed; }
+    .stk-tag.err { color: #cf1322; background: #fff1f0; }
+    .stk-tag.gray { color: #666; background: #f5f5f5; }
+    .stk-tag.cp { color: #722ed1; background: #f9f0ff; }
+    .num-pos { color: #389e0d; }
+    .num-neg { color: #cf1322; }
+    .num-zero { color: var(--secondary); }
+    .stk-note { margin-top: 8px; color: var(--secondary); font-size: 12px; line-height: 18px; }
+    .stk-info {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      gap: 12px 20px;
+      margin-bottom: 12px;
+    }
+    .stk-info label { display: block; margin-bottom: 4px; color: var(--secondary); }
+    .order-view label { color: var(--secondary); }
+    .order-view .kv {
+      display: grid;
+      grid-template-columns: 108px 1fr;
+      gap: 6px 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .order-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px 16px;
+      margin-bottom: 12px;
+    }
+
+    .dialog.order-wide {
+      width: 1000px;
+      max-width: calc(100vw - 48px);
+    }
+
+    .form-divider {
+      display: flex;
+      align-items: center;
+      margin: 4px 0 16px;
+      color: #303133;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .form-divider::before,
+    .form-divider::after {
+      content: "";
+      height: 1px;
+      background: #dcdfe6;
+    }
+
+    .form-divider::before { width: 16px; }
+    .form-divider::after { flex: 1; margin-left: 12px; }
+    .form-divider.section { margin-top: 22px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 18px;
+      row-gap: 16px;
+    }
+
+    .form-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .form-item.wide { grid-column: span 2; }
+
+    .form-item > label {
+      width: 108px;
+      flex: none;
+      padding-top: 6px;
+      color: #606266;
+      font-size: 13px;
+      line-height: 20px;
+      text-align: right;
+    }
+
+    .fake-control {
+      flex: 1;
+      min-width: 0;
+      height: 32px;
+      padding: 0 10px;
+      color: #606266;
+      background: #f5f7fa;
+      border: 1px solid #e4e7ed;
+      border-radius: 4px;
+      font-size: 13px;
+      line-height: 30px;
+    }
+
+    select.fake-control { padding-right: 24px; }
+    textarea.fake-control {
+      height: 64px;
+      padding-top: 6px;
+      line-height: 20px;
+      resize: none;
+    }
+
+    .order-sheet { width: 100%; margin-top: 4px; }
+    .order-sheet th,
+    .order-sheet td {
+      height: 42px;
+      padding: 6px 8px;
+      text-align: left;
+      background: #fff;
+    }
+    .order-sheet th { color: #909399; font-weight: 500; background: #f5f7fa; }
+    .order-sheet .req { color: #f56c6c; margin-right: 2px; }
+    .order-sheet .fake-control { width: 100%; }
+    .order-log-pager { border-top: 0; }
 
     .dialog.drawer {
       width: 520px;
@@ -782,6 +1042,37 @@
       flex: none;
     }
 
+    .header-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .drawer-back {
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: -4px;
+      padding: 0;
+      color: #303133;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+    }
+
+    .drawer-back svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
     .close {
       width: 24px;
       height: 24px;
@@ -796,6 +1087,72 @@
       padding: 14px 16px;
       overflow: auto;
       flex: 1;
+    }
+
+    .dialog-body.progress-body { padding: 0 0 16px; }
+
+    .progress-table {
+      width: 100%;
+      table-layout: auto;
+      border-collapse: collapse;
+    }
+    .progress-table th,
+    .progress-table td {
+      height: 48px;
+      padding: 0 12px;
+      border: 0;
+      font-size: 13px;
+      font-weight: 400;
+      text-align: left;
+      color: #606266;
+      background: transparent;
+      position: static;
+    }
+    .progress-table th {
+      height: 44px;
+      color: #909399;
+      background: #fff;
+    }
+    .progress-table td { border-bottom: 1px solid #f2f3f5; }
+    .progress-table tbody tr:nth-child(even) td { background: #fafafa; }
+    .progress-table .link { margin-right: 0; color: #6d5bd0; }
+    .progress-tag {
+      display: inline-block;
+      padding: 0 8px;
+      border: 1px solid #e1f3d8;
+      border-radius: 4px;
+      color: #67c23a;
+      background: #f0f9eb;
+      font-size: 12px;
+      line-height: 22px;
+    }
+    .progress-tag.run { color: #e6a23c; background: #fdf6ec; border-color: #faecd8; }
+    .progress-tag.fail { color: #f56c6c; background: #fef0f0; border-color: #fde2e2; }
+    .progress-tip { margin: 16px 0 0; color: #999; font-size: 12px; text-align: center; }
+
+    .task-section {
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .task-section:last-child {
+      margin-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .task-label {
+      margin-bottom: 6px;
+      color: #909399;
+      font-size: 12px;
+      line-height: 18px;
+    }
+
+    .task-value {
+      color: #303133;
+      font-size: 14px;
+      line-height: 22px;
+      word-break: break-all;
     }
 
     .dialog-footer {
@@ -830,6 +1187,15 @@
       grid-template-columns: 1fr;
       gap: 12px;
     }
+
+    .order-view .form-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 24px;
+      row-gap: 16px;
+      width: 100%;
+    }
+
+    .order-view .form-item.wide { grid-column: 1 / -1; }
 
     .form-item label {
       display: block;
@@ -880,6 +1246,16 @@
 </head>
 <body>
   <div class="layout">
+    <aside class="module-rail" aria-label="一级模块">
+      <div class="module-item active" data-module="finance" title="财务">
+        <span class="yen">¥</span>
+        <span class="title">财务</span>
+      </div>
+      <div class="module-item" data-module="storage" title="仓储">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.1 4.2 8.6v.4h1.1V19h13.4V9h1.1v-.4L12 3.1zm5.5 5.2V17.6H6.5V8.3h.2L12 4.8l5.3 3.3h.2zM8.2 11.2h7.6v1.4H8.2v-1.4zm0 2.5h7.6V15H8.2v-1.3zm0 2.4h7.6v1.4H8.2v-1.4z"/></svg>
+        <span class="title">仓储</span>
+      </div>
+    </aside>
     <aside class="sidebar">
       <div class="aside-box">
         <nav class="el-menu-mock" id="sideMenu"></nav>
@@ -894,6 +1270,7 @@
           <section id="page-config" class="page-panel"></section>
           <section id="page-existing" class="page-panel"></section>
           <section id="page-empty" class="page-panel"></section>
+          <section id="page-storage" class="page-panel"></section>
         </div>
       </div>
     </main>
@@ -1462,7 +1839,29 @@
     deleteConfigId: null,
     batchInputId: "",
     toastTimer: null,
-    menuOpen: { sales: true, coupang: true, amazon: false, finance: false },
+    module: "finance",
+    financePage: "detail",
+    menuOpen: { sales: true, coupang: true, amazon: false, finance: false, ship: false, io: true, whset: false, stocktake: true },
+    stk: {
+      results: [],
+      docs: [],
+      detailId: null,
+      queried: false,
+      formal: false,
+      reconcile: {},
+      drawer: null,
+      orderPreset: null,
+      listPage: 1,
+      listPageSize: 10,
+      resultPage: 1,
+      resultPageSize: 10,
+      detailPage: 1,
+      detailPageSize: 10,
+      progress: [],
+      progressSeq: 1,
+      progressViewId: null,
+      progressChannel: "stocktake"
+    },
     colWidths: {},
     cdiQtyExpanded: false
   };
@@ -1671,6 +2070,7 @@
   }
 
   function closeOverlay() {
+    if (state.stk) state.stk.drawer = null;
     $("overlay").classList.remove("open", "drawer-mode");
     $("dialogRoot").className = "dialog";
     $("dialogRoot").innerHTML = "";
@@ -1710,6 +2110,13 @@
   }
 
   function renderSideMenu() {
+    document.querySelectorAll(".module-item").forEach(function (node) {
+      node.classList.toggle("active", node.getAttribute("data-module") === state.module);
+    });
+    if (state.module !== "finance") {
+      $("sideMenu").innerHTML = storageMenuHtml();
+      return;
+    }
     const salesOpen = groupOpen("sales");
     const coupangOpen = groupOpen("coupang");
     const amazonOpen = groupOpen("amazon");
@@ -2968,15 +3375,901 @@
     showToast("生成单据完成：新生成 " + n + " 条", "success");
   }
 
+  /* —— 仓储 / 库存盘点 —— */
+  const STORAGE_PAGES = {
+    monthlyStocktake: 1, stocktakeResults: 1, stocktakeDetail: 1,
+    inboundOrder: 1, outboundOrder: 1, otherInbound: 1, otherOutbound: 1
+  };
+  const STK_LOCAL = [
+    { month: "2026-07", sku: "E320-ST-WT-KR-608", name: "本土店报告原始商品名称 A", scenes: [
+      ["调拨完成", 0, false, ""], ["调拨入库", 20, true, ""], ["销售出库", 0, true, ""], ["退货入库", 0, true, ""], ["调拨出库", 0, true, ""]
+    ]},
+    { month: "2026-07", sku: "E320-ST-WT-KR-613", name: "本土店报告原始商品名称 B", scenes: [
+      ["调拨完成", 0, false, ""], ["调拨入库", 15, true, ""], ["销售出库", 0, true, ""], ["退货入库", 0, true, ""], ["调拨出库", 0, true, ""]
+    ]},
+    { month: "2026-07", sku: "E320-ST-WT-KR-614", name: "本土店报告原始商品名称 C", scenes: [
+      ["调拨完成", 0, false, ""], ["调拨入库", 6, true, ""], ["销售出库", 0, true, ""], ["退货入库", 0, true, ""], ["调拨出库", 0, true, ""]
+    ]},
+    { month: "2026-07", sku: "E320-ST-WT-KR-609", name: "本土店报告原始商品名称 D", scenes: [
+      ["调拨完成", 0, false, ""], ["调拨入库", 0, true, ""], ["销售出库", -567, true, ""], ["退货入库", 0, true, ""], ["调拨出库", 0, true, ""]
+    ]},
+    { month: "2026-07", sku: "E320-ST-WT-KR-610", name: "本土店报告原始商品名称 E", scenes: [
+      ["调拨完成", 0, false, ""], ["调拨入库", 0, true, ""], ["销售出库", 0, true, ""], ["退货入库", 35, true, ""], ["调拨出库", 0, true, ""]
+    ]},
+    { month: "2026-07", sku: "E320-ST-WT-KR-611", name: "本土店报告原始商品名称 F", scenes: [
+      ["调拨完成", 0, false, ""], ["调拨入库", 0, true, ""], ["销售出库", 0, true, ""], ["退货入库", 0, true, ""], ["调拨出库", -11, true, ""]
+    ]},
+    { month: "2026-08", sku: "C120-AC-BK-KR-801", name: "本土店 8 月调拨入库演示货品 A", scenes: [
+      ["调拨完成", 0, false, ""], ["调拨入库", 8, true, ""], ["销售出库", 0, true, ""], ["退货入库", 0, true, ""], ["调拨出库", 0, true, ""]
+    ]},
+    { month: "2026-08", sku: "C120-AC-BK-KR-802", name: "本土店 8 月调拨入库演示货品 B", scenes: [
+      ["调拨完成", 0, false, ""], ["调拨入库", 11, true, ""], ["销售出库", 0, true, ""], ["退货入库", 0, true, ""], ["调拨出库", 0, true, ""]
+    ]},
+    { month: "2026-08", sku: "C120-AC-BK-KR-803", name: "本土店 8 月调拨入库演示货品 C", scenes: [
+      ["调拨完成", 0, false, ""], ["调拨入库", 14, true, "库存体系未维护，无法创建其他入库单。"], ["销售出库", 0, true, ""], ["退货入库", 0, true, ""], ["调拨出库", 0, true, ""]
+    ]},
+    { month: "2026-08", sku: "E310-ST-GY-KR-802", name: "本土店 8 月销售出库演示货品", scenes: [
+      ["调拨完成", 0, false, ""], ["调拨入库", 0, true, ""], ["销售出库", -5, true, ""], ["退货入库", 0, true, ""], ["调拨出库", 0, true, ""]
+    ]}
+  ];
+  const STK_BIZ = { "调拨完成": "", "调拨入库": "调拨入库", "销售出库": "销售出库", "退货入库": "退货入库", "调拨出库": "调拨出库" };
+  const STK_ORDERS = [
+    { documentNo: "IB260731001", documentType: "入库单", documentDate: "2026-07-31", warehouse: "韩国Coupang本土店仓", businessType: "调拨入库", businessDocumentNo: "AS26073100001", warehouseTime: "2026-07-31 23:59:59", createdBy: "系统", note: "Coupang本土店调拨入库演示数据", items: [
+      { sku: "E320-ST-WT-KR-608", name: "本土店报告原始商品名称 A", quantity: 18 },
+      { sku: "E320-ST-WT-KR-613", name: "本土店报告原始商品名称 B", quantity: 13 },
+      { sku: "E320-ST-WT-KR-614", name: "本土店报告原始商品名称 C", quantity: 6 }
+    ]},
+    { documentNo: "IB260731002", documentType: "入库单", documentDate: "2026-07-31", warehouse: "韩国Coupang本土店仓", businessType: "退货入库", businessDocumentNo: "RMA26073100001", warehouseTime: "2026-07-31 23:59:59", createdBy: "系统", note: "Coupang本土店退货入库演示数据", items: [
+      { sku: "E320-ST-WT-KR-610", name: "本土店报告原始商品名称 E", quantity: 35 }
+    ]},
+    { documentNo: "IB260831001", documentType: "入库单", documentDate: "2026-08-31", warehouse: "韩国Coupang本土店仓", businessType: "调拨入库", businessDocumentNo: "AS26083100001", warehouseTime: "2026-08-31 23:59:59", createdBy: "系统", note: "Coupang本土店调拨入库演示数据", items: [
+      { sku: "C120-AC-BK-KR-801", name: "本土店 8 月调拨入库演示货品 A", quantity: 6 },
+      { sku: "C120-AC-BK-KR-802", name: "本土店 8 月调拨入库演示货品 B", quantity: 8 },
+      { sku: "C120-AC-BK-KR-803", name: "本土店 8 月调拨入库演示货品 C", quantity: 10 }
+    ]},
+    { documentNo: "IB260831101", documentType: "入库单", documentDate: "2026-08-31", warehouse: "韩国Coupang海外1店仓", businessType: "调拨入库", businessDocumentNo: "AS26083100101", warehouseTime: "2026-08-31 23:59:59", createdBy: "系统", note: "Coupang海外1店当月入库流水演示数据", items: [
+      { sku: "S820-ST-BK-KR-615", name: "Coupang海外1店货品", quantity: 6 },
+      { sku: "C120-AC-BK-KR-615", name: "Coupang海外1店货品", quantity: 4 }
+    ]},
+    { documentNo: "IB260831102", documentType: "入库单", documentDate: "2026-08-31", warehouse: "韩国Coupang海外2店仓", businessType: "调拨入库", businessDocumentNo: "AS26083100102", warehouseTime: "2026-08-31 23:59:59", createdBy: "系统", note: "Coupang海外2店当月入库流水演示数据", items: [
+      { sku: "E310-ST-GY-KR-646", name: "Coupang海外2店货品", quantity: 45 },
+      { sku: "T520-ST-WT-KR-646", name: "Coupang海外2店货品", quantity: 1 }
+    ]},
+    { documentNo: "OB260731001", documentType: "出库单", documentDate: "2026-07-31", warehouse: "韩国Coupang本土店仓", businessType: "销售出库", businessDocumentNo: "SO26073100001", warehouseTime: "2026-07-31 23:59:59", createdBy: "系统", note: "Coupang本土店销售出库演示数据", items: [
+      { sku: "E320-ST-WT-KR-609", name: "本土店报告原始商品名称 D", quantity: 565 }
+    ]},
+    { documentNo: "OB260731002", documentType: "出库单", documentDate: "2026-07-31", warehouse: "韩国Coupang本土店仓", businessType: "调拨出库", businessDocumentNo: "AS26073100002", warehouseTime: "2026-07-31 23:59:59", createdBy: "系统", note: "Coupang本土店调拨出库演示数据", items: [
+      { sku: "E320-ST-WT-KR-611", name: "本土店报告原始商品名称 F", quantity: 9 }
+    ]},
+    { documentNo: "OB260831001", documentType: "出库单", documentDate: "2026-08-31", warehouse: "韩国Coupang本土店仓", businessType: "销售出库", businessDocumentNo: "SO26083100001", warehouseTime: "2026-08-31 23:59:59", createdBy: "系统", note: "Coupang本土店销售出库演示数据", items: [
+      { sku: "E310-ST-GY-KR-802", name: "本土店 8 月单据生成失败演示货品", quantity: 2 }
+    ]},
+    { documentNo: "OB260831101", documentType: "出库单", documentDate: "2026-08-31", warehouse: "韩国Coupang海外1店仓", businessType: "销售出库", businessDocumentNo: "SO26083100101", warehouseTime: "2026-08-31 23:59:59", createdBy: "系统", note: "Coupang海外1店当月出库流水演示数据", items: [
+      { sku: "S700-ST-BL-KR-615-REF", name: "Coupang海外1店货品", quantity: 5 },
+      { sku: "E310-ST-GY-KR-615", name: "Coupang海外1店货品", quantity: 8 }
+    ]},
+    { documentNo: "OB260831102", documentType: "出库单", documentDate: "2026-08-31", warehouse: "韩国Coupang海外2店仓", businessType: "销售出库", businessDocumentNo: "SO26083100102", warehouseTime: "2026-08-31 23:59:59", createdBy: "系统", note: "Coupang海外2店当月出库流水演示数据", items: [
+      { sku: "S700-ST-BL-KR-646", name: "Coupang海外2店货品", quantity: 7 },
+      { sku: "S820-ST-BK-KR-646", name: "Coupang海外2店货品", quantity: 10 }
+    ]}
+  ];
+  const STK_OVERSEAS = [
+    { type: "o1", site: "Coupang-CGF1", warehouse: "韩国Coupang海外1店仓", month: "2026-07", sku: "S700-ST-BL-KR-615-REF", closing: 19 },
+    { type: "o1", site: "Coupang-CGF1", warehouse: "韩国Coupang海外1店仓", month: "2026-07", sku: "S820-ST-BK-KR-615", closing: 86 },
+    { type: "o1", site: "Coupang-CGF1", warehouse: "韩国Coupang海外1店仓", month: "2026-07", sku: "E310-ST-GY-KR-615", closing: 41 },
+    { type: "o1", site: "Coupang-CGF1", warehouse: "韩国Coupang海外1店仓", month: "2026-07", sku: "C120-AC-BK-KR-615", closing: 66 },
+    { type: "o2", site: "Coupang-CGF2", warehouse: "韩国Coupang海外2店仓", month: "2026-07", sku: "E310-ST-GY-KR-646", closing: 647 },
+    { type: "o2", site: "Coupang-CGF2", warehouse: "韩国Coupang海外2店仓", month: "2026-07", sku: "S700-ST-BL-KR-646", closing: 208 },
+    { type: "o2", site: "Coupang-CGF2", warehouse: "韩国Coupang海外2店仓", month: "2026-07", sku: "T520-ST-WT-KR-646", closing: 36 },
+    { type: "o2", site: "Coupang-CGF2", warehouse: "韩国Coupang海外2店仓", month: "2026-07", sku: "S820-ST-BK-KR-646", closing: 80 },
+    { type: "o1", site: "Coupang-CGF1", warehouse: "韩国Coupang海外1店仓", month: "2026-08", sku: "S700-ST-BL-KR-615-REF", closing: 12 },
+    { type: "o1", site: "Coupang-CGF1", warehouse: "韩国Coupang海外1店仓", month: "2026-08", sku: "S820-ST-BK-KR-615", closing: 92 },
+    { type: "o1", site: "Coupang-CGF1", warehouse: "韩国Coupang海外1店仓", month: "2026-08", sku: "E310-ST-GY-KR-615", closing: 30 },
+    { type: "o1", site: "Coupang-CGF1", warehouse: "韩国Coupang海外1店仓", month: "2026-08", sku: "C120-AC-BK-KR-615", closing: 72 },
+    { type: "o2", site: "Coupang-CGF2", warehouse: "韩国Coupang海外2店仓", month: "2026-08", sku: "E310-ST-GY-KR-646", closing: 694 },
+    { type: "o2", site: "Coupang-CGF2", warehouse: "韩国Coupang海外2店仓", month: "2026-08", sku: "S700-ST-BL-KR-646", closing: 201 },
+    { type: "o2", site: "Coupang-CGF2", warehouse: "韩国Coupang海外2店仓", month: "2026-08", sku: "T520-ST-WT-KR-646", closing: 39 },
+    { type: "o2", site: "Coupang-CGF2", warehouse: "韩国Coupang海外2店仓", month: "2026-08", sku: "S820-ST-BK-KR-646", closing: 68 }
+  ];
+
+  function stkVal(id) {
+    const el = $(id);
+    return el ? String(el.value || "") : "";
+  }
+  function stkNow() {
+    const now = new Date();
+    function p(n) { return n < 10 ? "0" + n : String(n); }
+    return now.getFullYear() + "-" + p(now.getMonth() + 1) + "-" + p(now.getDate()) + " " + p(now.getHours()) + ":" + p(now.getMinutes()) + ":" + p(now.getSeconds());
+  }
+  function stkMonthEnd(month) {
+    if (!month) return "";
+    const parts = month.split("-");
+    const y = Number(parts[0]);
+    const m = Number(parts[1]);
+    const d = new Date(y, m, 0).getDate();
+    return y + "-" + (m < 10 ? "0" + m : m) + "-" + (d < 10 ? "0" + d : d);
+  }
+  function stkPrevMonth(month) {
+    const parts = month.split("-").map(Number);
+    const date = new Date(parts[0], parts[1] - 2, 1);
+    const m = date.getMonth() + 1;
+    return date.getFullYear() + "-" + (m < 10 ? "0" + m : m);
+  }
+  function stkWhName(type) {
+    return type === "local" ? "韩国Coupang本土店仓" : type === "o1" ? "韩国Coupang海外1店仓" : "韩国Coupang海外2店仓";
+  }
+  function stkSigned(n) {
+    const cls = n > 0 ? "num-pos" : n < 0 ? "num-neg" : "num-zero";
+    return '<span class="' + cls + '">' + n + "</span>";
+  }
+  function stkDash() { return '<span style="color:#999">-</span>'; }
+  function stkTag(status) {
+    const map = { "待生成单据": "warn", "已完成": "ok", "生成失败": "err", "进行中": "warn", "未核对": "gray", "待生成": "warn", "已生成": "ok", "仅展示": "gray", "无需调整": "gray" };
+    return '<span class="stk-tag ' + (map[status] || "gray") + '">' + esc(status) + "</span>";
+  }
+  function stkRegularImpact(month, warehouse, sku, businessType) {
+    return STK_ORDERS.filter(function (order) {
+      return order.documentDate.indexOf(month) === 0 && order.warehouse === warehouse && (!businessType || order.businessType === businessType);
+    }).reduce(function (sum, order) {
+      const sign = order.documentType === "入库单" ? 1 : -1;
+      return sum + order.items.filter(function (item) { return item.sku === sku; }).reduce(function (s, item) { return s + sign * item.quantity; }, 0);
+    }, 0);
+  }
+  function stkBaseRows(type) {
+    if (type === "local") {
+      const rows = [];
+      STK_LOCAL.forEach(function (src) {
+        src.scenes.forEach(function (scene) {
+          const report = scene[1];
+          const system = scene[2] ? stkRegularImpact(src.month, "韩国Coupang本土店仓", src.sku, STK_BIZ[scene[0]]) : 0;
+          rows.push({
+            month: src.month, sku: src.sku, name: src.name, warehouse: "韩国Coupang本土店仓", scene: scene[0],
+            adjustable: scene[2], generationError: scene[3] || "", report: report, system: system,
+            opening: "", flow: "", closing: ""
+          });
+        });
+      });
+      return rows;
+    }
+    return STK_OVERSEAS.filter(function (row) { return row.type === type; }).map(function (row) {
+      const prior = STK_OVERSEAS.find(function (item) {
+        return item.type === type && item.sku === row.sku && item.month === stkPrevMonth(row.month);
+      });
+      const opening = prior ? prior.closing : 0;
+      const flow = stkRegularImpact(row.month, row.warehouse, row.sku, "");
+      return {
+        month: row.month, sku: row.sku, name: row.sku, warehouse: row.warehouse, scene: "",
+        adjustable: true, generationError: "", report: "", system: "",
+        opening: opening, flow: flow, closing: row.closing
+      };
+    });
+  }
+  function stkOtherImpact(type, row) {
+    return state.stk.docs.filter(function (doc) {
+      if (doc.status !== "已审核" || doc.documentDate.indexOf(row.month) !== 0 || doc.warehouse !== row.warehouse) return false;
+      if (type === "local") return doc.secondScene === row.scene || doc.items.some(function (item) { return item.scene === row.scene; });
+      return true;
+    }).reduce(function (sum, doc) {
+      const sign = doc.documentType === "其他入库单" ? 1 : -1;
+      return sum + doc.items.filter(function (item) { return item.sku === row.sku; }).reduce(function (s, item) { return s + sign * item.quantity; }, 0);
+    }, 0);
+  }
+  function stkApplyImpact(type, row) {
+    const impact = stkOtherImpact(type, row);
+    if (type === "local") {
+      const system = row.system + impact;
+      const diff = system - row.report;
+      return Object.assign({}, row, { system: system, diff: diff, direction: row.adjustable ? (diff > 0 ? "其他出库" : diff < 0 ? "其他入库" : "-") : "-" });
+    }
+    const flow = row.flow + impact;
+    const diff = row.opening + flow - row.closing;
+    return Object.assign({}, row, { flow: flow, diff: diff, direction: diff > 0 ? "其他出库" : diff < 0 ? "其他入库" : "-" });
+  }
+  function getStocktakeRows(type) {
+    return stkBaseRows(type).map(function (row) { return stkApplyImpact(type, row); });
+  }
+  function stkReconcile(type, month) {
+    return state.stk.reconcile[type + "|" + month] || { status: "未核对", completed: false, running: false, finishedAt: "—", exception: "—", snapshot: null };
+  }
+  function stkRowsForQuery(type, month) {
+    const rec = stkReconcile(type, month);
+    const rows = rec.completed && rec.snapshot ? rec.snapshot : getStocktakeRows(type).filter(function (row) { return row.month === month; });
+    return rows.map(function (row) { return Object.assign({}, row); });
+  }
+  function stkHead() {
+    return "<tr><th>站点</th><th>仓库</th><th>当地店铺日期</th><th>系统SKU</th><th>业务分类</th><th class=\"num\">报告期初数量</th><th class=\"num\">系统流水数量</th><th class=\"num\">报告流水数量</th><th class=\"num\">系统计算期末数量</th><th class=\"num\">报告期末数量</th><th class=\"num\">差异数量</th><th>调整方向</th></tr>";
+  }
+  function stkSite(type) {
+    return type === "local" ? "Coupang本土-KR" : type === "o1" ? "Coupang-CGF1" : "Coupang-CGF2";
+  }
+  function renderStocktakeTable(rows, type, reconciled) {
+    const isLocal = type === "local";
+    if (!rows.length) return '<tr><td colspan="12"><div class="empty">未查询到符合条件的数据</div></td></tr>';
+    return rows.map(function (row) {
+      const site = stkSite(type);
+      const date = stkMonthEnd(row.month);
+      if (isLocal) {
+        return "<tr><td>" + site + "</td><td>" + stkWhName(type) + "</td><td>" + date + "</td><td>" + esc(row.sku) + "</td><td>" + esc(row.scene) + "</td><td></td><td class=\"num\">" +
+          (reconciled ? stkSigned(row.system) : stkDash()) + "</td><td class=\"num\">" + stkSigned(row.report) + "</td><td></td><td></td><td class=\"num\">" +
+          (reconciled ? stkSigned(row.diff) : stkDash()) + "</td><td>" + (reconciled && row.adjustable && row.direction !== "-" ? row.direction : "-") + "</td></tr>";
+      }
+      return "<tr><td>" + site + "</td><td>" + stkWhName(type) + "</td><td>" + date + "</td><td>" + esc(row.sku) + "</td><td></td><td class=\"num\">" + row.opening + "</td><td class=\"num\">" +
+        (reconciled ? stkSigned(row.flow) : stkDash()) + "</td><td></td><td class=\"num\">" + (reconciled ? (row.opening + row.flow) : stkDash()) + "</td><td class=\"num\">" + row.closing +
+        "</td><td class=\"num\">" + (reconciled ? stkSigned(row.diff) : stkDash()) + "</td><td>" + (reconciled && row.direction !== "-" ? row.direction : "-") + "</td></tr>";
+    }).join("");
+  }
+  function pageSlice(rows, page, size) {
+    const total = rows.length;
+    const pages = Math.max(1, Math.ceil(total / size) || 1);
+    const current = Math.min(Math.max(1, page), pages);
+    return { page: current, pages: pages, rows: rows.slice((current - 1) * size, current * size) };
+  }
+
+  function evaPagerHtml(total, page, pageSize, key) {
+    const pages = Math.max(1, Math.ceil(total / pageSize) || 1);
+    const current = Math.min(Math.max(1, page), pages);
+    const sizes = [10, 25, 50, 100];
+    let start = Math.max(1, current - 2);
+    let end = Math.min(pages, start + 4);
+    start = Math.max(1, end - 4);
+    let nums = "";
+    for (let i = start; i <= end; i++) {
+      nums += '<button class="pg-btn' + (i === current ? " active" : "") + '" type="button" data-act="pg-go" data-id="' + key + '" data-page="' + i + '">' + i + "</button>";
+    }
+    return (
+      '<div class="el-pagination">' +
+        '<span class="pg-total">共 ' + total + " 条</span>" +
+        '<select class="pg-size" data-id="' + key + '">' +
+          sizes.map(function (n) {
+            return '<option value="' + n + '"' + (n === pageSize ? " selected" : "") + ">" + n + "条/页</option>";
+          }).join("") +
+        "</select>" +
+        '<button class="pg-btn" type="button" data-act="pg-prev" data-id="' + key + '"' + (current <= 1 ? " disabled" : "") + ">‹</button>" +
+        nums +
+        '<button class="pg-btn" type="button" data-act="pg-next" data-id="' + key + '"' + (current >= pages ? " disabled" : "") + ">›</button>" +
+        '<span>前往</span>' +
+        '<input class="pg-input" data-pg-input="' + key + '" value="' + current + '" />' +
+        "<span>页</span>" +
+      "</div>"
+    );
+  }
+
+  function refreshStkPage(key) {
+    if (key === "list") queryStocktake(false);
+    else if (key === "result") renderResultsPage();
+    else if (key === "detail") renderStocktakeDetailPage();
+  }
+  function renderMonthlyStocktake(keep) {
+    const type = keep ? stkVal("stk-warehouse") : "local";
+    const month = keep ? stkVal("stk-month") : "2026-07";
+    const sku = keep ? stkVal("stk-sku") : "";
+    $("page-storage").innerHTML =
+      '<div class="stk-filter-panel">' +
+        '<div class="search-bar">' +
+          '<select id="stk-warehouse" class="control"><option value="">请选择仓库</option><option value="local"' + (type === "local" ? " selected" : "") + '>韩国Coupang本土店仓</option><option value="o1"' + (type === "o1" ? " selected" : "") + '>韩国Coupang海外1店仓</option><option value="o2"' + (type === "o2" ? " selected" : "") + '>韩国Coupang海外2店仓</option></select>' +
+          '<input id="stk-month" class="input-control" type="month" value="' + esc(month) + '" title="月份" />' +
+          '<input id="stk-sku" class="input-control" placeholder="系统SKU" value="' + esc(sku) + '" />' +
+        "</div>" +
+        '<div class="search-bar stk-actions">' +
+          '<button class="btn primary" type="button" data-act="stk-query">查询报告流水</button>' +
+          '<button class="btn" type="button" data-act="stk-reconcile">核对系统流水</button>' +
+          '<button class="btn" type="button" data-act="stk-progress">状态进度</button>' +
+          '<button class="btn primary" type="button" data-act="stk-create">生成盘点结果表</button>' +
+          '<button class="btn light" type="button" data-act="stk-export">导出</button>' +
+        "</div>" +
+      "</div>" +
+      '<section class="table-shell"><div class="table-wrap"><table><thead id="stk-head"></thead><tbody id="stk-body"></tbody></table></div><div id="stk-pager"></div></section>';
+    if (type && month) queryStocktake(false);
+    else renderStocktakeInitial();
+  }
+  function renderStocktakeInitial() {
+    const head = $("stk-head");
+    if (!head) return;
+    head.innerHTML = stkHead();
+    $("stk-body").innerHTML = '<tr><td colspan="12"><div class="empty">请设置仓库和月份后点击“查询报告流水”获取盘点数据</div></td></tr>';
+    const pager = $("stk-pager");
+    if (pager) pager.innerHTML = evaPagerHtml(0, 1, state.stk.listPageSize, "list");
+  }
+  function queryStocktake(showMessage) {
+    const type = stkVal("stk-warehouse");
+    const month = stkVal("stk-month");
+    const sku = stkVal("stk-sku").toLowerCase();
+    if (!type || !month) {
+      state.stk.queried = false;
+      state.stk.formal = false;
+      renderStocktakeInitial();
+      if (showMessage) showToast(!type && !month ? "请选择仓库和月份后再查询报告流水" : !type ? "请选择仓库后再查询报告流水" : "请选择月份后再查询报告流水", "error");
+      return;
+    }
+    if (showMessage) state.stk.listPage = 1;
+    const rec = stkReconcile(type, month);
+    const rows = stkRowsForQuery(type, month).filter(function (row) { return !sku || row.sku.toLowerCase().indexOf(sku) >= 0; });
+    const reconciled = !!rec.completed;
+    state.stk.formal = reconciled && !rec.running;
+    const sized = pageSlice(rows, state.stk.listPage, state.stk.listPageSize);
+    state.stk.listPage = sized.page;
+    $("stk-head").innerHTML = stkHead();
+    $("stk-body").innerHTML = sized.rows.length ? renderStocktakeTable(sized.rows, type, reconciled) : '<tr><td colspan="12"><div class="empty">未查询到符合条件的数据</div></td></tr>';
+    const pager = $("stk-pager");
+    if (pager) pager.innerHTML = evaPagerHtml(rows.length, sized.page, state.stk.listPageSize, "list");
+    state.stk.queried = true;
+    if (showMessage) {
+      pushStkProgress({
+        taskName: "查询报告流水",
+        status: "已完成",
+        rows: stkMonthEnd(month),
+        scope: stkWhName(type) + " / " + month + (sku ? " / " + stkVal("stk-sku") : ""),
+        resultText: reconciled ? (rec.running ? "查询完成，当前展示上一份核对快照。" : "查询完成，当前展示已完成核对快照。") : "未完成。查询仅展示报告数据，系统流水及差异数量显示“-”。",
+        exception: "—",
+        finishedAt: stkNow()
+      });
+      showToast(reconciled ? (rec.running ? "查询完成，当前展示上一份核对快照" : "查询完成，当前展示已完成核对快照") : "查询完成，当前为未核对的报告预览数据", "success");
+    }
+  }
+  function reconcileInventory() {
+    const type = stkVal("stk-warehouse");
+    const month = stkVal("stk-month");
+    if (!type || !month) {
+      showToast(!type && !month ? "请选择仓库和月份后再核对系统流水" : !type ? "请选择仓库后再核对系统流水" : "请选择月份后再核对系统流水", "error");
+      return;
+    }
+    const key = type + "|" + month;
+    const prev = state.stk.reconcile[key] || {};
+    if (prev.running) { showToast("系统流水正在核对，请在状态进度中查看", "warning"); return; }
+    state.stk.formal = false;
+    state.stk.reconcile[key] = { status: "进行中", completed: !!(prev.completed && prev.snapshot), running: true, finishedAt: prev.finishedAt || "—", exception: "—", snapshot: prev.snapshot || null };
+    const task = pushStkProgress({
+      taskName: "核对系统流水",
+      status: "进行中",
+      rows: stkMonthEnd(month),
+      scope: stkWhName(type) + " / " + month,
+      resultText: "正在核对报告与系统流水，请稍候。",
+      exception: "—",
+      finishedAt: "—"
+    });
+    setTimeout(function () {
+      const finishedAt = stkNow();
+      const snapshot = getStocktakeRows(type).filter(function (row) { return row.month === month; }).map(function (row) { return Object.assign({}, row); });
+      state.stk.reconcile[key] = { status: "已完成", completed: true, running: false, finishedAt: finishedAt, exception: "—", snapshot: snapshot };
+      task.status = "已完成";
+      task.resultText = "已完成。请人工点击“查询报告流水”查看本次核对快照；再次拉取报告不会自动覆盖，需再次核对后更新。";
+      task.finishedAt = finishedAt;
+      if (state.stk.drawer === "progress" || (state.stk.drawer === "progress-detail" && state.stk.progressViewId === task.id)) openStkDrawer(state.stk.drawer);
+      showToast("核对系统流水完成，请点击“查询报告流水”查看核对后的正确数量", "success");
+    }, 2000);
+  }
+  function createStocktakeResult() {
+    const type = stkVal("stk-warehouse");
+    const month = stkVal("stk-month");
+    if (!type) { showToast("生成盘点结果表前请先选择仓库", "error"); return; }
+    if (!state.stk.queried) { showToast("请先点击查询报告流水获取盘点对比数据", "error"); return; }
+    if (!month) { showToast("生成盘点结果表前请先选择月份", "error"); return; }
+    if (!stkReconcile(type, month).completed) { showToast("请先完成核对系统流水，再生成盘点结果表", "error"); return; }
+    if (!state.stk.formal) { showToast("核对系统流水已完成，请重新点击“查询报告流水”后再生成盘点结果表", "error"); return; }
+    if (stkReconcile(type, month).running) { showToast("系统流水正在再次核对，请等待完成后重新点击查询报告流水再生成盘点结果表", "error"); return; }
+    const warehouse = stkWhName(type);
+    const previous = state.stk.results.filter(function (row) { return row.warehouse === warehouse && row.month === month; });
+    const unfinished = previous.find(function (row) { return row.status !== "已完成"; });
+    if (unfinished) { showToast("存在未完成的盘点结果 " + unfinished.id + "，请先处理生成失败或待生成单据。", "error"); return; }
+    const rows = stkRowsForQuery(type, month);
+    const pending = rows.filter(function (row) { return row.adjustable !== false && row.diff !== 0; }).length;
+    const sequence = String(previous.length + 1);
+    const seq = sequence.length < 3 ? ("00" + sequence).slice(-3) : sequence;
+    const id = "CSTK-" + month.replace("-", "") + "-" + (type === "local" ? "KR-L" : type === "o1" ? "KR-O1" : "KR-O2") + "-" + seq;
+    const result = {
+      id: id, platform: "Coupang", warehouse: warehouse, dimension: "月度汇总", month: month,
+      typeName: type === "local" ? "Coupang本土店月度盘点" : "Coupang海外店月度盘点",
+      pending: pending, status: pending ? "待生成单据" : "已完成", docGenCondition: "", siteSummaryCondition: "是",
+      created: stkNow(), type: type, rows: rows, generationAttempt: false, generatedDocumentCount: 0, generationRunning: false
+    };
+    state.stk.results.unshift(result);
+    state.stk.detailId = id;
+    state.stk.detailPage = 1;
+    showToast("已生成新的盘点结果表", "success");
+    switchPage("stocktakeDetail");
+  }
+  function stkDetail() {
+    return state.stk.results.find(function (row) { return row.id === state.stk.detailId; }) || null;
+  }
+  function stkRowKey(type, row) { return [type, row.month, row.sku, type === "local" ? row.scene : ""].join("|"); }
+  function resultGeneratedImpact(result, row) {
+    const key = stkRowKey(result.type, row);
+    return state.stk.docs.filter(function (doc) { return doc.resultId === result.id; }).reduce(function (sum, doc) {
+      return sum + doc.items.filter(function (item) { return item.rowKey === key; }).reduce(function (s, item) { return s + item.impact; }, 0);
+    }, 0);
+  }
+  function detailRows(result) {
+    return (result.rows || []).map(function (row) {
+      const impact = resultGeneratedImpact(result, row);
+      if (result.type === "local") {
+        const system = row.system + impact;
+        const diff = system - row.report;
+        return Object.assign({}, row, { system: system, diff: diff, direction: row.adjustable ? (diff > 0 ? "其他出库" : diff < 0 ? "其他入库" : "-") : "-", originalDirection: row.direction });
+      }
+      const flow = row.flow + impact;
+      const diff = row.opening + flow - row.closing;
+      return Object.assign({}, row, { flow: flow, diff: diff, direction: diff > 0 ? "其他出库" : diff < 0 ? "其他入库" : "-", originalDirection: row.direction });
+    });
+  }
+  function stkScenes(result, row) {
+    if (result.type !== "local") return { firstScene: "盘点", secondScene: "平台仓报告差异调整", note: "盘点结果 " + result.id + " 自动生成" };
+    const map = {
+      "调拨入库": { firstScene: "备货", secondScene: "待调查调整", note: "Coupang火箭仓备货接收平台报告之间的差异调整" },
+      "销售出库": { firstScene: "销售", secondScene: "待调查调整", note: "Coupang火箭仓销售出库差异调整（平台报告之间导致出库差异）" },
+      "退货入库": { firstScene: "售后", secondScene: "待调查调整", note: "Coupang火箭仓退货入库差异调整（平台报告之间导致入库差异）" },
+      "调拨出库": { firstScene: "调拨", secondScene: "待调查调整", note: "Coupang火箭仓移除差异调整（平台报告之间导致出库差异）" }
+    };
+    return map[row.scene] || { firstScene: "盘点", secondScene: "平台仓报告差异调整", note: "盘点结果 " + result.id + " 自动生成" };
+  }
+  function adjustmentGroupKey(result, row) {
+    const documentType = row.direction === "其他入库" ? "其他入库单" : "其他出库单";
+    const scenes = stkScenes(result, row);
+    return [documentType, stkMonthEnd(result.month), result.warehouse, scenes.firstScene, scenes.secondScene].join("|");
+  }
+  function documentNumber(row, result) {
+    const dateKey = stkMonthEnd(result.month).replace(/-/g, "").slice(2);
+    const prefix = row.direction === "其他入库" ? "OIB" : "OOB";
+    const revision = result.id.split("-").pop();
+    const suffix = revision === "001" ? "" : "-R" + revision;
+    if (result.type === "local") {
+      const sequences = { "调拨入库": "001", "销售出库": "002", "退货入库": "003", "调拨出库": "004" };
+      return prefix + dateKey + (sequences[row.scene] || "999") + suffix;
+    }
+    return prefix + dateKey + (row.direction === "其他入库" ? "001" : "002") + suffix;
+  }
+  function generatedDocumentForRow(row, result) {
+    const key = stkRowKey(result.type, row);
+    return state.stk.docs.find(function (doc) {
+      return doc.resultId === result.id && doc.items.some(function (item) { return item.rowKey === key; });
+    });
+  }
+  function generationFailureGroups(result) {
+    const groups = {};
+    const list = [];
+    (result.rows || []).forEach(function (row) {
+      if (row.adjustable === false || row.diff === 0 || !row.generationError || generatedDocumentForRow(row, result)) return;
+      const shaped = Object.assign({}, row, { direction: row.originalDirection || row.direction });
+      const key = adjustmentGroupKey(result, shaped);
+      if (groups[key]) return;
+      groups[key] = 1;
+      list.push({ key: key, documentNo: documentNumber(shaped, result), message: "单据包含 SKU " + row.sku + "，" + row.generationError, resolved: !!row.generationErrorResolved });
+    });
+    return list;
+  }
+  function detailLineMeta(row, result) {
+    if (row.adjustable === false) return { status: "仅展示", documentNo: "", error: "" };
+    const document = generatedDocumentForRow(row, result);
+    if (document) return { status: "已生成", documentNo: document.documentNo, error: "" };
+    const shaped = Object.assign({}, row, { direction: row.originalDirection || row.direction });
+    const failure = generationFailureGroups(result).find(function (group) { return group.key === adjustmentGroupKey(result, shaped); });
+    if (result.generationAttempt && failure) return { status: "生成失败", documentNo: "", error: failure.message };
+    if (row.diff === 0) return { status: "无需调整", documentNo: "", error: "" };
+    return { status: "待生成", documentNo: "", error: "" };
+  }
+  function renderResultsPage() {
+    const platform = stkVal("res-platform");
+    const warehouse = stkVal("res-warehouse");
+    const month = stkVal("res-month");
+    const typeName = stkVal("res-type");
+    const status = stkVal("res-status");
+    const rows = state.stk.results.filter(function (row) {
+      return (!platform || row.platform === platform) && (!warehouse || row.warehouse === warehouse) && (!month || row.month === month) && (!typeName || row.typeName === typeName) && (!status || row.status === status);
+    });
+    const sized = pageSlice(rows, state.stk.resultPage, state.stk.resultPageSize);
+    state.stk.resultPage = sized.page;
+    const body = sized.rows.length ? sized.rows.map(function (row) {
+      return "<tr><td>" + esc(row.id) + "</td><td><span class=\"stk-tag cp\">" + esc(row.platform) + "</span></td><td>" + esc(row.warehouse) + "</td><td>" + esc(row.dimension) + "</td><td>" + esc(row.month) + "</td><td>" + esc(row.typeName) + "</td><td>" + stkTag(row.status) + "</td><td>" + esc(row.docGenCondition || "—") + "</td><td>" + esc(row.created) + "</td><td><a class=\"link\" data-act=\"res-open\" data-id=\"" + esc(row.id) + "\">查看</a></td></tr>";
+    }).join("") : '<tr><td colspan="10"><div class="empty">暂无盘点结果表</div></td></tr>';
+    $("page-storage").innerHTML =
+      '<div class="stk-filter-panel">' +
+        '<div class="search-bar">' +
+          '<select id="res-platform" class="control"><option value="">平台</option><option' + (platform === "Coupang" ? " selected" : "") + '>Coupang</option></select>' +
+          '<select id="res-warehouse" class="control"><option value="">仓库</option><option' + (warehouse === "韩国Coupang本土店仓" ? " selected" : "") + '>韩国Coupang本土店仓</option><option' + (warehouse === "韩国Coupang海外1店仓" ? " selected" : "") + '>韩国Coupang海外1店仓</option><option' + (warehouse === "韩国Coupang海外2店仓" ? " selected" : "") + '>韩国Coupang海外2店仓</option></select>' +
+          '<input id="res-month" class="input-control" type="month" value="' + esc(month) + '" />' +
+          '<select id="res-type" class="control"><option value="">类型</option><option' + (typeName === "Coupang本土店月度盘点" ? " selected" : "") + '>Coupang本土店月度盘点</option><option' + (typeName === "Coupang海外店月度盘点" ? " selected" : "") + '>Coupang海外店月度盘点</option></select>' +
+          '<select id="res-status" class="control"><option value="">状态</option><option' + (status === "待生成单据" ? " selected" : "") + '>待生成单据</option><option' + (status === "已完成" ? " selected" : "") + '>已完成</option><option' + (status === "生成失败" ? " selected" : "") + '>生成失败</option></select>' +
+        "</div>" +
+        '<div class="search-bar stk-actions">' +
+          '<button class="btn primary" type="button" data-act="res-query">查询</button>' +
+          '<button class="btn" type="button" data-act="res-reset">重置</button>' +
+          '<button class="btn light" type="button" data-act="res-export">导出</button>' +
+        "</div>" +
+      "</div>" +
+      '<section class="table-shell"><div class="table-wrap"><table><thead><tr><th>盘点结果编号</th><th>平台</th><th>仓库</th><th>盘点维度</th><th>月份</th><th>类型</th><th>状态</th><th>单据生成条件</th><th>创建时间</th><th>操作</th></tr></thead><tbody>' + body + "</tbody></table></div>" +
+      evaPagerHtml(rows.length, sized.page, state.stk.resultPageSize, "result") + "</section>";
+  }
+  function renderStocktakeDetailPage() {
+    const r = stkDetail();
+    if (!r) { switchPage("stocktakeResults"); return; }
+    const pendingRows = detailRows(r);
+    const isLocal = r.type === "local";
+    const head = "<tr><th>站点</th><th>仓库</th><th>当地店铺日期</th><th>系统SKU</th><th>业务分类</th><th class=\"num\">报告期初数量</th><th class=\"num\">系统流水数量</th><th class=\"num\">报告流水数量</th><th class=\"num\">系统计算期末数量</th><th class=\"num\">报告期末数量</th><th class=\"num\">差异数量</th><th>调整方向</th><th>明细状态</th><th>生成单据单号</th><th>异常信息</th></tr>";
+    const sized = pageSlice(pendingRows, state.stk.detailPage, state.stk.detailPageSize);
+    state.stk.detailPage = sized.page;
+    const body = sized.rows.length ? sized.rows.map(function (row) {
+      const meta = detailLineMeta(row, r);
+      const hasDoc = !!meta.documentNo;
+      const direction = row.diff !== 0 ? row.direction : (hasDoc ? row.originalDirection : "");
+      const docCell = hasDoc ? '<a class="link" data-act="stk-open-doc" data-id="' + esc(meta.documentNo) + '">' + esc(meta.documentNo) + "</a>" : "-";
+      const directionCell = direction && direction !== "-" && direction !== "—" ? esc(direction) : "-";
+      const errorCell = stkBlank(meta.error);
+      if (isLocal) {
+        return "<tr><td>Coupang本土-KR</td><td>" + esc(r.warehouse) + "</td><td>" + stkMonthEnd(r.month) + "</td><td>" + esc(row.sku) + "</td><td>" + esc(row.scene) + "</td><td></td><td class=\"num\">" + stkSigned(row.system) + "</td><td class=\"num\">" + stkSigned(row.report) + "</td><td></td><td></td><td class=\"num\">" + stkSigned(row.diff) + "</td><td>" + directionCell + "</td><td>" + stkTag(meta.status) + "</td><td>" + docCell + "</td><td>" + errorCell + "</td></tr>";
+      }
+      return "<tr><td>" + stkSite(r.type) + "</td><td>" + esc(r.warehouse) + "</td><td>" + stkMonthEnd(r.month) + "</td><td>" + esc(row.sku) + "</td><td></td><td class=\"num\">" + row.opening + "</td><td class=\"num\">" + stkSigned(row.flow) + "</td><td></td><td class=\"num\">" + (row.opening + row.flow) + "</td><td class=\"num\">" + row.closing + "</td><td class=\"num\">" + stkSigned(row.diff) + "</td><td>" + directionCell + "</td><td>" + stkTag(meta.status) + "</td><td>" + docCell + "</td><td>" + errorCell + "</td></tr>";
+    }).join("") : '<tr><td colspan="15"><div class="empty">暂无明细</div></td></tr>';
+    const disabled = r.status === "已完成" || r.pending === 0 || r.generationRunning ? " disabled" : "";
+    const summaryDisabled = r.generationAttempt || r.generationRunning ? " disabled" : "";
+    $("page-storage").innerHTML =
+      '<div class="table-toolbar" style="margin-bottom:12px;"><div><div style="font-size:16px;font-weight:600;">盘点结果详情</div><div class="stk-note">盘点结果完成后可基于更新后的报告或新增出入库流水创建下一轮结果；已生成单据不提供删除操作。</div></div><button class="btn" type="button" data-act="stk-back">返回</button></div>' +
+      '<div class="stk-info"><div><label>盘点结果编号</label><div>' + esc(r.id) + "</div></div><div><label>平台</label><div>Coupang</div></div><div><label>仓库</label><div>" + esc(r.warehouse) + "</div></div><div><label>盘点维度</label><div>" + esc(r.dimension) + "</div></div><div><label>月份</label><div>" + esc(r.month) + '</div></div><div><label>汇总方式</label><div>按月汇总（固定）</div></div><div><label>类型</label><div>' + esc(r.typeName) + "</div></div><div><label>状态</label><div>" + stkTag(r.status) + "</div></div></div>" +
+      '<div class="search-bar"><label style="color:#606266;">是否按照站点汇总</label><select id="stk-site-summary" class="control"' + summaryDisabled + '><option value="是"' + ((r.siteSummaryCondition || "是") === "是" ? " selected" : "") + '>是</option><option value="否"' + (r.siteSummaryCondition === "否" ? " selected" : "") + '>否</option></select>' +
+      '<button class="btn primary" type="button" data-act="stk-gen"' + disabled + ">" + (r.generationAttempt ? "再次生成" : "生成单据") + '</button><button class="btn" type="button" data-act="stk-gen-progress">状态进度</button><button class="btn light" type="button" data-act="stk-export">导出</button></div>' +
+      '<section class="table-shell"><div class="table-toolbar"><div class="toolbar-left">盘点差异明细</div></div><div class="table-wrap"><table><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div>" +
+      evaPagerHtml(pendingRows.length, sized.page, state.stk.detailPageSize, "detail") + "</section>";
+  }
+  function buildOtherInventoryDocuments(result) {
+    const groups = {};
+    const failures = generationFailureGroups(result).filter(function (group) { return !group.resolved; });
+    detailRows(result).filter(function (row) { return row.adjustable !== false && row.diff !== 0; }).forEach(function (row) {
+      const groupKey = adjustmentGroupKey(result, row);
+      if (failures.some(function (group) { return group.key === groupKey; })) return;
+      if (state.stk.docs.some(function (doc) { return doc.resultId === result.id && doc.groupKey === groupKey; })) return;
+      const scenes = stkScenes(result, row);
+      const documentDate = stkMonthEnd(result.month);
+      if (!groups[groupKey]) {
+        groups[groupKey] = {
+          resultId: result.id, groupKey: groupKey, documentNo: documentNumber(row, result),
+          documentType: row.direction === "其他入库" ? "其他入库单" : "其他出库单",
+          documentDate: documentDate, warehouse: result.warehouse, firstScene: scenes.firstScene, secondScene: scenes.secondScene,
+          status: "已审核", businessNode: "", relatedDocumentNo: result.id, warehouseTime: documentDate + " 23:59:59",
+          createdBy: "系统", createdAt: documentDate + " 23:59:59", note: scenes.note, items: []
+        };
+      }
+      groups[groupKey].items.push({
+        rowKey: stkRowKey(result.type, row), sku: row.sku, name: row.name || row.sku, scene: result.type === "local" ? row.scene : "",
+        quantity: Math.abs(row.diff), impact: row.direction === "其他入库" ? Math.abs(row.diff) : -Math.abs(row.diff), inventorySystem: "公共"
+      });
+    });
+    return Object.keys(groups).map(function (key) { return groups[key]; });
+  }
+  function finishGenerateDocs(result) {
+    const documents = buildOtherInventoryDocuments(result);
+    state.stk.docs = state.stk.docs.concat(documents);
+    result.docGenCondition = "按月汇总";
+    result.generationAttempt = true;
+    result.generatedDocumentCount = (result.generatedDocumentCount || 0) + documents.length;
+    const pendingRows = detailRows(result).filter(function (row) { return row.adjustable !== false && row.diff !== 0; });
+    const failures = generationFailureGroups(result).filter(function (group) { return !group.resolved; });
+    result.pending = pendingRows.length;
+    result.status = failures.length ? "生成失败" : "已完成";
+    result.generationRunning = false;
+    const task = state.stk.progress.find(function (item) { return item.id === result.progressTaskId; });
+    if (task) {
+      task.status = result.status;
+      task.resultText = (result.generatedDocumentCount || 0) + " 张单据已生成；" + failures.length + " 张单据待处理。";
+      task.exception = failures.length ? failures.map(function (group) { return group.documentNo + "：" + group.message; }).join("\n") : "-";
+      task.finishedAt = stkNow();
+    }
+    if (state.page === "stocktakeDetail") renderStocktakeDetailPage();
+    if (state.stk.drawer === "progress" || (state.stk.drawer === "progress-detail" && task && state.stk.progressViewId === task.id)) openStkDrawer(state.stk.drawer);
+    showToast(failures.length ? "已生成 " + documents.length + " 张其他出入库单；" + failures.length + " 张单据生成失败。" : "已生成 " + documents.length + " 张其他出入库单", failures.length ? "error" : "success");
+  }
+  function generateDocs() {
+    const result = stkDetail();
+    if (!result || result.pending === 0) return;
+    if (result.generationRunning) { showToast("单据正在生成，请在状态进度中查看", "warning"); return; }
+    const siteSummary = stkVal("stk-site-summary");
+    if (!siteSummary) { showToast("请先选择是否按照站点汇总", "error"); return; }
+    if (siteSummary !== "是") { showToast("Coupang 盘点必须按站点汇总，请选择“是”后再生成单据", "error"); return; }
+    const pendingRows = detailRows(result).filter(function (row) { return row.adjustable !== false && row.diff !== 0; });
+    result.siteSummaryCondition = siteSummary;
+    result.generationRunning = true;
+    result.generationTotalRows = pendingRows.length;
+    const task = pushStkProgress({
+      taskName: "生成单据",
+      status: "进行中",
+      rows: stkMonthEnd(result.month),
+      channel: "generate",
+      resultId: result.id,
+      scope: result.id,
+      resultText: "正在按明细逐行生成单据：共 " + pendingRows.length + " 行，每行等待 0.5 秒。",
+      exception: "生成结束后更新。",
+      finishedAt: "—"
+    });
+    result.progressTaskId = task.id;
+    renderStocktakeDetailPage();
+    setTimeout(function () { finishGenerateDocs(result); }, Math.max(500, pendingRows.length * 500));
+  }
+  function resolveGenerationFailures() {
+    const result = stkDetail();
+    if (!result) return;
+    const failures = generationFailureGroups(result);
+    if (!failures.length) { showToast("当前没有待处理的生成异常", "error"); return; }
+    result.rows.forEach(function (row) { if (row.generationError) row.generationErrorResolved = true; });
+    result.errorResolved = true;
+    const task = state.stk.progress.find(function (item) { return item.id === result.progressTaskId; });
+    if (task) {
+      task.resultText = "异常处理已完成；当前状态和报错信息保留，待点击“再次生成”后更新。";
+    }
+    if (state.stk.drawer === "progress-detail" && task && state.stk.progressViewId === task.id) openStkDrawer("progress-detail");
+    showToast("演示：异常 SKU 已处理完成，当前失败状态及报错信息保留；请点击“再次生成”补生成失败单据", "success");
+  }
+  function pushStkProgress(record) {
+    const now = stkNow();
+    const item = {
+      id: "P" + state.stk.progressSeq++,
+      taskName: record.taskName,
+      status: record.status,
+      rows: record.rows,
+      time: now.slice(5, 16),
+      scope: record.scope,
+      channel: record.channel || "stocktake",
+      resultId: record.resultId || "",
+      resultText: record.resultText,
+      exception: record.exception || "—",
+      finishedAt: record.finishedAt || "—"
+    };
+    state.stk.progress.unshift(item);
+    state.stk.progress = state.stk.progress.slice(0, 50);
+    return item;
+  }
+  function progressStatusTag(status) {
+    if (status === "进行中") return '<span class="progress-tag run">进行中</span>';
+    if (status === "生成失败" || status === "失败") return '<span class="progress-tag fail">生成失败</span>';
+    return '<span class="progress-tag">已完成</span>';
+  }
+  function progressListHtml() {
+    const channel = state.stk.progressChannel || "stocktake";
+    const rows = state.stk.progress.filter(function (row) { return (row.channel || "stocktake") === channel; });
+    const body = rows.length ? rows.map(function (row) {
+      return "<tr><td>" + esc(row.taskName) + "</td><td>" + progressStatusTag(row.status) + "</td><td>" + esc(row.rows || "-") + "</td><td>" + esc(row.time) + '</td><td><a class="link" data-act="stk-progress-view" data-id="' + esc(row.id) + '">查看</a></td></tr>';
+    }).join("") : '<tr><td colspan="5"><div class="empty">暂无记录</div></td></tr>';
+    return '<table class="progress-table"><thead><tr><th>任务</th><th>状态</th><th>店铺时间</th><th>开始时间</th><th>操作</th></tr></thead><tbody>' + body + '</tbody></table><p class="progress-tip">仅展示最近 50 条记录</p>';
+  }
+  function generationDetailHtml(row) {
+    const result = state.stk.results.find(function (item) { return item.id === row.resultId; });
+    if (!result) {
+      return stkSection("盘点结果编号", esc(row.scope || "-")) +
+        stkSection("任务状态", stkTag(row.status)) +
+        stkSection("生成结果", esc(row.resultText || "-")) +
+        stkSection("异常单据", esc(row.exception || "-").replace(/\n/g, "<br>"));
+    }
+    if (result.generationRunning && row.status === "进行中") {
+      return stkSection("盘点结果编号", esc(result.id)) +
+        stkSection("任务状态", stkTag("进行中")) +
+        stkSection("生成结果", "正在按明细逐行生成单据：共 " + (result.generationTotalRows || 0) + " 行，每行等待 0.5 秒。") +
+        stkSection("异常单据", "生成结束后更新。");
+    }
+    const failures = generationFailureGroups(result);
+    const failureHtml = failures.length ? failures.map(function (group) { return "<div>" + esc(group.documentNo) + "：" + esc(group.message) + "</div>"; }).join("") : "-";
+    const actions = failures.length && result.generationAttempt && !result.errorResolved ? '<div class="task-section"><button class="btn primary" type="button" data-act="stk-resolve">模拟完成异常处理</button></div>' : "";
+    const docs = state.stk.docs.filter(function (doc) { return doc.resultId === result.id; });
+    const docLinks = docs.map(function (doc) {
+      return '<div><a class="link" data-act="stk-open-doc" data-id="' + esc(doc.documentNo) + '">' + esc(doc.documentType) + " " + esc(doc.documentNo) + "</a></div>";
+    }).join("");
+    const summary = result.errorResolved && result.status === "生成失败"
+      ? "异常处理已完成；当前状态和报错信息保留，待点击“再次生成”后更新。"
+      : (result.generatedDocumentCount || 0) + " 张单据已生成；" + failures.length + " 张单据待处理。";
+    const generationResult = docLinks ? summary + '<div style="margin-top:8px">' + docLinks + "</div>" : summary;
+    return stkSection("盘点结果编号", esc(result.id)) +
+      stkSection("任务状态", stkTag(result.status)) +
+      stkSection("生成结果", generationResult) +
+      stkSection("异常单据", failureHtml) +
+      actions;
+  }
+  function progressDetailHtml(row) {
+    if (!row) return stkSection("提示", "未找到这条进度记录。");
+    return stkSection("核对范围", esc(row.scope)) +
+      stkSection("任务状态", stkTag(row.status)) +
+      stkSection("核对结果", esc(row.resultText)) +
+      stkSection("异常信息", stkBlank(row.exception)) +
+      stkSection("完成时间", esc(row.finishedAt || "—"));
+  }
+  function stkBlank(value) {
+    const text = value == null ? "" : String(value).trim();
+    if (!text || text === "—" || text === "-") return "-";
+    return esc(text);
+  }
+  function stkSection(label, content) {
+    return '<div class="task-section"><div class="task-label">' + label + '</div><div class="task-value">' + content + "</div></div>";
+  }
+  function stkDrawerHtml() {
+    const kind = state.stk.drawer;
+    if (kind === "progress") return drawerShell("状态进度", progressListHtml(), "progress-body");
+    if (kind === "progress-detail") {
+      const row = state.stk.progress.find(function (item) { return item.id === state.stk.progressViewId; });
+      const isGenerate = row && row.channel === "generate";
+      return drawerShell(isGenerate ? "盘点单据生成状态" : "库存核对状态", isGenerate ? generationDetailHtml(row) : progressDetailHtml(row), null, "stk-progress-back");
+    }
+    if (kind === "reconcile") {
+      const type = stkVal("stk-warehouse");
+      const month = stkVal("stk-month");
+      const rec = type && month ? stkReconcile(type, month) : null;
+      const body = !rec
+        ? stkSection("提示", "请选择仓库和月份后再查看核对状态。")
+        : stkSection("核对范围", esc(stkWhName(type)) + " / " + esc(month)) +
+          stkSection("任务状态", stkTag(rec.status)) +
+          stkSection("核对结果", rec.running ? "正在核对报告与系统流水，请稍候。" : rec.completed ? "已完成。请人工点击“查询报告流水”查看本次核对快照；再次拉取报告不会自动覆盖，需再次核对后更新。" : "未完成。查询仅展示报告数据，系统流水及差异数量显示“-”。") +
+          stkSection("异常信息", stkBlank(rec.exception)) +
+          stkSection("完成时间", esc(rec.finishedAt));
+      return drawerShell("库存核对状态", body);
+    }
+    const result = stkDetail();
+    if (!result) return drawerShell("盘点单据生成状态", stkSection("提示", "请先打开盘点结果详情。"));
+    if (result.generationRunning) {
+      return drawerShell("盘点单据生成状态",
+        stkSection("盘点结果编号", esc(result.id)) +
+        stkSection("任务状态", stkTag("进行中")) +
+        stkSection("生成结果", "正在按明细逐行生成单据：共 " + (result.generationTotalRows || 0) + " 行，每行等待 0.5 秒。") +
+        stkSection("异常单据", "生成结束后更新。"));
+    }
+    const failures = generationFailureGroups(result);
+    const failureHtml = failures.length ? failures.map(function (group) { return "<div>" + esc(group.documentNo) + "：" + esc(group.message) + "</div>"; }).join("") : "无";
+    const actions = failures.length && result.generationAttempt && !result.errorResolved ? '<div class="task-section"><button class="btn primary" type="button" data-act="stk-resolve">模拟完成异常处理</button></div>' : "";
+    const generationResult = !result.generationAttempt ? "尚未执行生成。" : (result.errorResolved && result.status === "生成失败" ? "异常处理已完成；当前状态和报错信息保留，待点击“再次生成”后更新。" : (result.generatedDocumentCount || 0) + " 张单据已生成；" + failures.length + " 张单据待处理。");
+    return drawerShell("盘点单据生成状态",
+      stkSection("盘点结果编号", esc(result.id)) +
+      stkSection("任务状态", stkTag(result.status)) +
+      stkSection("生成结果", generationResult) +
+      stkSection("异常单据", failureHtml) +
+      actions);
+  }
+  function drawerShell(title, body, bodyClass, backAct) {
+    const heading = backAct
+      ? '<span class="header-title"><button class="drawer-back" type="button" data-act="' + backAct + '" title="返回"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg></button><span>' + title + "</span></span>"
+      : "<span>" + title + "</span>";
+    return '<div class="dialog-header">' + heading + '<button class="close" type="button" data-act="close">×</button></div><div class="dialog-body' + (bodyClass ? " " + bodyClass : "") + '" style="padding:' + (bodyClass ? "0 0 16px" : "18px 20px") + ';">' + body + "</div>";
+  }
+  function openStkDrawer(kind) {
+    state.stk.drawer = kind;
+    openOverlay(stkDrawerHtml(), { drawer: true });
+  }
+  function orderRows(kind) {
+    if (kind === "inbound") return STK_ORDERS.filter(function (order) { return order.documentType === "入库单"; });
+    if (kind === "outbound") return STK_ORDERS.filter(function (order) { return order.documentType === "出库单"; });
+    const typeName = kind === "otherInbound" ? "其他入库单" : "其他出库单";
+    return state.stk.docs.filter(function (doc) { return doc.documentType === typeName; });
+  }
+  function renderOrderPage(kind) {
+    const preset = state.stk.orderPreset && state.stk.orderPreset.kind === kind ? state.stk.orderPreset : { no: "", warehouse: "", type: "" };
+    const openViewNo = preset.openView ? preset.no : "";
+    state.stk.orderPreset = null;
+    const io = kind.indexOf("Inbound") >= 0 || kind === "inbound" ? "入库" : "出库";
+    const other = kind.indexOf("other") === 0;
+    const rows = orderRows(kind).filter(function (order) {
+      return !preset.no || String(order.documentNo).indexOf(preset.no) >= 0;
+    });
+    const body = rows.length ? rows.map(function (order) {
+      const qty = order.items.reduce(function (sum, item) { return sum + item.quantity; }, 0);
+      if (!other) {
+        return "<tr><td>" + esc(order.documentNo) + "</td><td>" + esc(order.warehouse) + "</td><td>" + esc(order.businessType) + "</td><td>" + esc(order.businessDocumentNo) + "</td><td class=\"num\">" + qty + "</td><td>" + esc(order.warehouseTime) + "</td><td>" + esc(order.note) + "</td><td>" + esc(order.createdBy) + '</td><td><a class="link" data-act="order-view" data-id="' + esc(order.documentNo) + '">查看</a></td></tr>';
+      }
+      return "<tr><td>" + esc(order.documentNo) + "</td><td>" + stkTag("已审核") + "</td><td>" + esc(order.warehouse) + "</td><td class=\"num\">" + qty + "</td><td>" + esc(order.documentDate) + "</td><td>" + esc(order.firstScene || "—") + "</td><td>" + esc(order.secondScene || "—") + "</td><td>" + esc(order.relatedDocumentNo || "") + "</td><td>" + esc(order.warehouseTime) + "</td><td>" + esc(order.note) + "</td><td>" + esc(order.createdBy) + '</td><td><a class="link" data-act="order-view" data-id="' + esc(order.documentNo) + '">查看</a></td></tr>';
+    }).join("") : '<tr><td colspan="12"><div class="empty">暂无' + io + "单</div></td></tr>";
+    const head = other
+      ? "<tr><th>" + io + "单号</th><th>状态</th><th>" + io + "仓库</th><th class=\"num\">" + io + "总数</th><th>" + io + "时间</th><th>一级库存场景</th><th>二级库存场景</th><th>关联单据</th><th>仓库" + io + "时间</th><th>备注</th><th>创建人</th><th>操作</th></tr>"
+      : "<tr><th>" + io + "单号</th><th>" + io + "仓库</th><th>业务类型</th><th>业务单号</th><th class=\"num\">" + io + "总数</th><th>" + io + "时间</th><th>备注</th><th>创建人</th><th>操作</th></tr>";
+    $("page-storage").innerHTML =
+      '<div class="search-bar"><input id="ord-no" class="input-control" placeholder="' + io + '单号" value="' + esc(preset.no || "") + '" /><button class="btn primary" type="button" data-act="order-search" data-id="' + kind + '">搜索</button><button class="btn" type="button" data-act="order-reset" data-id="' + kind + '">重置</button><button class="btn light" type="button" data-act="stk-export">导出</button></div>' +
+      '<section class="table-shell"><div class="table-wrap"><table><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div><div class=\"pager\"><span>共 " + rows.length + " 条</span></div></section>";
+    if (openViewNo) openOrderView(openViewNo);
+  }
+  function openOrderView(documentNo) {
+    const order = STK_ORDERS.concat(state.stk.docs).find(function (item) { return item.documentNo === documentNo; });
+    if (!order) return;
+    const isOther = order.documentType.indexOf("其他") === 0;
+    const io = order.documentType.indexOf("入库") >= 0 ? "入库" : "出库";
+    if (!isOther) {
+      const items = order.items.map(function (item) {
+        return "<tr><td>" + esc(item.sku) + "</td><td>" + esc(item.name || item.sku) + "</td><td class=\"num\">" + item.quantity + "</td><td>" + esc(order.note || "") + "</td></tr>";
+      }).join("");
+      const fields = [["单号", order.documentNo], ["仓库", order.warehouse], ["业务类型", order.businessType], ["业务单据", order.businessDocumentNo], ["时间", order.warehouseTime]];
+      openOverlay(
+        '<div class="dialog-header"><span>查看' + io + '单</span><button class="close" type="button" data-act="close">×</button></div>' +
+        '<div class="dialog-body order-view"><div class="order-grid">' + fields.map(function (field) {
+          return '<div class="kv"><label>' + field[0] + '</label><div>' + esc(field[1] || "—") + "</div></div>";
+        }).join("") + '</div><div class="kv"><label>备注</label><div>' + esc(order.note || "") + '</div></div><div class="table-wrap" style="margin-top:12px;"><table><thead><tr><th>SKU</th><th>产品名称</th><th class="num">' + io + "数量</th><th>备注</th></tr></thead><tbody>" + items + "</tbody></table></div></div>" +
+        '<div class="dialog-footer"><button class="btn" type="button" data-act="close">关闭</button></div>',
+        { cls: "xwide" }
+      );
+      return;
+    }
+    function field(label, value, kind) {
+      const text = value == null || value === "" ? "" : String(value);
+      let control = "";
+      if (kind === "textarea") {
+        control = '<textarea class="fake-control" disabled>' + esc(text) + "</textarea>";
+      } else if (kind === "select") {
+        control = '<select class="fake-control" disabled><option>' + esc(text || "请选择") + "</option></select>";
+      } else {
+        control = '<input class="fake-control" disabled value="' + esc(text) + '" />';
+      }
+      return '<div class="form-item' + (kind === "textarea" ? " wide" : "") + '"><label>' + label + ' :</label>' + control + "</div>";
+    }
+    function shiftTime(text, seconds) {
+      const date = new Date(String(text || "").replace(/-/g, "/"));
+      if (isNaN(date.getTime())) return text || "-";
+      date.setSeconds(date.getSeconds() + seconds);
+      function p(n) { return n < 10 ? "0" + n : String(n); }
+      return date.getFullYear() + "-" + p(date.getMonth() + 1) + "-" + p(date.getDate()) + " " + p(date.getHours()) + ":" + p(date.getMinutes()) + ":" + p(date.getSeconds());
+    }
+    const baseTime = order.createdAt || order.warehouseTime;
+    const logs = [
+      ["审批", 16],
+      ["提交", 13],
+      ["新增", 0]
+    ].map(function (row) {
+      return "<tr><td>" + esc(shiftTime(baseTime, row[1])) + "</td><td>" + esc(order.createdBy || "系统") + "</td><td>" + row[0] + "</td><td></td></tr>";
+    }).join("");
+    const lines = order.items.map(function (item) {
+      const remark = item.remark || order.note || "";
+      return "<tr><td><input class=\"fake-control\" disabled value=\"" + esc(item.sku) + "\" /></td><td>" + esc(item.name || item.sku) + "</td><td><input class=\"fake-control\" disabled value=\"" + item.quantity + "\" /></td><td><select class=\"fake-control\" disabled><option>" + esc(item.inventorySystem || "公共") + "</option></select></td><td><input class=\"fake-control\" disabled value=\"" + esc(remark) + "\" /></td></tr>";
+    }).join("");
+    openOverlay(
+      '<div class="dialog-header"><span>查看其他' + io + '单</span><button class="close" type="button" data-act="close">×</button></div>' +
+      '<div class="dialog-body order-view">' +
+        '<div class="form-divider"><span>基本信息</span></div>' +
+        '<div class="form-grid">' +
+          field(io + "单号", order.documentNo) +
+          field(io + "仓库", order.warehouse, "select") +
+          field("业务节点", order.businessNode, "select") +
+          field("一级库存场景", order.firstScene, "select") +
+          field("二级库存场景", order.secondScene, "select") +
+          field("仓库" + io + "时间", order.warehouseTime) +
+          field("关联单号", order.relatedDocumentNo) +
+          field("状态", order.status || "已审核", "select") +
+          field("备注", order.note, "textarea") +
+        "</div>" +
+        '<div class="form-divider section"><span>' + io + "明细</span></div>" +
+        '<div class="table-wrap"><table class="order-sheet"><thead><tr><th><span class="req">*</span>SKU</th><th>产品名称</th><th><span class="req">*</span>' + io + '数量</th><th><span class="req">*</span>库存层级</th><th>备注</th></tr></thead><tbody>' + lines + "</tbody></table></div>" +
+        '<div class="form-divider section"><span>操作日志</span></div>' +
+        '<div class="table-wrap"><table class="order-sheet"><thead><tr><th>操作时间</th><th>操作人</th><th>操作类型</th><th>操作详情</th></tr></thead><tbody>' + logs + "</tbody></table></div>" +
+        '<div class="el-pagination order-log-pager"><span class="pg-total">共 3 条</span><select class="pg-size" disabled><option>10条/页</option></select><button class="pg-btn" type="button" disabled>‹</button><button class="pg-btn active" type="button">1</button><button class="pg-btn" type="button" disabled>›</button><span>前往</span><input class="pg-input" value="1" disabled /><span>页</span></div>' +
+      "</div>" +
+      '<div class="dialog-footer"><button class="btn" type="button" data-act="close">取消</button></div>',
+      { cls: "order-wide" }
+    );
+  }
+  function renderStoragePage(page) {
+    if (page === "monthlyStocktake") renderMonthlyStocktake(false);
+    else if (page === "stocktakeResults") renderResultsPage();
+    else if (page === "stocktakeDetail") renderStocktakeDetailPage();
+    else renderOrderPage(page);
+  }
+  function storageMenuHtml() {
+    function open(key) { return state.menuOpen[key] ? " is-open" : ""; }
+    function arrow(key) { return state.menuOpen[key] ? "⌃" : "⌄"; }
+    function item(id, label, scope) {
+      const active = (state.page === id || (id === "stocktakeResults" && state.page === "stocktakeDetail")) ? " is-active" : "";
+      const tag = scope ? '<span class="menu-scope-tag" title="本期需求改动页面">本期</span>' : "";
+      return '<div class="el-menu-item level-3' + active + (scope ? " is-scope" : "") + '" data-menu="' + id + '"><span class="menu-icon">' + ICONS.leaf + '</span><span class="sle">' + label + "</span>" + tag + "</div>";
+    }
+    function group(key, label, inner) {
+      return '<div class="el-sub-menu__title" data-toggle="' + key + '"><span class="menu-icon">' + ICONS.warehouse + '</span><span class="sle">' + label + '</span><span class="submenu-arrow">' + arrow(key) + "</span></div>" +
+        '<div class="menu-group' + open(key) + '">' + inner + "</div>";
+    }
+    return group("ship", "发货管理", item("storagePlaceholder", "正式环境菜单", false)) +
+      group("io", "出入库", item("inboundOrder", "入库单", false) + item("outboundOrder", "出库单", false) + item("otherInbound", "其他入库", false) + item("otherOutbound", "其他出库", false)) +
+      group("whset", "仓储设置", item("storagePlaceholder", "正式环境菜单", false)) +
+      group("stocktake", "库存盘点", item("monthlyStocktake", "货品数量盘点", true) + item("stocktakeResults", "盘点结果表", true));
+  }
+
   /* —— navigation —— */
   function switchPage(page) {
     const isExisting = !!EXISTING_REPORTS[page];
     const isCoupangInv = isCoupangInvPage(page);
-    if (!PAGE_META[page] && !isExisting) {
+    const isStorage = !!STORAGE_PAGES[page];
+    if (!PAGE_META[page] && !isExisting && !isStorage) {
       showToast("该菜单为正式环境参考入口，本期原型未展开", "warning");
       return;
     }
     state.page = page;
+    if (isStorage) state.module = "storage";
+    else {
+      state.module = "finance";
+      state.financePage = page;
+    }
     expandMenuForPage(page);
     ["detail", "summary", "config"].forEach(function (p) {
       const el = $("page-" + p);
@@ -2990,6 +4283,12 @@
       emptyEl.classList.toggle("active", isCoupangInv);
       if (isCoupangInv) renderCoupangInvPage(false);
       else emptyEl.innerHTML = "";
+    }
+    const storageEl = $("page-storage");
+    if (storageEl) {
+      storageEl.classList.toggle("active", isStorage);
+      if (isStorage) renderStoragePage(page);
+      else storageEl.innerHTML = "";
     }
     renderSideMenu();
   }
@@ -3016,6 +4315,19 @@
   }
 
   document.addEventListener("click", function (e) {
+    const moduleEl = e.target.closest("[data-module]");
+    if (moduleEl) {
+      const next = moduleEl.getAttribute("data-module");
+      if (next === state.module) return;
+      if (next === "storage") {
+        state.menuOpen.stocktake = true;
+        state.menuOpen.io = true;
+        switchPage("monthlyStocktake");
+      } else {
+        switchPage(state.financePage || "detail");
+      }
+      return;
+    }
     const toggleEl = e.target.closest("[data-toggle]");
     if (toggleEl) {
       const key = toggleEl.getAttribute("data-toggle");
@@ -3070,6 +4382,84 @@
       case "config-toggle": openStatusConfirm(id); break;
       case "config-toggle-confirm": confirmToggleConfig(); break;
       case "config-save": saveConfigForm(); break;
+      case "stk-query": queryStocktake(true); break;
+      case "stk-reconcile": reconcileInventory(); break;
+      case "stk-progress":
+        state.stk.progressChannel = "stocktake";
+        openStkDrawer("progress");
+        break;
+      case "stk-gen-progress":
+        state.stk.progressChannel = "generate";
+        openStkDrawer("progress");
+        break;
+      case "stk-progress-view":
+        (function () {
+          const row = state.stk.progress.find(function (item) { return item.id === id; });
+          state.stk.progressViewId = id;
+          state.stk.progressChannel = row && row.channel ? row.channel : (state.stk.progressChannel || "stocktake");
+          openStkDrawer("progress-detail");
+        })();
+        break;
+      case "stk-export":
+      case "res-export": showToast("导出成功", "success"); break;
+      case "stk-create": createStocktakeResult(); break;
+      case "res-query":
+        state.stk.resultPage = 1;
+        renderResultsPage();
+        break;
+      case "res-reset":
+        ["res-platform", "res-warehouse", "res-month", "res-type", "res-status"].forEach(function (fid) {
+          const el = $(fid);
+          if (el) el.value = "";
+        });
+        state.stk.resultPage = 1;
+        renderResultsPage();
+        break;
+      case "res-open":
+        state.stk.detailId = id;
+        state.stk.detailPage = 1;
+        switchPage("stocktakeDetail");
+        break;
+      case "pg-prev":
+      case "pg-next":
+      case "pg-go":
+        (function () {
+          const pageKey = id + "Page";
+          let page = state.stk[pageKey] || 1;
+          if (act === "pg-prev") page -= 1;
+          else if (act === "pg-next") page += 1;
+          else page = parseInt(actEl.getAttribute("data-page"), 10) || 1;
+          state.stk[pageKey] = Math.max(1, page);
+          refreshStkPage(id);
+        })();
+        break;
+      case "stk-back": switchPage("stocktakeResults"); break;
+      case "stk-gen": generateDocs(); break;
+      case "stk-progress-back": openStkDrawer("progress"); break;
+      case "stk-resolve": resolveGenerationFailures(); break;
+      case "stk-open-doc":
+        (function () {
+          const doc = state.stk.docs.find(function (item) { return item.documentNo === id; });
+          if (!doc) return;
+          const kind = doc.documentType === "其他入库单" ? "otherInbound" : "otherOutbound";
+          closeOverlay();
+          state.stk.orderPreset = { kind: kind, no: id, openView: true };
+          switchPage(kind);
+        })();
+        break;
+      case "order-search":
+        (function () {
+          const no = stkVal("ord-no").trim();
+          state.stk.orderPreset = { kind: id, no: no };
+          renderOrderPage(id);
+          showToast("查询完成", "success");
+        })();
+        break;
+      case "order-reset":
+        state.stk.orderPreset = { kind: id, no: "" };
+        renderOrderPage(id);
+        break;
+      case "order-view": openOrderView(id); break;
       case "existing-search":
       case "existing-reset":
         renderExistingPage(state.page);
@@ -3083,10 +4473,35 @@
   });
 
   document.addEventListener("change", function (e) {
+    if (e.target && e.target.classList.contains("pg-size")) {
+      const key = e.target.getAttribute("data-id");
+      state.stk[key + "PageSize"] = parseInt(e.target.value, 10) || 10;
+      state.stk[key + "Page"] = 1;
+      refreshStkPage(key);
+      return;
+    }
+    if (e.target && (e.target.id === "stk-warehouse" || e.target.id === "stk-month" || e.target.id === "stk-sku")) {
+      state.stk.queried = false;
+      state.stk.formal = false;
+      renderStocktakeInitial();
+      return;
+    }
+    if (e.target && e.target.id === "stk-site-summary") {
+      const result = stkDetail();
+      if (result) result.siteSummaryCondition = e.target.value;
+      return;
+    }
     const modeEl = e.target.closest("[data-sku-mode]");
     if (!modeEl) return;
     const input = $(modeEl.getAttribute("data-sku-mode"));
     if (input) input.placeholder = modeEl.value === "2" ? "仅支持单个查询" : "双击批量查询";
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter" || !e.target || !e.target.getAttribute("data-pg-input")) return;
+    const key = e.target.getAttribute("data-pg-input");
+    state.stk[key + "Page"] = Math.max(1, parseInt(e.target.value, 10) || 1);
+    refreshStkPage(key);
   });
 
   document.addEventListener("dblclick", function (e) {
@@ -3122,7 +4537,7 @@
 
     document.addEventListener("mousemove", function (e) {
       if (!dragging) return;
-      applyWidth(e.clientX);
+      applyWidth(e.clientX - 70);
     });
 
     document.addEventListener("mouseup", function () {
