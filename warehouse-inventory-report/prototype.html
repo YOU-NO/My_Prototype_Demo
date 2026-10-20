@@ -439,6 +439,15 @@
       border-color: var(--primary);
     }
 
+    .btn.primary.is-done,
+    .btn.primary.is-done:hover {
+      color: #fff;
+      background: #a0cfff;
+      border-color: #a0cfff;
+      opacity: 1;
+      cursor: not-allowed;
+    }
+
     .btn.light {
       color: #2f73d9;
       background: var(--primary-weak);
@@ -915,12 +924,36 @@
     .num-pos { color: #389e0d; }
     .num-neg { color: #cf1322; }
     .num-zero { color: var(--secondary); }
-    .stk-note { margin-top: 8px; color: var(--secondary); font-size: 12px; line-height: 18px; }
+    .stk-detail-head {
+      position: relative;
+      margin-bottom: 12px;
+      padding: 12px 16px 12px 20px;
+      background: #fff;
+    }
+
+    .stk-detail-title {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 24px;
+    }
+
+    .stk-detail-head .drawer-back {
+      position: absolute;
+      left: 0;
+      top: 12px;
+      width: 20px;
+      margin: 0;
+    }
+
+    .stk-note { margin-top: 4px; color: var(--secondary); font-size: 12px; line-height: 18px; }
     .stk-info {
       display: grid;
-      grid-template-columns: repeat(4, minmax(140px, 1fr));
-      gap: 12px 20px;
+      grid-template-columns: repeat(3, minmax(140px, 1fr));
+      gap: 16px 24px;
       margin-bottom: 12px;
+      padding: 16px 20px;
+      background: #f5f7fa;
+      border-radius: 4px;
     }
     .stk-info label { display: block; margin-bottom: 4px; color: var(--secondary); }
     .order-view label { color: var(--secondary); }
@@ -1024,7 +1057,7 @@
     .order-log-pager { border-top: 0; }
 
     .dialog.drawer {
-      width: 520px;
+      width: 640px;
       max-height: none;
       height: 100%;
       border-radius: 0;
@@ -2208,6 +2241,7 @@
           '<div class="toolbar-left">' +
             '<button class="btn light" type="button" data-act="existing-export">导出</button>' +
             '<button class="btn light" type="button" data-act="existing-gen-doc">生成单据</button>' +
+            '<button class="btn" type="button" data-act="report-progress">状态进度</button>' +
           "</div>" +
         "</div>" +
         '<div class="table-wrap" id="existingTableWrap">' +
@@ -2751,6 +2785,7 @@
           '<div class="toolbar-left">' +
             '<button class="btn light" type="button" data-act="detail-export">导出</button>' +
             '<button class="btn light" type="button" data-act="detail-gen-doc">生成单据</button>' +
+            '<button class="btn" type="button" data-act="report-progress">状态进度</button>' +
           "</div>" +
           '<div class="toolbar-right">' + legendHtml("report") + "</div>" +
         "</div>" +
@@ -2819,6 +2854,7 @@
           '<div class="toolbar-left">' +
             '<button class="btn light" type="button" data-act="ci-export">导出</button>' +
             '<button class="btn light" type="button" data-act="ci-gen-doc">生成单据</button>' +
+            '<button class="btn" type="button" data-act="report-progress">状态进度</button>' +
           "</div>" +
           '<div class="toolbar-right">' + legendHtml(ctx.legendKind || "report") + "</div>" +
         "</div>" +
@@ -2884,6 +2920,7 @@
           '<div class="toolbar-left">' +
             '<button class="btn light" type="button" data-act="summary-export">导出</button>' +
             '<button class="btn light" type="button" data-act="summary-gen-doc">生成单据</button>' +
+            '<button class="btn" type="button" data-act="report-progress">状态进度</button>' +
           "</div>" +
           '<div class="toolbar-right">' + legendHtml("report") + "</div>" +
         "</div>" +
@@ -3344,6 +3381,28 @@
     showToast(row.status === "停用" ? "已停用" : "已启用", "success");
   }
 
+  function reportProgressChannel(page) {
+    return "report:" + (page || state.page || "");
+  }
+  function reportPageTitle(page) {
+    if (PAGE_META[page]) return PAGE_META[page].title;
+    if (EXISTING_REPORTS[page]) return EXISTING_REPORTS[page].title;
+    return page || "报告";
+  }
+  function recordReportProgress(page, created, shopDates, docNos) {
+    const dates = shopDates.filter(function (date, index) { return date && shopDates.indexOf(date) === index; });
+    return pushStkProgress({
+      taskName: "生成单据",
+      status: "已完成",
+      rows: dates.length ? dates.join("、") : "-",
+      channel: reportProgressChannel(page),
+      scope: reportPageTitle(page),
+      resultText: "生成单据完成：新生成 " + created + " 条",
+      docNos: docNos || [],
+      exception: "-",
+      finishedAt: stkNow()
+    });
+  }
   function runGenDoc(target) {
     let rows;
     let refresh;
@@ -3355,6 +3414,7 @@
       rows = state[ctx.rowsKey];
       refresh = renderCoupangInvTable;
     } else if (target === "existing") {
+      recordReportProgress(state.page, 0, [], []);
       showToast("生成单据完成：新生成 0 条", "success");
       return;
     } else {
@@ -3362,6 +3422,8 @@
       refresh = renderDetailTable;
     }
     let n = 0;
+    const shopDates = [];
+    const docNos = [];
     rows.forEach(function (r) {
       if (r.parsedDone === "是" && r.parseAbnormal !== "是" && r.generateDoc === "是" && !r.docNo) {
         state.docSeq += 1;
@@ -3369,9 +3431,12 @@
         const prefix = types.indexOf("其他入库单") >= 0 || types.indexOf("收货列表") >= 0 ? "IR" : "IA";
         r.docNo = prefix + "2026" + state.docSeq;
         n += 1;
+        if (r.localDate) shopDates.push(r.localDate);
+        docNos.push(r.docNo);
       }
     });
     refresh();
+    recordReportProgress(state.page, n, shopDates, docNos);
     showToast("生成单据完成：新生成 " + n + " 条", "success");
   }
 
@@ -3503,6 +3568,11 @@
     return '<span class="' + cls + '">' + n + "</span>";
   }
   function stkDash() { return '<span style="color:#999">-</span>'; }
+  function stkDirectionCapsule(text) {
+    if (!text || text === "-" || text === "—") return "-";
+    const tone = String(text).indexOf("出库") >= 0 ? " out" : "";
+    return '<span class="capsule' + tone + '">' + esc(text) + "</span>";
+  }
   function stkTag(status) {
     const map = { "待生成单据": "warn", "已完成": "ok", "生成失败": "err", "进行中": "warn", "未核对": "gray", "待生成": "warn", "已生成": "ok", "仅展示": "gray", "无需调整": "gray" };
     return '<span class="stk-tag ' + (map[status] || "gray") + '">' + esc(status) + "</span>";
@@ -3577,7 +3647,7 @@
     return rows.map(function (row) { return Object.assign({}, row); });
   }
   function stkHead() {
-    return "<tr><th>站点</th><th>仓库</th><th>当地店铺日期</th><th>系统SKU</th><th>业务分类</th><th class=\"num\">报告期初数量</th><th class=\"num\">系统流水数量</th><th class=\"num\">报告流水数量</th><th class=\"num\">系统计算期末数量</th><th class=\"num\">报告期末数量</th><th class=\"num\">差异数量</th><th>调整方向</th></tr>";
+    return "<tr><th>站点</th><th>仓库</th><th>当地店铺日期</th><th>系统SKU</th><th>业务分类</th><th class=\"num\">报告期初数量</th><th class=\"num\">系统流水数量</th><th class=\"num\">报告流水数量</th><th class=\"num\">系统计算期末数量</th><th class=\"num\">报告期末数量</th><th class=\"num\">差异数量</th><th>调整单据类型</th></tr>";
   }
   function stkSite(type) {
     return type === "local" ? "Coupang本土-KR" : type === "o1" ? "Coupang-CGF1" : "Coupang-CGF2";
@@ -3591,11 +3661,11 @@
       if (isLocal) {
         return "<tr><td>" + site + "</td><td>" + stkWhName(type) + "</td><td>" + date + "</td><td>" + esc(row.sku) + "</td><td>" + esc(row.scene) + "</td><td></td><td class=\"num\">" +
           (reconciled ? stkSigned(row.system) : stkDash()) + "</td><td class=\"num\">" + stkSigned(row.report) + "</td><td></td><td></td><td class=\"num\">" +
-          (reconciled ? stkSigned(row.diff) : stkDash()) + "</td><td>" + (reconciled && row.adjustable && row.direction !== "-" ? row.direction : "-") + "</td></tr>";
+          (reconciled ? stkSigned(row.diff) : stkDash()) + "</td><td>" + stkDirectionCapsule(reconciled && row.adjustable ? row.direction : "-") + "</td></tr>";
       }
       return "<tr><td>" + site + "</td><td>" + stkWhName(type) + "</td><td>" + date + "</td><td>" + esc(row.sku) + "</td><td></td><td class=\"num\">" + row.opening + "</td><td class=\"num\">" +
         (reconciled ? stkSigned(row.flow) : stkDash()) + "</td><td></td><td class=\"num\">" + (reconciled ? (row.opening + row.flow) : stkDash()) + "</td><td class=\"num\">" + row.closing +
-        "</td><td class=\"num\">" + (reconciled ? stkSigned(row.diff) : stkDash()) + "</td><td>" + (reconciled && row.direction !== "-" ? row.direction : "-") + "</td></tr>";
+        "</td><td class=\"num\">" + (reconciled ? stkSigned(row.diff) : stkDash()) + "</td><td>" + stkDirectionCapsule(reconciled ? row.direction : "-") + "</td></tr>";
     }).join("");
   }
   function pageSlice(rows, page, size) {
@@ -3837,7 +3907,7 @@
     return list;
   }
   function detailLineMeta(row, result) {
-    if (row.adjustable === false) return { status: "仅展示", documentNo: "", error: "" };
+    if (row.adjustable === false) return { status: "无需调整", documentNo: "", error: "" };
     const document = generatedDocumentForRow(row, result);
     if (document) return { status: "已生成", documentNo: document.documentNo, error: "" };
     const shaped = Object.assign({}, row, { direction: row.originalDirection || row.direction });
@@ -3850,23 +3920,21 @@
     const platform = stkVal("res-platform");
     const warehouse = stkVal("res-warehouse");
     const month = stkVal("res-month");
-    const typeName = stkVal("res-type");
     const status = stkVal("res-status");
     const rows = state.stk.results.filter(function (row) {
-      return (!platform || row.platform === platform) && (!warehouse || row.warehouse === warehouse) && (!month || row.month === month) && (!typeName || row.typeName === typeName) && (!status || row.status === status);
+      return (!platform || row.platform === platform) && (!warehouse || row.warehouse === warehouse) && (!month || row.month === month) && (!status || row.status === status);
     });
     const sized = pageSlice(rows, state.stk.resultPage, state.stk.resultPageSize);
     state.stk.resultPage = sized.page;
     const body = sized.rows.length ? sized.rows.map(function (row) {
-      return "<tr><td>" + esc(row.id) + "</td><td><span class=\"stk-tag cp\">" + esc(row.platform) + "</span></td><td>" + esc(row.warehouse) + "</td><td>" + esc(row.dimension) + "</td><td>" + esc(row.month) + "</td><td>" + esc(row.typeName) + "</td><td>" + stkTag(row.status) + "</td><td>" + esc(row.docGenCondition || "—") + "</td><td>" + esc(row.created) + "</td><td><a class=\"link\" data-act=\"res-open\" data-id=\"" + esc(row.id) + "\">查看</a></td></tr>";
-    }).join("") : '<tr><td colspan="10"><div class="empty">暂无盘点结果表</div></td></tr>';
+      return "<tr><td>" + esc(row.id) + "</td><td><span class=\"stk-tag cp\">" + esc(row.platform) + "</span></td><td>" + esc(row.warehouse) + "</td><td>" + esc(row.month) + "</td><td>" + stkTag(row.status) + "</td><td>" + esc(row.created) + "</td><td><a class=\"link\" data-act=\"res-open\" data-id=\"" + esc(row.id) + "\">查看</a></td></tr>";
+    }).join("") : '<tr><td colspan="7"><div class="empty">暂无盘点结果表</div></td></tr>';
     $("page-storage").innerHTML =
       '<div class="stk-filter-panel">' +
         '<div class="search-bar">' +
           '<select id="res-platform" class="control"><option value="">平台</option><option' + (platform === "Coupang" ? " selected" : "") + '>Coupang</option></select>' +
           '<select id="res-warehouse" class="control"><option value="">仓库</option><option' + (warehouse === "韩国Coupang本土店仓" ? " selected" : "") + '>韩国Coupang本土店仓</option><option' + (warehouse === "韩国Coupang海外1店仓" ? " selected" : "") + '>韩国Coupang海外1店仓</option><option' + (warehouse === "韩国Coupang海外2店仓" ? " selected" : "") + '>韩国Coupang海外2店仓</option></select>' +
           '<input id="res-month" class="input-control" type="month" value="' + esc(month) + '" />' +
-          '<select id="res-type" class="control"><option value="">类型</option><option' + (typeName === "Coupang本土店月度盘点" ? " selected" : "") + '>Coupang本土店月度盘点</option><option' + (typeName === "Coupang海外店月度盘点" ? " selected" : "") + '>Coupang海外店月度盘点</option></select>' +
           '<select id="res-status" class="control"><option value="">状态</option><option' + (status === "待生成单据" ? " selected" : "") + '>待生成单据</option><option' + (status === "已完成" ? " selected" : "") + '>已完成</option><option' + (status === "生成失败" ? " selected" : "") + '>生成失败</option></select>' +
         "</div>" +
         '<div class="search-bar stk-actions">' +
@@ -3875,7 +3943,7 @@
           '<button class="btn light" type="button" data-act="res-export">导出</button>' +
         "</div>" +
       "</div>" +
-      '<section class="table-shell"><div class="table-wrap"><table><thead><tr><th>盘点结果编号</th><th>平台</th><th>仓库</th><th>盘点维度</th><th>月份</th><th>类型</th><th>状态</th><th>单据生成条件</th><th>创建时间</th><th>操作</th></tr></thead><tbody>' + body + "</tbody></table></div>" +
+      '<section class="table-shell"><div class="table-wrap"><table><thead><tr><th>盘点结果编号</th><th>平台</th><th>仓库</th><th>月份</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead><tbody>' + body + "</tbody></table></div>" +
       evaPagerHtml(rows.length, sized.page, state.stk.resultPageSize, "result") + "</section>";
   }
   function renderStocktakeDetailPage() {
@@ -3883,7 +3951,7 @@
     if (!r) { switchPage("stocktakeResults"); return; }
     const pendingRows = detailRows(r);
     const isLocal = r.type === "local";
-    const head = "<tr><th>站点</th><th>仓库</th><th>当地店铺日期</th><th>系统SKU</th><th>业务分类</th><th class=\"num\">报告期初数量</th><th class=\"num\">系统流水数量</th><th class=\"num\">报告流水数量</th><th class=\"num\">系统计算期末数量</th><th class=\"num\">报告期末数量</th><th class=\"num\">差异数量</th><th>调整方向</th><th>明细状态</th><th>生成单据单号</th><th>异常信息</th></tr>";
+    const head = "<tr><th>站点</th><th>仓库</th><th>当地店铺日期</th><th>系统SKU</th><th>业务分类</th><th class=\"num\">报告期初数量</th><th class=\"num\">系统流水数量</th><th class=\"num\">报告流水数量</th><th class=\"num\">系统计算期末数量</th><th class=\"num\">报告期末数量</th><th class=\"num\">差异数量</th><th>调整单据类型</th><th>明细状态</th><th>生成单据号</th><th>异常信息</th></tr>";
     const sized = pageSlice(pendingRows, state.stk.detailPage, state.stk.detailPageSize);
     state.stk.detailPage = sized.page;
     const body = sized.rows.length ? sized.rows.map(function (row) {
@@ -3891,20 +3959,21 @@
       const hasDoc = !!meta.documentNo;
       const direction = row.diff !== 0 ? row.direction : (hasDoc ? row.originalDirection : "");
       const docCell = hasDoc ? '<a class="link" data-act="stk-open-doc" data-id="' + esc(meta.documentNo) + '">' + esc(meta.documentNo) + "</a>" : "-";
-      const directionCell = direction && direction !== "-" && direction !== "—" ? esc(direction) : "-";
+      const directionCell = stkDirectionCapsule(direction);
       const errorCell = stkBlank(meta.error);
       if (isLocal) {
         return "<tr><td>Coupang本土-KR</td><td>" + esc(r.warehouse) + "</td><td>" + stkMonthEnd(r.month) + "</td><td>" + esc(row.sku) + "</td><td>" + esc(row.scene) + "</td><td></td><td class=\"num\">" + stkSigned(row.system) + "</td><td class=\"num\">" + stkSigned(row.report) + "</td><td></td><td></td><td class=\"num\">" + stkSigned(row.diff) + "</td><td>" + directionCell + "</td><td>" + stkTag(meta.status) + "</td><td>" + docCell + "</td><td>" + errorCell + "</td></tr>";
       }
       return "<tr><td>" + stkSite(r.type) + "</td><td>" + esc(r.warehouse) + "</td><td>" + stkMonthEnd(r.month) + "</td><td>" + esc(row.sku) + "</td><td></td><td class=\"num\">" + row.opening + "</td><td class=\"num\">" + stkSigned(row.flow) + "</td><td></td><td class=\"num\">" + (row.opening + row.flow) + "</td><td class=\"num\">" + row.closing + "</td><td class=\"num\">" + stkSigned(row.diff) + "</td><td>" + directionCell + "</td><td>" + stkTag(meta.status) + "</td><td>" + docCell + "</td><td>" + errorCell + "</td></tr>";
     }).join("") : '<tr><td colspan="15"><div class="empty">暂无明细</div></td></tr>';
-    const disabled = r.status === "已完成" || r.pending === 0 || r.generationRunning ? " disabled" : "";
+    const done = r.status === "已完成";
+    const disabled = done || r.pending === 0 || r.generationRunning ? " disabled" : "";
     const summaryDisabled = r.generationAttempt || r.generationRunning ? " disabled" : "";
     $("page-storage").innerHTML =
-      '<div class="table-toolbar" style="margin-bottom:12px;"><div><div style="font-size:16px;font-weight:600;">盘点结果详情</div><div class="stk-note">盘点结果完成后可基于更新后的报告或新增出入库流水创建下一轮结果；已生成单据不提供删除操作。</div></div><button class="btn" type="button" data-act="stk-back">返回</button></div>' +
-      '<div class="stk-info"><div><label>盘点结果编号</label><div>' + esc(r.id) + "</div></div><div><label>平台</label><div>Coupang</div></div><div><label>仓库</label><div>" + esc(r.warehouse) + "</div></div><div><label>盘点维度</label><div>" + esc(r.dimension) + "</div></div><div><label>月份</label><div>" + esc(r.month) + '</div></div><div><label>汇总方式</label><div>按月汇总（固定）</div></div><div><label>类型</label><div>' + esc(r.typeName) + "</div></div><div><label>状态</label><div>" + stkTag(r.status) + "</div></div></div>" +
+      '<div class="stk-detail-head"><button class="drawer-back" type="button" data-act="stk-back" title="返回"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg></button><div><div class="stk-detail-title">盘点结果详情</div><div class="stk-note">盘点结果完成后可基于更新后的报告或新增出入库流水创建下一轮结果；已生成单据不提供删除操作。</div></div></div>' +
+      '<div class="stk-info"><div><label>盘点结果编号</label><div>' + esc(r.id) + "</div></div><div><label>平台</label><div>Coupang</div></div><div><label>仓库</label><div>" + esc(r.warehouse) + "</div></div><div><label>月份</label><div>" + esc(r.month) + '</div></div><div><label>汇总方式</label><div>按日汇总</div></div><div><label>状态</label><div>' + stkTag(r.status) + "</div></div></div>" +
       '<div class="search-bar"><label style="color:#606266;">是否按照站点汇总</label><select id="stk-site-summary" class="control"' + summaryDisabled + '><option value="是"' + ((r.siteSummaryCondition || "是") === "是" ? " selected" : "") + '>是</option><option value="否"' + (r.siteSummaryCondition === "否" ? " selected" : "") + '>否</option></select>' +
-      '<button class="btn primary" type="button" data-act="stk-gen"' + disabled + ">" + (r.generationAttempt ? "再次生成" : "生成单据") + '</button><button class="btn" type="button" data-act="stk-gen-progress">状态进度</button><button class="btn light" type="button" data-act="stk-export">导出</button></div>' +
+      '<button class="btn primary' + (done ? " is-done" : "") + '" type="button" data-act="stk-gen"' + disabled + '>生成单据</button><button class="btn" type="button" data-act="stk-gen-progress">状态进度</button><button class="btn light" type="button" data-act="stk-export">导出</button></div>' +
       '<section class="table-shell"><div class="table-toolbar"><div class="toolbar-left">盘点差异明细</div></div><div class="table-wrap"><table><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div>" +
       evaPagerHtml(pendingRows.length, sized.page, state.stk.detailPageSize, "detail") + "</section>";
   }
@@ -4006,6 +4075,8 @@
       scope: record.scope,
       channel: record.channel || "stocktake",
       resultId: record.resultId || "",
+      operator: record.operator || "系统",
+      docNos: record.docNos || [],
       resultText: record.resultText,
       exception: record.exception || "—",
       finishedAt: record.finishedAt || "—"
@@ -4023,9 +4094,9 @@
     const channel = state.stk.progressChannel || "stocktake";
     const rows = state.stk.progress.filter(function (row) { return (row.channel || "stocktake") === channel; });
     const body = rows.length ? rows.map(function (row) {
-      return "<tr><td>" + esc(row.taskName) + "</td><td>" + progressStatusTag(row.status) + "</td><td>" + esc(row.rows || "-") + "</td><td>" + esc(row.time) + '</td><td><a class="link" data-act="stk-progress-view" data-id="' + esc(row.id) + '">查看</a></td></tr>';
-    }).join("") : '<tr><td colspan="5"><div class="empty">暂无记录</div></td></tr>';
-    return '<table class="progress-table"><thead><tr><th>任务</th><th>状态</th><th>店铺时间</th><th>开始时间</th><th>操作</th></tr></thead><tbody>' + body + '</tbody></table><p class="progress-tip">仅展示最近 50 条记录</p>';
+      return "<tr><td>" + esc(row.taskName) + "</td><td>" + progressStatusTag(row.status) + "</td><td>" + esc(row.rows || "-") + "</td><td>" + esc(row.time) + "</td><td>" + esc(row.operator || "系统") + '</td><td><a class="link" data-act="stk-progress-view" data-id="' + esc(row.id) + '">查看</a></td></tr>';
+    }).join("") : '<tr><td colspan="6"><div class="empty">暂无记录</div></td></tr>';
+    return '<table class="progress-table"><thead><tr><th>任务</th><th>状态</th><th>店铺时间</th><th>开始时间</th><th>操作人</th><th>操作</th></tr></thead><tbody>' + body + '</tbody></table><p class="progress-tip">仅展示最近 50 条记录</p>';
   }
   function generationDetailHtml(row) {
     const result = state.stk.results.find(function (item) { return item.id === row.resultId; });
@@ -4058,6 +4129,15 @@
       stkSection("异常单据", failureHtml) +
       actions;
   }
+  function reportDetailHtml(row) {
+    const docs = row.docNos || [];
+    const docHtml = docs.length ? '<div style="margin-top:8px">' + docs.map(function (no) { return "<div>" + esc(no) + "</div>"; }).join("") + "</div>" : "";
+    return stkSection("报告", esc(row.scope || "-")) +
+      stkSection("任务状态", stkTag(row.status)) +
+      stkSection("生成结果", esc(row.resultText || "-") + docHtml) +
+      stkSection("异常信息", stkBlank(row.exception)) +
+      stkSection("完成时间", esc(row.finishedAt || "-"));
+  }
   function progressDetailHtml(row) {
     if (!row) return stkSection("提示", "未找到这条进度记录。");
     return stkSection("核对范围", esc(row.scope)) +
@@ -4080,7 +4160,10 @@
     if (kind === "progress-detail") {
       const row = state.stk.progress.find(function (item) { return item.id === state.stk.progressViewId; });
       const isGenerate = row && row.channel === "generate";
-      return drawerShell(isGenerate ? "盘点单据生成状态" : "库存核对状态", isGenerate ? generationDetailHtml(row) : progressDetailHtml(row), null, "stk-progress-back");
+      const isReport = row && String(row.channel || "").indexOf("report:") === 0;
+      const title = isGenerate ? "盘点单据生成状态" : isReport ? "单据生成状态" : "库存核对状态";
+      const body = isGenerate ? generationDetailHtml(row) : isReport ? reportDetailHtml(row) : progressDetailHtml(row);
+      return drawerShell(title, body, null, "stk-progress-back");
     }
     if (kind === "reconcile") {
       const type = stkVal("stk-warehouse");
@@ -4392,6 +4475,10 @@
         state.stk.progressChannel = "generate";
         openStkDrawer("progress");
         break;
+      case "report-progress":
+        state.stk.progressChannel = reportProgressChannel(state.page);
+        openStkDrawer("progress");
+        break;
       case "stk-progress-view":
         (function () {
           const row = state.stk.progress.find(function (item) { return item.id === id; });
@@ -4408,7 +4495,7 @@
         renderResultsPage();
         break;
       case "res-reset":
-        ["res-platform", "res-warehouse", "res-month", "res-type", "res-status"].forEach(function (fid) {
+        ["res-platform", "res-warehouse", "res-month", "res-status"].forEach(function (fid) {
           const el = $(fid);
           if (el) el.value = "";
         });
