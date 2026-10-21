@@ -1149,6 +1149,7 @@
     .progress-table td { border-bottom: 1px solid #f2f3f5; }
     .progress-table tbody tr:nth-child(even) td { background: #fafafa; }
     .progress-table .link { margin-right: 0; color: #6d5bd0; }
+    .progress-table .link + .link { margin-left: 12px; }
     .progress-tag {
       display: inline-block;
       padding: 0 8px;
@@ -3390,11 +3391,10 @@
     return page || "报告";
   }
   function recordReportProgress(page, created, shopDates, docNos) {
-    const dates = shopDates.filter(function (date, index) { return date && shopDates.indexOf(date) === index; });
     return pushStkProgress({
       taskName: "生成单据",
       status: "已完成",
-      rows: dates.length ? dates.join("、") : "-",
+      rows: "-",
       channel: reportProgressChannel(page),
       scope: reportPageTitle(page),
       resultText: "生成单据完成：新生成 " + created + " 条",
@@ -3574,7 +3574,7 @@
     return '<span class="capsule' + tone + '">' + esc(text) + "</span>";
   }
   function stkTag(status) {
-    const map = { "待生成单据": "warn", "已完成": "ok", "生成失败": "err", "进行中": "warn", "未核对": "gray", "待生成": "warn", "已生成": "ok", "仅展示": "gray", "无需调整": "gray" };
+    const map = { "待生成单据": "warn", "已完成": "ok", "生成失败": "err", "生成异常": "err", "进行中": "warn", "未核对": "gray", "待生成": "warn", "已生成": "ok", "仅展示": "gray", "无需调整": "gray" };
     return '<span class="stk-tag ' + (map[status] || "gray") + '">' + esc(status) + "</span>";
   }
   function stkRegularImpact(month, warehouse, sku, businessType) {
@@ -4071,7 +4071,7 @@
       taskName: record.taskName,
       status: record.status,
       rows: record.rows,
-      time: now.slice(5, 16),
+      time: now.slice(0, 10),
       scope: record.scope,
       channel: record.channel || "stocktake",
       resultId: record.resultId || "",
@@ -4087,16 +4087,76 @@
   }
   function progressStatusTag(status) {
     if (status === "进行中") return '<span class="progress-tag run">进行中</span>';
+    if (status === "生成异常") return '<span class="progress-tag fail">生成异常</span>';
     if (status === "生成失败" || status === "失败") return '<span class="progress-tag fail">生成失败</span>';
     return '<span class="progress-tag">已完成</span>';
   }
+  function ensureProgressSeeds(channel) {
+    if (state.stk.progress.some(function (row) { return row.channel === channel && row.seed; })) return;
+    const isStocktake = channel === "stocktake";
+    const scope = isStocktake
+      ? "韩国Coupang本土店仓 / 2026-07"
+      : channel === "generate"
+        ? "CSTK-202607-KR-L-001"
+        : reportPageTitle(String(channel).replace(/^report:/, ""));
+    const samples = [
+      {
+        taskName: isStocktake ? "查询报告流水" : "生成单据",
+        status: "进行中",
+        time: "2026-10-21",
+        resultText: isStocktake ? "正在查询报告流水，请稍候。" : "正在生成单据，请稍候。",
+        exception: "-",
+        finishedAt: "-"
+      },
+      {
+        taskName: isStocktake ? "核对系统流水" : "生成单据",
+        status: "已完成",
+        time: "2026-10-20",
+        resultText: isStocktake ? "核对完成，报告与系统流水已对齐。" : "生成单据完成：新生成 3 条",
+        exception: "-",
+        finishedAt: "2026-10-20 18:06:22",
+        docNos: isStocktake ? [] : ["OIB20260721001", "OOB20260721002"]
+      },
+      {
+        taskName: isStocktake ? "查询报告流水" : "生成单据",
+        status: "生成异常",
+        time: "2026-10-20",
+        resultText: isStocktake ? "查询报告流水失败。" : "生成单据失败。",
+        exception: "库存体系未维护，无法创建其他入库单。",
+        finishedAt: "-"
+      }
+    ];
+    samples.forEach(function (sample) {
+      state.stk.progress.push({
+        id: "P" + state.stk.progressSeq++,
+        taskName: sample.taskName,
+        status: sample.status,
+        rows: String(channel).indexOf("report:") === 0 ? "-" : "2026-07-31",
+        time: sample.time,
+        scope: scope,
+        channel: channel,
+        resultId: "",
+        operator: "系统",
+        docNos: sample.docNos || [],
+        resultText: sample.resultText,
+        exception: sample.exception,
+        finishedAt: sample.finishedAt,
+        seed: true
+      });
+    });
+  }
   function progressListHtml() {
     const channel = state.stk.progressChannel || "stocktake";
+    ensureProgressSeeds(channel);
     const rows = state.stk.progress.filter(function (row) { return (row.channel || "stocktake") === channel; });
     const body = rows.length ? rows.map(function (row) {
-      return "<tr><td>" + esc(row.taskName) + "</td><td>" + progressStatusTag(row.status) + "</td><td>" + esc(row.rows || "-") + "</td><td>" + esc(row.time) + "</td><td>" + esc(row.operator || "系统") + '</td><td><a class="link" data-act="stk-progress-view" data-id="' + esc(row.id) + '">查看</a></td></tr>';
+      const refresh = row.status === "进行中" || row.status === "生成异常"
+        ? '<a class="link" data-act="stk-progress-refresh" data-id="' + esc(row.id) + '">刷新</a>'
+        : "";
+      const shopTime = String(channel).indexOf("report:") === 0 ? "-" : (row.rows || "-");
+      return "<tr><td>" + esc(row.taskName) + "</td><td>" + progressStatusTag(row.status) + "</td><td>" + esc(shopTime) + "</td><td>" + esc(row.time) + "</td><td>" + esc(row.operator || "系统") + '</td><td><a class="link" data-act="stk-progress-view" data-id="' + esc(row.id) + '">查看</a>' + refresh + "</td></tr>";
     }).join("") : '<tr><td colspan="6"><div class="empty">暂无记录</div></td></tr>';
-    return '<table class="progress-table"><thead><tr><th>任务</th><th>状态</th><th>店铺时间</th><th>开始时间</th><th>操作人</th><th>操作</th></tr></thead><tbody>' + body + '</tbody></table><p class="progress-tip">仅展示最近 50 条记录</p>';
+    return '<table class="progress-table"><thead><tr><th>任务</th><th>状态</th><th>店铺时间</th><th>执行时间</th><th>操作人</th><th>操作</th></tr></thead><tbody>' + body + '</tbody></table><p class="progress-tip">仅展示最近 50 条记录</p>';
   }
   function generationDetailHtml(row) {
     const result = state.stk.results.find(function (item) { return item.id === row.resultId; });
@@ -4479,6 +4539,13 @@
         state.stk.progressChannel = reportProgressChannel(state.page);
         openStkDrawer("progress");
         break;
+      case "stk-progress-refresh": {
+        const row = state.stk.progress.find(function (item) { return item.id === id; });
+        if (row) row.time = stkNow().slice(0, 10);
+        showToast("已刷新");
+        openStkDrawer("progress");
+        break;
+      }
       case "stk-progress-view":
         (function () {
           const row = state.stk.progress.find(function (item) { return item.id === id; });
