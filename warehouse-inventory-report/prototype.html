@@ -3397,7 +3397,7 @@
       rows: "-",
       channel: reportProgressChannel(page),
       scope: reportPageTitle(page),
-      resultText: "生成单据完成：新生成 " + created + " 条",
+      resultText: "生成单据完成：本次生成 " + created + " 条",
       docNos: docNos || [],
       exception: "-",
       finishedAt: stkNow()
@@ -3415,7 +3415,7 @@
       refresh = renderCoupangInvTable;
     } else if (target === "existing") {
       recordReportProgress(state.page, 0, [], []);
-      showToast("生成单据完成：新生成 0 条", "success");
+      showToast("已新建生单任务", "success");
       return;
     } else {
       rows = state.detailRows;
@@ -3437,7 +3437,7 @@
     });
     refresh();
     recordReportProgress(state.page, n, shopDates, docNos);
-    showToast("生成单据完成：新生成 " + n + " 条", "success");
+    showToast("已新建生单任务", "success");
   }
 
   /* —— 仓储 / 库存盘点 —— */
@@ -4112,7 +4112,7 @@
         taskName: isStocktake ? "核对系统流水" : "生成单据",
         status: "已完成",
         time: "2026-10-20",
-        resultText: isStocktake ? "核对完成，报告与系统流水已对齐。" : "生成单据完成：新生成 3 条",
+        resultText: isStocktake ? "核对完成，报告与系统流水已对齐。" : "生成单据完成：本次生成 2 条",
         exception: "-",
         finishedAt: "2026-10-20 18:06:22",
         docNos: isStocktake ? [] : ["OIB20260721001", "OOB20260721002"]
@@ -4123,6 +4123,11 @@
         time: "2026-10-20",
         resultText: isStocktake ? "查询报告流水失败。" : "生成单据失败。",
         exception: "库存体系未维护，无法创建其他入库单。",
+        exceptionDocs: isStocktake ? [] : [
+          { no: "IA20261021006", message: "库存体系未维护，无法创建其他入库单。" },
+          { no: "IA20261021007", message: "SKU 未匹配到系统商品，无法创建其他出库单。" },
+          { no: "OOB20261021008", message: "仓库未维护，无法创建其他出库单。" }
+        ],
         finishedAt: "-"
       }
     ];
@@ -4138,6 +4143,7 @@
         resultId: "",
         operator: "系统",
         docNos: sample.docNos || [],
+        exceptionDocs: sample.exceptionDocs || [],
         resultText: sample.resultText,
         exception: sample.exception,
         finishedAt: sample.finishedAt,
@@ -4161,10 +4167,11 @@
   function generationDetailHtml(row) {
     const result = state.stk.results.find(function (item) { return item.id === row.resultId; });
     if (!result) {
+      const abnormal = row.status === "生成异常" ? exceptionDocsHtml(row) : esc(row.exception || "-").replace(/\n/g, "<br>");
       return stkSection("盘点结果编号", esc(row.scope || "-")) +
         stkSection("任务状态", stkTag(row.status)) +
         stkSection("生成结果", esc(row.resultText || "-")) +
-        stkSection("异常单据", esc(row.exception || "-").replace(/\n/g, "<br>"));
+        stkSection("异常单据", abnormal);
     }
     if (result.generationRunning && row.status === "进行中") {
       return stkSection("盘点结果编号", esc(result.id)) +
@@ -4189,13 +4196,21 @@
       stkSection("异常单据", failureHtml) +
       actions;
   }
+  function exceptionDocsHtml(row) {
+    const docs = row.exceptionDocs || [];
+    if (!docs.length) return stkBlank(row.exception).replace(/\n/g, "<br>");
+    return docs.map(function (doc) {
+      return "<div>" + esc(doc.no) + "：" + esc(doc.message) + "</div>";
+    }).join("");
+  }
   function reportDetailHtml(row) {
     const docs = row.docNos || [];
     const docHtml = docs.length ? '<div style="margin-top:8px">' + docs.map(function (no) { return "<div>" + esc(no) + "</div>"; }).join("") + "</div>" : "";
+    const exceptionHtml = row.status === "生成异常" ? exceptionDocsHtml(row) : stkBlank(row.exception);
     return stkSection("报告", esc(row.scope || "-")) +
       stkSection("任务状态", stkTag(row.status)) +
       stkSection("生成结果", esc(row.resultText || "-") + docHtml) +
-      stkSection("异常信息", stkBlank(row.exception)) +
+      stkSection("异常信息", exceptionHtml) +
       stkSection("完成时间", esc(row.finishedAt || "-"));
   }
   function progressDetailHtml(row) {
