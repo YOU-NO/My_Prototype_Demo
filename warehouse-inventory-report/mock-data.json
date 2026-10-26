@@ -696,13 +696,13 @@
     {
       "id": "cgi1", "viId": "92529096184", "productId": "92529096184", "quantity": 31, "newQuantity": "",
       "site": "Coupang-CGF1", "localDate": "2026-07-31", "systemSku": "S700-ST-BL-KR-615-REF",
-      "scene": "", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 31, "generateDoc": "是", "docCategory": "其他出入库单", "docType": "其他入库单,其他出库单", "dailySummary": "否",
+      "scene": "", "bizType": "", "warehouse": "韩国Coupang海外1店仓", "sellable": "", "qty": 31, "generateDoc": "是", "docCategory": "其他出入库单", "docType": "其他入库单,其他出库单", "dailySummary": "否",
       "docNo": "IR202701,IA202702", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
     },
     {
       "id": "cgi2", "viId": "93316832936", "productId": "8991797344", "quantity": 647, "newQuantity": "",
       "site": "Coupang-CGF2", "localDate": "2026-07-31", "systemSku": "E310-ST-GY-KR-646",
-      "scene": "", "bizType": "", "warehouse": "韩国Coupang本土店仓", "sellable": "", "qty": 647, "generateDoc": "是", "docCategory": "其他出入库单", "docType": "其他入库单", "dailySummary": "否",
+      "scene": "", "bizType": "", "warehouse": "韩国Coupang海外2店仓", "sellable": "", "qty": 647, "generateDoc": "是", "docCategory": "其他出入库单", "docType": "其他入库单", "dailySummary": "否",
       "docNo": "IR202703", "parsedDone": "是", "hasUpdate": "否", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
     }
   ],
