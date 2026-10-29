@@ -1906,6 +1906,7 @@
       orderPreset: null,
       listPage: 1,
       listPageSize: 10,
+      listSnapshot: null,
       resultPage: 1,
       resultPageSize: 10,
       detailPage: 1,
@@ -3730,8 +3731,18 @@
     );
   }
 
+  function paintStocktakeList(snapshot) {
+    const head = $("stk-head");
+    if (!head || !snapshot) return;
+    const sized = pageSlice(snapshot.rows, state.stk.listPage, state.stk.listPageSize);
+    state.stk.listPage = sized.page;
+    head.innerHTML = stkHead();
+    $("stk-body").innerHTML = sized.rows.length ? renderStocktakeTable(sized.rows, snapshot.type, snapshot.reconciled, snapshot.reportReady) : '<tr><td colspan="12"><div class="empty">未查询到符合条件的数据</div></td></tr>';
+    const pager = $("stk-pager");
+    if (pager) pager.innerHTML = evaPagerHtml(snapshot.rows.length, sized.page, state.stk.listPageSize, "list");
+  }
   function refreshStkPage(key) {
-    if (key === "list") queryStocktake(false);
+    if (key === "list") paintStocktakeList(state.stk.listSnapshot);
     else if (key === "result") renderResultsPage();
     else if (key === "detail") renderStocktakeDetailPage();
   }
@@ -3778,6 +3789,7 @@
     else renderStocktakeInitial();
   }
   function renderStocktakeInitial() {
+    state.stk.listSnapshot = null;
     const head = $("stk-head");
     if (!head) return;
     head.innerHTML = stkHead();
@@ -3829,12 +3841,8 @@
     const rows = stkRowsForQuery(type, month).filter(function (row) { return (!platform || platform === "Coupang") && (!sku || row.sku.toLowerCase().indexOf(sku) >= 0); });
     const reconciled = reportReady && !!rec.completed;
     state.stk.formal = reconciled && !rec.running;
-    const sized = pageSlice(rows, state.stk.listPage, state.stk.listPageSize);
-    state.stk.listPage = sized.page;
-    $("stk-head").innerHTML = stkHead();
-    $("stk-body").innerHTML = sized.rows.length ? renderStocktakeTable(sized.rows, type, reconciled, reportReady) : '<tr><td colspan="12"><div class="empty">未查询到符合条件的数据</div></td></tr>';
-    const pager = $("stk-pager");
-    if (pager) pager.innerHTML = evaPagerHtml(rows.length, sized.page, state.stk.listPageSize, "list");
+    state.stk.listSnapshot = { rows: rows, type: type, reconciled: reconciled, reportReady: reportReady };
+    paintStocktakeList(state.stk.listSnapshot);
     state.stk.queried = true;
   }
   function reconcileInventory() {
@@ -4810,7 +4818,6 @@
     if (e.target && (e.target.id === "stk-platform" || e.target.id === "stk-warehouse" || e.target.id === "stk-month")) {
       state.stk.queried = false;
       state.stk.formal = false;
-      renderStocktakeInitial();
       return;
     }
     if (e.target && e.target.id === "stk-site-summary") {
