@@ -948,7 +948,6 @@
       margin: 0;
     }
 
-    .stk-note { margin-top: 4px; color: var(--secondary); font-size: 12px; line-height: 18px; }
     .stk-info {
       display: grid;
       grid-template-columns: repeat(3, minmax(140px, 1fr));
@@ -959,6 +958,7 @@
       border-radius: 4px;
     }
     .stk-info label { display: block; margin-bottom: 4px; color: var(--secondary); }
+    .stk-detail-lines .table-toolbar { padding-left: 10px; }
     .order-view label { color: var(--secondary); }
     .order-view .kv {
       display: grid;
@@ -4082,11 +4082,11 @@
     const done = r.status === "已完成";
     const disabled = done || r.pending === 0 || r.generationRunning ? " disabled" : "";
     $("page-storage").innerHTML =
-      '<div class="stk-detail-head"><button class="drawer-back" type="button" data-act="stk-back" title="返回"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg></button><div><div class="stk-detail-title">盘点结果详情</div><div class="stk-note">盘点结果完成后可基于更新后的报告或新增出入库流水创建下一轮结果；已生成单据不提供删除操作。</div></div></div>' +
+      '<div class="stk-detail-head"><button class="drawer-back" type="button" data-act="stk-back" title="返回"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg></button><div class="stk-detail-title">盘点结果详情</div></div>' +
       '<div class="stk-info"><div><label>盘点结果编号</label><div>' + esc(r.id) + "</div></div><div><label>平台</label><div>Coupang</div></div><div><label>仓库</label><div>" + esc(r.warehouse) + "</div></div><div><label>月份</label><div>" + esc(r.month) + '</div></div><div><label>汇总方式</label><div>按日汇总</div></div><div><label>状态</label><div>' + stkTag(r.status) + "</div></div></div>" +
       '<div class="search-bar"><label style="color:#606266;">是否按照站点汇总</label><select id="stk-site-summary" class="control" disabled><option value="是" selected>是</option></select>' +
       '<button class="btn primary' + (done ? " is-done" : "") + '" type="button" data-act="stk-gen"' + disabled + '>生成单据</button><button class="btn" type="button" data-act="stk-gen-progress">状态进度</button><button class="btn light" type="button" data-act="stk-export">导出</button></div>' +
-      '<section class="table-shell"><div class="table-toolbar"><div class="toolbar-left">盘点差异明细</div></div><div class="table-wrap"><table><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div>" +
+      '<section class="table-shell stk-detail-lines"><div class="table-toolbar"><div class="toolbar-left">盘点差异明细</div></div><div class="table-wrap"><table><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div>" +
       evaPagerHtml(pendingRows.length, sized.page, state.stk.detailPageSize, "detail") + "</section>";
   }
   function buildOtherInventoryDocuments(result) {
