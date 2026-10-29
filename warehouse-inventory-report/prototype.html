@@ -1857,6 +1857,13 @@
     ];
   })();
 
+  function stkLocalLine(month, sku, scene, report, system) {
+    return { month: month, sku: sku, name: sku, warehouse: "韩国Coupang本土店仓", scene: scene, adjustable: true, generationError: "", report: report, system: system, opening: "", flow: "", closing: "" };
+  }
+  function stkOverseasLine(warehouse, month, sku, opening, flow, closing) {
+    return { month: month, sku: sku, name: sku, warehouse: warehouse, scene: "", adjustable: true, generationError: "", report: "", system: "", opening: opening, flow: flow, closing: closing };
+  }
+
   /* —— state —— */
   const state = {
     page: "detail",
@@ -1881,13 +1888,13 @@
     menuOpen: { sales: true, coupang: true, amazon: false, finance: false, ship: false, io: true, whset: false, stocktake: true },
     stk: {
       results: [
-        { id: "202608-Coupang-B-0", letter: "B", seq: 0, platform: "Coupang", warehouse: "韩国Coupang海外1店仓", month: "2026-08", type: "o1", status: "已完成", created: "2026-08-31 18:20:11", pending: 0, rows: [], siteSummaryCondition: "是", generationAttempt: true, generatedDocumentCount: 2, generationRunning: false },
-        { id: "202608-Coupang-A-0", letter: "A", seq: 0, platform: "Coupang", warehouse: "韩国Coupang本土店仓", month: "2026-08", type: "local", status: "待生成单据", created: "2026-08-31 17:06:42", pending: 4, rows: [], siteSummaryCondition: "是", generationAttempt: false, generatedDocumentCount: 0, generationRunning: false },
-        { id: "202607-Coupang-C-0", letter: "C", seq: 0, platform: "Coupang", warehouse: "韩国Coupang海外2店仓", month: "2026-07", type: "o2", status: "生成失败", created: "2026-07-31 16:40:08", pending: 3, rows: [], siteSummaryCondition: "是", generationAttempt: true, generatedDocumentCount: 1, generationRunning: false },
-        { id: "202607-Coupang-B-0", letter: "B", seq: 0, platform: "Coupang", warehouse: "韩国Coupang海外1店仓", month: "2026-07", type: "o1", status: "已完成", created: "2026-07-31 15:12:33", pending: 0, rows: [], siteSummaryCondition: "是", generationAttempt: true, generatedDocumentCount: 2, generationRunning: false },
-        { id: "202607-Coupang-A-2", letter: "A", seq: 2, platform: "Coupang", warehouse: "韩国Coupang本土店仓", month: "2026-07", type: "local", status: "待生成单据", created: "2026-07-31 14:28:19", pending: 6, rows: [], siteSummaryCondition: "是", generationAttempt: false, generatedDocumentCount: 0, generationRunning: false },
-        { id: "202607-Coupang-A-1", letter: "A", seq: 1, platform: "Coupang", warehouse: "韩国Coupang本土店仓", month: "2026-07", type: "local", status: "已完成", created: "2026-07-31 11:05:47", pending: 0, rows: [], siteSummaryCondition: "是", generationAttempt: true, generatedDocumentCount: 3, generationRunning: false },
-        { id: "202607-Coupang-A-0", letter: "A", seq: 0, platform: "Coupang", warehouse: "韩国Coupang本土店仓", month: "2026-07", type: "local", status: "已完成", created: "2026-07-31 09:16:02", pending: 0, rows: [], siteSummaryCondition: "是", generationAttempt: true, generatedDocumentCount: 2, generationRunning: false }
+        { id: "202608-Coupang-B-0", letter: "B", seq: 0, platform: "Coupang", warehouse: "韩国Coupang海外1店仓", month: "2026-08", type: "o1", status: "已完成", created: "2026-08-31 18:20:11", pending: 0, rows: [stkOverseasLine("韩国Coupang海外1店仓", "2026-08", "S700-ST-BL-KR-615-REF", 19, -5, 10), stkOverseasLine("韩国Coupang海外1店仓", "2026-08", "E310-ST-GY-KR-615", 41, -8, 30)], siteSummaryCondition: "是", generationAttempt: true, generatedDocumentCount: 2, generationRunning: false },
+        { id: "202608-Coupang-A-0", letter: "A", seq: 0, platform: "Coupang", warehouse: "韩国Coupang本土店仓", month: "2026-08", type: "local", status: "待生成单据", created: "2026-08-31 17:06:42", pending: 3, rows: [stkLocalLine("2026-08", "C120-AC-BK-KR-801", "调拨入库", 8, 6), stkLocalLine("2026-08", "C120-AC-BK-KR-803", "调拨入库", 14, 10), stkLocalLine("2026-08", "E310-ST-GY-KR-802", "销售出库", -5, -2)], siteSummaryCondition: "是", generationAttempt: false, generatedDocumentCount: 0, generationRunning: false },
+        { id: "202607-Coupang-C-0", letter: "C", seq: 0, platform: "Coupang", warehouse: "韩国Coupang海外2店仓", month: "2026-07", type: "o2", status: "生成失败", created: "2026-07-31 16:40:08", pending: 3, rows: [stkOverseasLine("韩国Coupang海外2店仓", "2026-07", "E310-ST-GY-KR-646", 647, 45, 694), stkOverseasLine("韩国Coupang海外2店仓", "2026-07", "S820-ST-BK-KR-646", 80, -10, 68), stkOverseasLine("韩国Coupang海外2店仓", "2026-07", "T520-ST-WT-KR-646", 36, 1, 39)], siteSummaryCondition: "是", generationAttempt: true, generatedDocumentCount: 1, generationRunning: false },
+        { id: "202607-Coupang-B-0", letter: "B", seq: 0, platform: "Coupang", warehouse: "韩国Coupang海外1店仓", month: "2026-07", type: "o1", status: "已完成", created: "2026-07-31 15:12:33", pending: 0, rows: [stkOverseasLine("韩国Coupang海外1店仓", "2026-07", "S820-ST-BK-KR-615", 86, 6, 90), stkOverseasLine("韩国Coupang海外1店仓", "2026-07", "C120-AC-BK-KR-615", 66, 4, 72)], siteSummaryCondition: "是", generationAttempt: true, generatedDocumentCount: 2, generationRunning: false },
+        { id: "202607-Coupang-A-2", letter: "A", seq: 2, platform: "Coupang", warehouse: "韩国Coupang本土店仓", month: "2026-07", type: "local", status: "待生成单据", created: "2026-07-31 14:28:19", pending: 4, rows: [stkLocalLine("2026-07", "E320-ST-WT-KR-608", "调拨入库", 20, 18), stkLocalLine("2026-07", "E320-ST-WT-KR-613", "调拨入库", 13, 15), stkLocalLine("2026-07", "E320-ST-WT-KR-609", "销售出库", -567, -565), stkLocalLine("2026-07", "E320-ST-WT-KR-611", "调拨出库", -11, -9)], siteSummaryCondition: "是", generationAttempt: false, generatedDocumentCount: 0, generationRunning: false },
+        { id: "202607-Coupang-A-1", letter: "A", seq: 1, platform: "Coupang", warehouse: "韩国Coupang本土店仓", month: "2026-07", type: "local", status: "已完成", created: "2026-07-31 11:05:47", pending: 0, rows: [stkLocalLine("2026-07", "E320-ST-WT-KR-614", "调拨入库", 6, 4), stkLocalLine("2026-07", "E320-ST-WT-KR-610", "退货入库", 35, 32)], siteSummaryCondition: "是", generationAttempt: true, generatedDocumentCount: 2, generationRunning: false },
+        { id: "202607-Coupang-A-0", letter: "A", seq: 0, platform: "Coupang", warehouse: "韩国Coupang本土店仓", month: "2026-07", type: "local", status: "已完成", created: "2026-07-31 09:16:02", pending: 0, rows: [stkLocalLine("2026-07", "E320-ST-WT-KR-608", "调拨入库", 20, 16), stkLocalLine("2026-07", "E320-ST-WT-KR-611", "调拨出库", -11, -8)], siteSummaryCondition: "是", generationAttempt: true, generatedDocumentCount: 2, generationRunning: false }
       ],
       docs: [],
       detailId: null,
@@ -3638,16 +3645,20 @@
       return sum + doc.items.filter(function (item) { return item.sku === row.sku; }).reduce(function (s, item) { return s + sign * item.quantity; }, 0);
     }, 0);
   }
+  function stkAdjustDirection(diff, adjustable) {
+    if (adjustable === false || !diff) return "-";
+    return diff > 0 ? "其他入库" : "其他出库";
+  }
   function stkApplyImpact(type, row) {
     const impact = stkOtherImpact(type, row);
     if (type === "local") {
       const system = row.system + impact;
-      const diff = system - row.report;
-      return Object.assign({}, row, { system: system, diff: diff, direction: row.adjustable ? (diff > 0 ? "其他出库" : diff < 0 ? "其他入库" : "-") : "-" });
+      const diff = row.report - system;
+      return Object.assign({}, row, { system: system, diff: diff, direction: stkAdjustDirection(diff, row.adjustable) });
     }
     const flow = row.flow + impact;
-    const diff = row.opening + flow - row.closing;
-    return Object.assign({}, row, { flow: flow, diff: diff, direction: diff > 0 ? "其他出库" : diff < 0 ? "其他入库" : "-" });
+    const diff = row.closing - (row.opening + flow);
+    return Object.assign({}, row, { flow: flow, diff: diff, direction: stkAdjustDirection(diff, true) });
   }
   function getStocktakeRows(type) {
     return stkBaseRows(type).map(function (row) { return stkApplyImpact(type, row); });
@@ -3661,7 +3672,7 @@
     return rows.map(function (row) { return Object.assign({}, row); });
   }
   function stkHead() {
-    return "<tr><th>站点</th><th>仓库</th><th>当地店铺日期</th><th>系统SKU</th><th>业务分类</th><th class=\"num\">系统流水数量</th><th class=\"num\">报告流水数量</th><th class=\"num\">报告期初数量</th><th class=\"num\">系统期末数量</th><th class=\"num\">报告期末数量</th><th class=\"num\">差异数量</th><th>调整单据类型</th></tr>";
+    return "<tr><th>站点</th><th>仓库</th><th>当地店铺日期</th><th>系统SKU</th><th>业务分类</th><th class=\"num\">报告流水数量</th><th class=\"num\">系统流水数量</th><th class=\"num\">报告期初数量</th><th class=\"num\">报告期末数量</th><th class=\"num\">系统期末数量</th><th class=\"num\">差异数量</th><th>调整单据类型</th></tr>";
   }
   function stkSite(type) {
     return type === "local" ? "Coupang本土-KR" : type === "o1" ? "Coupang-CGF1" : "Coupang-CGF2";
@@ -3674,8 +3685,8 @@
       const date = stkMonthEnd(row.month);
       const qty = showReport
         ? (isLocal
-          ? "<td class=\"num\">" + (reconciled ? stkQty(row.system) : "") + "</td><td class=\"num\">" + stkQty(row.report) + "</td><td></td><td></td><td></td><td class=\"num\">" + (reconciled ? stkSigned(row.diff) : "") + "</td><td>" + (reconciled ? stkDirectionCapsule(row.adjustable ? row.direction : "-") : "") + "</td>"
-          : "<td class=\"num\">" + (reconciled ? stkQty(row.flow) : "") + "</td><td></td><td class=\"num\">" + stkQty(row.opening) + "</td><td class=\"num\">" + (reconciled ? stkQty(row.opening + row.flow) : "") + "</td><td class=\"num\">" + stkQty(row.closing) + "</td><td class=\"num\">" + (reconciled ? stkSigned(row.diff) : "") + "</td><td>" + (reconciled ? stkDirectionCapsule(row.direction) : "") + "</td>")
+          ? "<td class=\"num\">" + stkQty(row.report) + "</td><td class=\"num\">" + (reconciled ? stkQty(row.system) : "") + "</td><td></td><td></td><td></td><td class=\"num\">" + (reconciled ? stkSigned(row.diff) : "") + "</td><td>" + (reconciled ? stkDirectionCapsule(row.adjustable ? row.direction : "-") : "") + "</td>"
+          : "<td></td><td class=\"num\">" + (reconciled ? stkQty(row.flow) : "") + "</td><td class=\"num\">" + stkQty(row.opening) + "</td><td class=\"num\">" + stkQty(row.closing) + "</td><td class=\"num\">" + (reconciled ? stkQty(row.opening + row.flow) : "") + "</td><td class=\"num\">" + (reconciled ? stkSigned(row.diff) : "") + "</td><td>" + (reconciled ? stkDirectionCapsule(row.direction) : "") + "</td>")
         : "<td></td><td></td><td></td><td></td><td></td><td></td><td></td>";
       if (isLocal) {
         return "<tr><td>" + site + "</td><td>" + stkWhName(type) + "</td><td>" + date + "</td><td>" + esc(row.sku) + "</td><td>" + esc(row.scene) + "</td>" + qty + "</tr>";
@@ -3806,12 +3817,11 @@
         status: "已完成",
         rows: stkMonthEnd(month),
         scope: stkWhName(type) + " / " + month + (sku ? " / " + stkVal("stk-sku") : ""),
-        resultText: reconciled ? (rec.running ? "报告流水已获取，当前可查询上一份核对快照。" : "报告流水已获取，当前可查询已完成核对快照。") : "报告流水已获取。请点击查询查看。",
+        resultText: reconciled ? (rec.running ? "报告流水已获取，当前展示上一份核对快照。" : "报告流水已获取，当前展示已完成核对快照。") : "报告流水已获取。",
         exception: "—",
         finishedAt: stkNow()
       });
-      showToast("盘点报告数量完成，请点击查询查看明细", "success");
-      return;
+      showToast("盘点报告数量完成", "success");
     }
     if (showMessage) state.stk.listPage = 1;
     const reportReady = !!state.stk.reportFetched[type + "|" + month];
@@ -3854,10 +3864,11 @@
       const snapshot = getStocktakeRows(type).filter(function (row) { return row.month === month; }).map(function (row) { return Object.assign({}, row); });
       state.stk.reconcile[key] = { status: "已完成", completed: true, running: false, finishedAt: finishedAt, exception: "—", snapshot: snapshot };
       task.status = "已完成";
-      task.resultText = "已完成。请点击“查询”查看本次核对快照；再次拉取报告不会自动覆盖，需再次盘点系统流水后更新。";
+      task.resultText = "已完成。核对结果已更新到当前列表；再次拉取报告不会自动覆盖，需再次盘点系统流水后更新。";
       task.finishedAt = finishedAt;
+      if (state.page === "monthlyStocktake" && stkVal("stk-warehouse") === type && stkVal("stk-month") === month) queryStocktake(false);
       if (state.stk.drawer === "progress" || (state.stk.drawer === "progress-detail" && state.stk.progressViewId === task.id)) openStkDrawer(state.stk.drawer);
-      showToast("盘点系统流水完成，请点击“查询”查看核对后的正确数量", "success");
+      showToast("盘点系统流水完成", "success");
     }, 2000);
   }
   function stkResultLetter(index) {
@@ -3898,7 +3909,7 @@
     if (!state.stk.queried) { showToast("请先点击查询获取盘点对比数据", "error"); return; }
     if (!month) { showToast("生成盘点结果表前请先选择月份", "error"); return; }
     if (!stkReconcile(type, month).completed) { showToast("请先完成盘点系统流水，再生成盘点结果表", "error"); return; }
-    if (!state.stk.formal) { showToast("盘点系统流水已完成，请重新点击“查询”后再生成盘点结果表", "error"); return; }
+    if (!state.stk.formal) { showToast("盘点系统流水已完成，请等待列表刷新后再生成盘点结果表", "error"); return; }
     if (stkReconcile(type, month).running) { showToast("系统流水正在再次核对，请等待完成后重新点击查询再生成盘点结果表", "error"); return; }
     const warehouse = stkWhName(type);
     const platform = stkVal("stk-platform") || "Coupang";
@@ -3935,12 +3946,12 @@
       const impact = resultGeneratedImpact(result, row);
       if (result.type === "local") {
         const system = row.system + impact;
-        const diff = system - row.report;
-        return Object.assign({}, row, { system: system, diff: diff, direction: row.adjustable ? (diff > 0 ? "其他出库" : diff < 0 ? "其他入库" : "-") : "-", originalDirection: row.direction });
+        const diff = row.report - system;
+        return Object.assign({}, row, { system: system, diff: diff, direction: stkAdjustDirection(diff, row.adjustable), originalDirection: row.direction });
       }
       const flow = row.flow + impact;
-      const diff = row.opening + flow - row.closing;
-      return Object.assign({}, row, { flow: flow, diff: diff, direction: diff > 0 ? "其他出库" : diff < 0 ? "其他入库" : "-", originalDirection: row.direction });
+      const diff = row.closing - (row.opening + flow);
+      return Object.assign({}, row, { flow: flow, diff: diff, direction: stkAdjustDirection(diff, true), originalDirection: row.direction });
     });
   }
   function stkScenes(result, row) {
@@ -4010,8 +4021,8 @@
     state.stk.resultPage = sized.page;
     const body = sized.rows.length ? sized.rows.map(function (row) {
       const del = row.status === "待生成单据" ? '<a class="link danger" data-act="res-delete" data-id="' + esc(row.id) + '">删除</a>' : "";
-      return "<tr><td>" + esc(row.id) + "</td><td><span class=\"stk-tag cp\">" + esc(row.platform) + "</span></td><td>" + esc(row.warehouse) + "</td><td>" + esc(row.month) + "</td><td>" + stkTag(row.status) + "</td><td>" + esc(row.created) + "</td><td><a class=\"link\" data-act=\"res-open\" data-id=\"" + esc(row.id) + "\">查看</a>" + del + "</td></tr>";
-    }).join("") : '<tr><td colspan="7"><div class="empty">暂无盘点结果表</div></td></tr>';
+      return "<tr><td>" + esc(row.id) + "</td><td><span class=\"stk-tag cp\">" + esc(row.platform) + "</span></td><td>" + esc(row.warehouse) + "</td><td>" + esc(row.month) + "</td><td>" + stkTag(row.status) + "</td><td>" + esc(row.created) + "</td><td>system</td><td><a class=\"link\" data-act=\"res-open\" data-id=\"" + esc(row.id) + "\">查看</a>" + del + "</td></tr>";
+    }).join("") : '<tr><td colspan="8"><div class="empty">暂无盘点结果表</div></td></tr>';
     $("page-storage").innerHTML =
       '<div class="stk-filter-panel">' +
         '<div class="search-bar">' +
@@ -4034,15 +4045,18 @@
           '<button class="btn light" type="button" data-act="res-export">导出</button>' +
         "</div>" +
       "</div>" +
-      '<section class="table-shell"><div class="table-wrap"><table><thead><tr><th>盘点结果编号</th><th>平台</th><th>仓库</th><th>月份</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead><tbody>' + body + "</tbody></table></div>" +
+      '<section class="table-shell"><div class="table-wrap"><table><thead><tr><th>盘点结果编号</th><th>平台</th><th>仓库</th><th>月份</th><th>状态</th><th>创建时间</th><th>创建人</th><th>操作</th></tr></thead><tbody>' + body + "</tbody></table></div>" +
       evaPagerHtml(rows.length, sized.page, state.stk.resultPageSize, "result") + "</section>";
   }
   function renderStocktakeDetailPage() {
     const r = stkDetail();
     if (!r) { switchPage("stocktakeResults"); return; }
-    const pendingRows = detailRows(r);
+    const pendingRows = detailRows(r).filter(function (row) {
+      const direction = row.direction;
+      return row.diff !== 0 && direction && direction !== "-" && direction !== "—";
+    });
     const isLocal = r.type === "local";
-    const head = "<tr><th>站点</th><th>仓库</th><th>当地店铺日期</th><th>系统SKU</th><th>业务分类</th><th class=\"num\">系统流水数量</th><th class=\"num\">报告流水数量</th><th class=\"num\">报告期初数量</th><th class=\"num\">系统期末数量</th><th class=\"num\">报告期末数量</th><th class=\"num\">差异数量</th><th>调整单据类型</th><th>明细状态</th><th>生成单据号</th><th>异常信息</th></tr>";
+    const head = "<tr><th>站点</th><th>仓库</th><th>当地店铺日期</th><th>系统SKU</th><th>业务分类</th><th class=\"num\">报告流水数量</th><th class=\"num\">系统流水数量</th><th class=\"num\">报告期初数量</th><th class=\"num\">报告期末数量</th><th class=\"num\">系统期末数量</th><th class=\"num\">差异数量</th><th>调整单据类型</th><th>明细状态</th><th>生成单据号</th><th>异常信息</th></tr>";
     const sized = pageSlice(pendingRows, state.stk.detailPage, state.stk.detailPageSize);
     state.stk.detailPage = sized.page;
     const body = sized.rows.length ? sized.rows.map(function (row) {
@@ -4053,17 +4067,16 @@
       const directionCell = stkDirectionCapsule(direction);
       const errorCell = stkBlank(meta.error);
       if (isLocal) {
-        return "<tr><td>Coupang本土-KR</td><td>" + esc(r.warehouse) + "</td><td>" + stkMonthEnd(r.month) + "</td><td>" + esc(row.sku) + "</td><td>" + esc(row.scene) + "</td><td class=\"num\">" + stkQty(row.system) + "</td><td class=\"num\">" + stkQty(row.report) + "</td><td></td><td></td><td></td><td class=\"num\">" + stkSigned(row.diff) + "</td><td>" + directionCell + "</td><td>" + stkTag(meta.status) + "</td><td>" + docCell + "</td><td>" + errorCell + "</td></tr>";
+        return "<tr><td>Coupang本土-KR</td><td>" + esc(r.warehouse) + "</td><td>" + stkMonthEnd(r.month) + "</td><td>" + esc(row.sku) + "</td><td>" + esc(row.scene) + "</td><td class=\"num\">" + stkQty(row.report) + "</td><td class=\"num\">" + stkQty(row.system) + "</td><td></td><td></td><td></td><td class=\"num\">" + stkSigned(row.diff) + "</td><td>" + directionCell + "</td><td>" + stkTag(meta.status) + "</td><td>" + docCell + "</td><td>" + errorCell + "</td></tr>";
       }
-      return "<tr><td>" + stkSite(r.type) + "</td><td>" + esc(r.warehouse) + "</td><td>" + stkMonthEnd(r.month) + "</td><td>" + esc(row.sku) + "</td><td></td><td class=\"num\">" + stkQty(row.flow) + "</td><td></td><td class=\"num\">" + stkQty(row.opening) + "</td><td class=\"num\">" + stkQty(row.opening + row.flow) + "</td><td class=\"num\">" + stkQty(row.closing) + "</td><td class=\"num\">" + stkSigned(row.diff) + "</td><td>" + directionCell + "</td><td>" + stkTag(meta.status) + "</td><td>" + docCell + "</td><td>" + errorCell + "</td></tr>";
+      return "<tr><td>" + stkSite(r.type) + "</td><td>" + esc(r.warehouse) + "</td><td>" + stkMonthEnd(r.month) + "</td><td>" + esc(row.sku) + "</td><td></td><td></td><td class=\"num\">" + stkQty(row.flow) + "</td><td class=\"num\">" + stkQty(row.opening) + "</td><td class=\"num\">" + stkQty(row.closing) + "</td><td class=\"num\">" + stkQty(row.opening + row.flow) + "</td><td class=\"num\">" + stkSigned(row.diff) + "</td><td>" + directionCell + "</td><td>" + stkTag(meta.status) + "</td><td>" + docCell + "</td><td>" + errorCell + "</td></tr>";
     }).join("") : '<tr><td colspan="15"><div class="empty">暂无明细</div></td></tr>';
     const done = r.status === "已完成";
     const disabled = done || r.pending === 0 || r.generationRunning ? " disabled" : "";
-    const summaryDisabled = r.generationAttempt || r.generationRunning ? " disabled" : "";
     $("page-storage").innerHTML =
       '<div class="stk-detail-head"><button class="drawer-back" type="button" data-act="stk-back" title="返回"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg></button><div><div class="stk-detail-title">盘点结果详情</div><div class="stk-note">盘点结果完成后可基于更新后的报告或新增出入库流水创建下一轮结果；已生成单据不提供删除操作。</div></div></div>' +
       '<div class="stk-info"><div><label>盘点结果编号</label><div>' + esc(r.id) + "</div></div><div><label>平台</label><div>Coupang</div></div><div><label>仓库</label><div>" + esc(r.warehouse) + "</div></div><div><label>月份</label><div>" + esc(r.month) + '</div></div><div><label>汇总方式</label><div>按日汇总</div></div><div><label>状态</label><div>' + stkTag(r.status) + "</div></div></div>" +
-      '<div class="search-bar"><label style="color:#606266;">是否按照站点汇总</label><select id="stk-site-summary" class="control"' + summaryDisabled + '><option value="是"' + ((r.siteSummaryCondition || "是") === "是" ? " selected" : "") + '>是</option><option value="否"' + (r.siteSummaryCondition === "否" ? " selected" : "") + '>否</option></select>' +
+      '<div class="search-bar"><label style="color:#606266;">是否按照站点汇总</label><select id="stk-site-summary" class="control" disabled><option value="是" selected>是</option></select>' +
       '<button class="btn primary' + (done ? " is-done" : "") + '" type="button" data-act="stk-gen"' + disabled + '>生成单据</button><button class="btn" type="button" data-act="stk-gen-progress">状态进度</button><button class="btn light" type="button" data-act="stk-export">导出</button></div>' +
       '<section class="table-shell"><div class="table-toolbar"><div class="toolbar-left">盘点差异明细</div></div><div class="table-wrap"><table><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div>" +
       evaPagerHtml(pendingRows.length, sized.page, state.stk.detailPageSize, "detail") + "</section>";
@@ -4192,10 +4205,10 @@
         : reportPageTitle(String(channel).replace(/^report:/, ""));
     const samples = isStocktake ? [
       { taskName: "盘点报告数量", status: "进行中", time: "2026-10-21", resultText: "正在盘点报告数量，请稍候。", exception: "-", finishedAt: "-" },
-      { taskName: "盘点报告数量", status: "已完成", time: "2026-10-21", resultText: "报告流水已获取。请点击查询查看。", exception: "-", finishedAt: "2026-10-21 09:20:18" },
+      { taskName: "盘点报告数量", status: "已完成", time: "2026-10-21", resultText: "报告流水已获取。", exception: "-", finishedAt: "2026-10-21 09:20:18" },
       { taskName: "盘点报告数量", status: "生成异常", time: "2026-10-20", resultText: "盘点报告数量失败。", exception: "报告数量获取失败。", failLines: [{ sku: "E320-ST-WT-KR-613", scene: "调拨入库" }, { sku: "E320-ST-WT-KR-610", scene: "退货入库" }], finishedAt: "-" },
       { taskName: "盘点系统流水", status: "进行中", time: "2026-10-21", resultText: "正在核对报告与系统流水，请稍候。", exception: "-", finishedAt: "-" },
-      { taskName: "盘点系统流水", status: "已完成", time: "2026-10-20", resultText: "已完成。请点击“查询”查看本次核对快照；再次拉取报告不会自动覆盖，需再次盘点系统流水后更新。", exception: "-", finishedAt: "2026-10-20 18:06:22" },
+      { taskName: "盘点系统流水", status: "已完成", time: "2026-10-20", resultText: "已完成。核对结果已更新到当前列表；再次拉取报告不会自动覆盖，需再次盘点系统流水后更新。", exception: "-", finishedAt: "2026-10-20 18:06:22" },
       { taskName: "盘点系统流水", status: "生成异常", time: "2026-10-20", resultText: "盘点系统流水失败。", exception: "系统流水核对失败。", failLines: [{ sku: "E320-ST-WT-KR-608", scene: "调拨入库" }, { sku: "E320-ST-WT-KR-611", scene: "调拨出库" }], finishedAt: "-" }
     ] : [
       {
@@ -4355,7 +4368,7 @@
         ? stkSection("提示", "请选择仓库和月份后再查看核对状态。")
         : stkSection("核对范围", esc(stkWhName(type)) + " / " + esc(month)) +
           stkSection("任务状态", stkTag(rec.status)) +
-          stkSection("核对结果", rec.running ? "正在核对报告与系统流水，请稍候。" : rec.completed ? "已完成。请点击“查询”查看本次核对快照；再次拉取报告不会自动覆盖，需再次盘点系统流水后更新。" : "未完成。查询仅展示报告数据。") +
+          stkSection("核对结果", rec.running ? "正在核对报告与系统流水，请稍候。" : rec.completed ? "已完成。核对结果已更新到当前列表；再次拉取报告不会自动覆盖，需再次盘点系统流水后更新。" : "未完成。查询仅展示报告数据。") +
           stkSection("异常信息", stkBlank(rec.exception)) +
           stkSection("完成时间", esc(rec.finishedAt));
       return drawerShell("库存核对状态", body);
