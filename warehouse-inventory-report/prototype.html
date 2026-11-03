@@ -3951,15 +3951,29 @@
   }
   function detailRows(result) {
     return (result.rows || []).map(function (row) {
-      const impact = resultGeneratedImpact(result, row);
       if (result.type === "local") {
-        const system = row.system + impact;
-        const diff = row.report - system;
-        return Object.assign({}, row, { system: system, diff: diff, direction: stkAdjustDirection(diff, row.adjustable), originalDirection: row.direction });
+        const system = Number(row.system) || 0;
+        const diff = Number(row.report) - system;
+        const direction = stkAdjustDirection(diff, row.adjustable);
+        return Object.assign({}, row, { system: system, diff: diff, direction: direction, originalDirection: direction });
       }
-      const flow = row.flow + impact;
-      const diff = row.closing - (row.opening + flow);
-      return Object.assign({}, row, { flow: flow, diff: diff, direction: stkAdjustDirection(diff, true), originalDirection: row.direction });
+      const flow = Number(row.flow) || 0;
+      const opening = Number(row.opening) || 0;
+      const closing = Number(row.closing) || 0;
+      const diff = closing - (opening + flow);
+      const direction = stkAdjustDirection(diff, true);
+      return Object.assign({}, row, { flow: flow, opening: opening, closing: closing, diff: diff, direction: direction, originalDirection: direction });
+    });
+  }
+  function detailDiffRows(result) {
+    return detailRows(result).filter(function (row) {
+      const direction = row.direction;
+      return row.diff !== 0 && direction && direction !== "-" && direction !== "—";
+    });
+  }
+  function detailPendingRows(result) {
+    return detailDiffRows(result).filter(function (row) {
+      return row.adjustable !== false && !generatedDocumentForRow(row, result);
     });
   }
   function stkScenes(result, row) {
@@ -3997,8 +4011,8 @@
   function generationFailureGroups(result) {
     const groups = {};
     const list = [];
-    (result.rows || []).forEach(function (row) {
-      if (row.adjustable === false || row.diff === 0 || !row.generationError || generatedDocumentForRow(row, result)) return;
+    detailDiffRows(result).forEach(function (row) {
+      if (row.adjustable === false || !row.generationError || generatedDocumentForRow(row, result)) return;
       const shaped = Object.assign({}, row, { direction: row.originalDirection || row.direction });
       const key = adjustmentGroupKey(result, shaped);
       if (groups[key]) return;
@@ -4059,19 +4073,16 @@
   function renderStocktakeDetailPage() {
     const r = stkDetail();
     if (!r) { switchPage("stocktakeResults"); return; }
-    const pendingRows = detailRows(r).filter(function (row) {
-      const direction = row.direction;
-      return row.diff !== 0 && direction && direction !== "-" && direction !== "—";
-    });
+    ensureResultDocuments(r);
+    const pendingRows = detailDiffRows(r);
     const isLocal = r.type === "local";
     const head = "<tr><th>站点</th><th>仓库</th><th>当地店铺日期</th><th>系统SKU</th><th>业务分类</th><th class=\"num\">报告流水数量</th><th class=\"num\">系统流水数量</th><th class=\"num\">报告期初数量</th><th class=\"num\">报告期末数量</th><th class=\"num\">系统期末数量</th><th class=\"num\">差异数量</th><th>调整单据类型</th><th>明细状态</th><th>生成单据号</th><th>异常信息</th></tr>";
     const sized = pageSlice(pendingRows, state.stk.detailPage, state.stk.detailPageSize);
     state.stk.detailPage = sized.page;
     const body = sized.rows.length ? sized.rows.map(function (row) {
       const meta = detailLineMeta(row, r);
-      const hasDoc = !!meta.documentNo;
-      const direction = row.diff !== 0 ? row.direction : (hasDoc ? row.originalDirection : "");
-      const docCell = hasDoc ? '<a class="link" data-act="stk-open-doc" data-id="' + esc(meta.documentNo) + '">' + esc(meta.documentNo) + "</a>" : "-";
+      const direction = row.direction || row.originalDirection || "";
+      const docCell = meta.documentNo ? '<a class="link" data-act="stk-open-doc" data-id="' + esc(meta.documentNo) + '">' + esc(meta.documentNo) + "</a>" : "-";
       const directionCell = stkDirectionCapsule(direction);
       const errorCell = stkBlank(meta.error);
       if (isLocal) {
@@ -4080,7 +4091,7 @@
       return "<tr><td>" + stkSite(r.type) + "</td><td>" + esc(r.warehouse) + "</td><td>" + stkMonthEnd(r.month) + "</td><td>" + esc(row.sku) + "</td><td></td><td></td><td class=\"num\">" + stkQty(row.flow) + "</td><td class=\"num\">" + stkQty(row.opening) + "</td><td class=\"num\">" + stkQty(row.closing) + "</td><td class=\"num\">" + stkQty(row.opening + row.flow) + "</td><td class=\"num\">" + stkSigned(row.diff) + "</td><td>" + directionCell + "</td><td>" + stkTag(meta.status) + "</td><td>" + docCell + "</td><td>" + errorCell + "</td></tr>";
     }).join("") : '<tr><td colspan="15"><div class="empty">暂无明细</div></td></tr>';
     const done = r.status === "已完成";
-    const disabled = done || r.pending === 0 || r.generationRunning ? " disabled" : "";
+    const disabled = done || detailPendingRows(r).length === 0 || r.generationRunning ? " disabled" : "";
     $("page-storage").innerHTML =
       '<div class="stk-detail-head"><button class="drawer-back" type="button" data-act="stk-back" title="返回"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg></button><div class="stk-detail-title">盘点结果详情</div></div>' +
       '<div class="stk-info"><div><label>盘点结果编号</label><div>' + esc(r.id) + "</div></div><div><label>平台</label><div>Coupang</div></div><div><label>仓库</label><div>" + esc(r.warehouse) + "</div></div><div><label>月份</label><div>" + esc(r.month) + '</div></div><div><label>汇总方式</label><div>按日汇总</div></div><div><label>状态</label><div>' + stkTag(r.status) + "</div></div></div>" +
@@ -4092,7 +4103,7 @@
   function buildOtherInventoryDocuments(result) {
     const groups = {};
     const failures = generationFailureGroups(result).filter(function (group) { return !group.resolved; });
-    detailRows(result).filter(function (row) { return row.adjustable !== false && row.diff !== 0; }).forEach(function (row) {
+    detailPendingRows(result).forEach(function (row) {
       const groupKey = adjustmentGroupKey(result, row);
       if (failures.some(function (group) { return group.key === groupKey; })) return;
       if (state.stk.docs.some(function (doc) { return doc.resultId === result.id && doc.groupKey === groupKey; })) return;
@@ -4114,13 +4125,24 @@
     });
     return Object.keys(groups).map(function (key) { return groups[key]; });
   }
+  function ensureResultDocuments(result) {
+    if (!result || !result.generationAttempt) return;
+    if (state.stk.docs.some(function (doc) { return doc.resultId === result.id; })) return;
+    if (result.status !== "已完成" && result.status !== "生成失败") return;
+    const documents = buildOtherInventoryDocuments(result);
+    if (result.status === "生成失败" && documents.length > 1) {
+      state.stk.docs = state.stk.docs.concat(documents.slice(0, Math.max(1, result.generatedDocumentCount || 1)));
+    } else {
+      state.stk.docs = state.stk.docs.concat(documents);
+    }
+  }
   function finishGenerateDocs(result) {
     const documents = buildOtherInventoryDocuments(result);
     state.stk.docs = state.stk.docs.concat(documents);
     result.docGenCondition = "按月汇总";
     result.generationAttempt = true;
     result.generatedDocumentCount = (result.generatedDocumentCount || 0) + documents.length;
-    const pendingRows = detailRows(result).filter(function (row) { return row.adjustable !== false && row.diff !== 0; });
+    const pendingRows = detailPendingRows(result);
     const failures = generationFailureGroups(result).filter(function (group) { return !group.resolved; });
     result.pending = pendingRows.length;
     result.status = failures.length ? "生成失败" : "已完成";
@@ -4138,12 +4160,12 @@
   }
   function generateDocs() {
     const result = stkDetail();
-    if (!result || result.pending === 0) return;
+    const pendingRows = detailPendingRows(result || {});
+    if (!result || !pendingRows.length) return;
     if (result.generationRunning) { showToast("单据正在生成，请在状态进度中查看", "warning"); return; }
     const siteSummary = stkVal("stk-site-summary");
     if (!siteSummary) { showToast("请先选择是否按照站点汇总", "error"); return; }
     if (siteSummary !== "是") { showToast("Coupang 盘点必须按站点汇总，请选择“是”后再生成单据", "error"); return; }
-    const pendingRows = detailRows(result).filter(function (row) { return row.adjustable !== false && row.diff !== 0; });
     result.siteSummaryCondition = siteSummary;
     result.generationRunning = true;
     result.generationTotalRows = pendingRows.length;
