@@ -1,0 +1,99 @@
+{
+  "featureName": "point-in-time-inventory",
+  "pageTitle": "时点库存",
+  "assumption": "本原型按仓库 + SKU 计算时点在库。期初取上月期末库存快照，期间变动直接取有效入库单、出库单明细，并按会计口径日期纳入。数量是演算数。原型假定上线月份为 2026-10，可选日期从 2026-11-01 到 2026-11-05。筋斗云GLC仓仍无期末快照。",
+  "levelsByWarehouse": {
+    "万邑通澳洲仓": ["万邑通澳洲_分销"],
+    "万邑通德国仓": ["万邑通德国_分销", "调拨_德国万邑通官网"],
+    "筋斗云DWA仓": ["Yahoo_JP"],
+    "筋斗云GLC仓": ["分销_JP"],
+    "法国谷仓售后仓": []
+  },
+  "goLiveMonth": "2026-10",
+  "today": "2026-11-05",
+  "warehouses": ["万邑通澳洲仓", "万邑通德国仓", "筋斗云DWA仓", "筋斗云GLC仓", "法国谷仓售后仓"],
+  "missingSnapshotWarehouses": ["筋斗云GLC仓"],
+  "snapshots": {
+    "2026-10": {
+      "万邑通澳洲仓": [
+        { "sku": "C610-AN-BK-KR-000", "skuName": "Shokz OpenMeet 韩国通用包装 BK", "availableQty": 0, "lockedQty": 0 },
+        { "sku": "S810-ST-PK-UK-170-N", "skuName": "Shokz OpenRun Pro 英国170客户包装 BK", "availableQty": 100, "lockedQty": 20 },
+        { "sku": "S820BK", "skuName": "Shokz OpenFit 2 德国通用包装 BK", "availableQty": 46, "lockedQty": 8 },
+        { "sku": "S900GY", "skuName": "Shokz OpenDots ONE 澳洲包装 GY", "availableQty": 12, "lockedQty": 0 },
+        { "sku": "T910-ST-BK-UK", "skuName": "Shokz OpenComm 2 英国包装 BK", "availableQty": 5, "lockedQty": 4 }
+      ],
+      "万邑通德国仓": [
+        { "sku": "S611BK", "skuName": "Shokz OpenSwim Pro 日本包装 BK", "availableQty": 9, "lockedQty": 1 },
+        { "sku": "S810-ST-PK-UK-170-N", "skuName": "Shokz OpenRun Pro 英国170客户包装 BK", "availableQty": 30, "lockedQty": 6 },
+        { "sku": "S820BK", "skuName": "Shokz OpenFit 2 德国通用包装 BK", "availableQty": 15, "lockedQty": 0 },
+        { "sku": "S900GY", "skuName": "Shokz OpenDots ONE 澳洲包装 GY", "availableQty": 4, "lockedQty": 2 },
+        { "sku": "C610-AN-BK-KR-000", "skuName": "Shokz OpenMeet 韩国通用包装 BK", "availableQty": 12, "lockedQty": 0 },
+        { "sku": "T910-ST-BK-UK", "skuName": "Shokz OpenComm 2 英国包装 BK", "availableQty": 8, "lockedQty": 3 }
+      ],
+      "筋斗云DWA仓": [
+        { "sku": "C610-AN-BK-KR-000", "skuName": "Shokz OpenMeet 韩国通用包装 BK", "availableQty": 80, "lockedQty": 3 },
+        { "sku": "S611BK", "skuName": "Shokz OpenSwim Pro 日本包装 BK", "availableQty": 18, "lockedQty": 0 },
+        { "sku": "S810-ST-PK-UK-170-N", "skuName": "Shokz OpenRun Pro 英国170客户包装 BK", "availableQty": 22, "lockedQty": 5 },
+        { "sku": "S820BK", "skuName": "Shokz OpenFit 2 德国通用包装 BK", "availableQty": 6, "lockedQty": 0 },
+        { "sku": "T910-ST-BK-UK", "skuName": "Shokz OpenComm 2 英国包装 BK", "availableQty": 11, "lockedQty": 2 },
+        { "sku": "S900GY", "skuName": "Shokz OpenDots ONE 澳洲包装 GY", "availableQty": 5, "lockedQty": 0 }
+      ],
+      "法国谷仓售后仓": [
+        { "sku": "S611BK", "skuName": "Shokz OpenSwim Pro 日本包装 BK", "availableQty": 3, "lockedQty": 0 },
+        { "sku": "S820BK", "skuName": "Shokz OpenFit 2 德国通用包装 BK", "availableQty": 14, "lockedQty": 0 },
+        { "sku": "S900GY", "skuName": "Shokz OpenDots ONE 澳洲包装 GY", "availableQty": 28, "lockedQty": 6 },
+        { "sku": "T910-ST-BK-UK", "skuName": "Shokz OpenComm 2 英国包装 BK", "availableQty": 7, "lockedQty": 1 },
+        { "sku": "C610-AN-BK-KR-000", "skuName": "Shokz OpenMeet 韩国通用包装 BK", "availableQty": 10, "lockedQty": 2 },
+        { "sku": "S810-ST-PK-UK-170-N", "skuName": "Shokz OpenRun Pro 英国170客户包装 BK", "availableQty": 40, "lockedQty": 0 }
+      ],
+      "新加坡待维修仓": [
+        { "sku": "C610-AN-BK-KR-000", "skuName": "Shokz OpenMeet 韩国通用包装 BK", "availableQty": 9, "lockedQty": 0 },
+        { "sku": "S810-ST-PK-UK-170-N", "skuName": "Shokz OpenRun Pro 英国170客户包装 BK", "availableQty": 2, "lockedQty": 1 },
+        { "sku": "S900GY", "skuName": "Shokz OpenDots ONE 澳洲包装 GY", "availableQty": 0, "lockedQty": 0 },
+        { "sku": "T910-ST-BK-UK", "skuName": "Shokz OpenComm 2 英国包装 BK", "availableQty": 16, "lockedQty": 4 },
+        { "sku": "S820BK", "skuName": "Shokz OpenFit 2 德国通用包装 BK", "availableQty": 11, "lockedQty": 0 },
+        { "sku": "S611BK", "skuName": "Shokz OpenSwim Pro 日本包装 BK", "availableQty": 1, "lockedQty": 0 }
+      ]
+    }
+  },
+  "documents": [
+    { "warehouseName": "万邑通澳洲仓", "sku": "S810-ST-PK-UK-170-N", "skuName": "Shokz OpenRun Pro 英国170客户包装 BK", "direction": "in", "businessType": "调拨入库", "qty": 10, "createTime": "2026-11-02 09:20:00", "boundTime": "2026-11-02 09:20:00" },
+    { "warehouseName": "万邑通澳洲仓", "sku": "S810-ST-PK-UK-170-N", "skuName": "Shokz OpenRun Pro 英国170客户包装 BK", "direction": "in", "businessType": "其他入库", "qty": 6, "createTime": "2026-11-04 11:00:00", "boundTime": "2026-10-20 16:00:00" },
+    { "warehouseName": "万邑通澳洲仓", "sku": "S810-ST-PK-UK-170-N", "skuName": "Shokz OpenRun Pro 英国170客户包装 BK", "direction": "in", "businessType": "其他入库", "qty": 2, "createTime": "2026-11-05 10:30:00", "boundTime": "2026-10-18 10:00:00" },
+    { "warehouseName": "万邑通澳洲仓", "sku": "S820BK", "skuName": "Shokz OpenFit 2 德国通用包装 BK", "direction": "in", "businessType": "盘点入库", "qty": 20, "createTime": "2026-11-01 10:15:00", "boundTime": "2026-11-01 10:15:00" },
+    { "warehouseName": "万邑通澳洲仓", "sku": "S820BK", "skuName": "Shokz OpenFit 2 德国通用包装 BK", "direction": "out", "businessType": "销售出库", "qty": 6, "createTime": "2026-11-03 16:40:00", "boundTime": "2026-11-03 16:40:00" },
+    { "warehouseName": "万邑通澳洲仓", "sku": "S900GY", "skuName": "Shokz OpenDots ONE 澳洲包装 GY", "direction": "in", "businessType": "调拨入库", "qty": 4, "createTime": "2026-11-04 09:05:00", "boundTime": "2026-11-04 09:05:00" },
+    { "warehouseName": "万邑通澳洲仓", "sku": "T910-ST-BK-UK", "skuName": "Shokz OpenComm 2 英国包装 BK", "direction": "out", "businessType": "销售出库", "qty": 3, "createTime": "2026-11-02 13:25:00", "boundTime": "2026-11-02 13:25:00" },
+    { "warehouseName": "万邑通澳洲仓", "sku": "S611BK", "skuName": "Shokz OpenSwim Pro 日本包装 BK", "direction": "in", "businessType": "其他入库", "qty": 7, "createTime": "2026-11-03 11:20:00", "boundTime": "2026-10-15 15:00:00" },
+    { "warehouseName": "万邑通澳洲仓", "sku": "S611BK", "skuName": "Shokz OpenSwim Pro 日本包装 BK", "direction": "out", "businessType": "销售出库", "qty": 2, "createTime": "2026-11-05 15:10:00", "boundTime": "2026-11-05 15:10:00" },
+    { "warehouseName": "万邑通德国仓", "sku": "S820BK", "skuName": "Shokz OpenFit 2 德国通用包装 BK", "direction": "out", "businessType": "销售出库", "qty": 15, "createTime": "2026-11-02 16:40:00", "boundTime": "2026-11-02 16:40:00" },
+    { "warehouseName": "万邑通德国仓", "sku": "S810-ST-PK-UK-170-N", "skuName": "Shokz OpenRun Pro 英国170客户包装 BK", "direction": "in", "businessType": "退货入库", "qty": 8, "createTime": "2026-11-01 08:40:00", "boundTime": "2026-11-01 08:40:00" },
+    { "warehouseName": "万邑通德国仓", "sku": "S810-ST-PK-UK-170-N", "skuName": "Shokz OpenRun Pro 英国170客户包装 BK", "direction": "out", "businessType": "销售出库", "qty": 3, "createTime": "2026-11-04 17:20:00", "boundTime": "2026-11-04 17:20:00" },
+    { "warehouseName": "万邑通德国仓", "sku": "S611BK", "skuName": "Shokz OpenSwim Pro 日本包装 BK", "direction": "in", "businessType": "退货入库", "qty": 2, "createTime": "2026-11-03 10:05:00", "boundTime": "2026-11-03 10:05:00" },
+    { "warehouseName": "万邑通德国仓", "sku": "S900GY", "skuName": "Shokz OpenDots ONE 澳洲包装 GY", "direction": "out", "businessType": "销售出库", "qty": 4, "createTime": "2026-11-03 18:30:00", "boundTime": "2026-11-03 18:30:00" },
+    { "warehouseName": "筋斗云DWA仓", "sku": "C610-AN-BK-KR-000", "skuName": "Shokz OpenMeet 韩国通用包装 BK", "direction": "in", "businessType": "盘点入库", "qty": 5, "createTime": "2026-11-02 09:50:00", "boundTime": "2026-11-02 09:50:00" },
+    { "warehouseName": "筋斗云DWA仓", "sku": "C610-AN-BK-KR-000", "skuName": "Shokz OpenMeet 韩国通用包装 BK", "direction": "out", "businessType": "销售出库", "qty": 9, "createTime": "2026-11-04 15:35:00", "boundTime": "2026-11-04 15:35:00" },
+    { "warehouseName": "筋斗云DWA仓", "sku": "S810-ST-PK-UK-170-N", "skuName": "Shokz OpenRun Pro 英国170客户包装 BK", "direction": "out", "businessType": "调拨出库", "qty": 4, "createTime": "2026-11-03 11:45:00", "boundTime": "2026-11-03 11:45:00" },
+    { "warehouseName": "筋斗云DWA仓", "sku": "S611BK", "skuName": "Shokz OpenSwim Pro 日本包装 BK", "direction": "in", "businessType": "其他入库", "qty": 10, "createTime": "2026-11-01 14:10:00", "boundTime": "2026-11-01 14:10:00" },
+    { "warehouseName": "筋斗云DWA仓", "sku": "S611BK", "skuName": "Shokz OpenSwim Pro 日本包装 BK", "direction": "out", "businessType": "销售出库", "qty": 3, "createTime": "2026-11-05 09:25:00", "boundTime": "2026-11-05 09:25:00" },
+    { "warehouseName": "筋斗云DWA仓", "sku": "T910-ST-BK-UK", "skuName": "Shokz OpenComm 2 英国包装 BK", "direction": "in", "businessType": "其他入库", "qty": 1, "createTime": "2026-11-04 10:40:00", "boundTime": "2026-10-28 16:20:00" },
+    { "warehouseName": "法国谷仓售后仓", "sku": "S900GY", "skuName": "Shokz OpenDots ONE 澳洲包装 GY", "direction": "in", "businessType": "退货入库", "qty": 5, "createTime": "2026-11-02 11:10:00", "boundTime": "2026-11-02 11:10:00" },
+    { "warehouseName": "法国谷仓售后仓", "sku": "S820BK", "skuName": "Shokz OpenFit 2 德国通用包装 BK", "direction": "out", "businessType": "销售出库", "qty": 4, "createTime": "2026-11-04 13:55:00", "boundTime": "2026-11-04 13:55:00" },
+    { "warehouseName": "法国谷仓售后仓", "sku": "T910-ST-BK-UK", "skuName": "Shokz OpenComm 2 英国包装 BK", "direction": "out", "businessType": "其他出库", "qty": 2, "createTime": "2026-11-03 09:30:00", "boundTime": "2026-11-03 09:30:00" },
+    { "warehouseName": "新加坡待维修仓", "sku": "T910-ST-BK-UK", "skuName": "Shokz OpenComm 2 英国包装 BK", "direction": "out", "businessType": "其他出库", "qty": 6, "createTime": "2026-11-02 15:05:00", "boundTime": "2026-11-02 15:05:00" },
+    { "warehouseName": "新加坡待维修仓", "sku": "C610-AN-BK-KR-000", "skuName": "Shokz OpenMeet 韩国通用包装 BK", "direction": "in", "businessType": "盘点入库", "qty": 4, "createTime": "2026-11-01 16:20:00", "boundTime": "2026-11-01 16:20:00" },
+    { "warehouseName": "新加坡待维修仓", "sku": "S810-ST-PK-UK-170-N", "skuName": "Shokz OpenRun Pro 英国170客户包装 BK", "direction": "out", "businessType": "销售出库", "qty": 2, "createTime": "2026-11-04 18:10:00", "boundTime": "2026-11-04 18:10:00" },
+    { "warehouseName": "万邑通德国仓", "sku": "C610-AN-BK-KR-000", "skuName": "Shokz OpenMeet 韩国通用包装 BK", "direction": "in", "businessType": "盘点入库", "qty": 6, "createTime": "2026-11-02 11:30:00", "boundTime": "2026-11-02 11:30:00" },
+    { "warehouseName": "万邑通德国仓", "sku": "C610-AN-BK-KR-000", "skuName": "Shokz OpenMeet 韩国通用包装 BK", "direction": "out", "businessType": "销售出库", "qty": 2, "createTime": "2026-11-04 08:20:00", "boundTime": "2026-11-04 08:20:00" },
+    { "warehouseName": "万邑通德国仓", "sku": "T910-ST-BK-UK", "skuName": "Shokz OpenComm 2 英国包装 BK", "direction": "out", "businessType": "销售出库", "qty": 1, "createTime": "2026-11-01 09:10:00", "boundTime": "2026-11-01 09:10:00" },
+    { "warehouseName": "筋斗云DWA仓", "sku": "S900GY", "skuName": "Shokz OpenDots ONE 澳洲包装 GY", "direction": "out", "businessType": "销售出库", "qty": 5, "createTime": "2026-11-03 13:15:00", "boundTime": "2026-11-03 13:15:00" },
+    { "warehouseName": "法国谷仓售后仓", "sku": "C610-AN-BK-KR-000", "skuName": "Shokz OpenMeet 韩国通用包装 BK", "direction": "in", "businessType": "其他入库", "qty": 3, "createTime": "2026-11-04 16:45:00", "boundTime": "2026-11-04 16:45:00" },
+    { "warehouseName": "法国谷仓售后仓", "sku": "S810-ST-PK-UK-170-N", "skuName": "Shokz OpenRun Pro 英国170客户包装 BK", "direction": "out", "businessType": "调拨出库", "qty": 6, "createTime": "2026-11-02 10:00:00", "boundTime": "2026-11-02 10:00:00" },
+    { "warehouseName": "新加坡待维修仓", "sku": "S820BK", "skuName": "Shokz OpenFit 2 德国通用包装 BK", "direction": "in", "businessType": "退货入库", "qty": 4, "createTime": "2026-11-03 14:50:00", "boundTime": "2026-11-03 14:50:00" },
+    { "warehouseName": "新加坡待维修仓", "sku": "S611BK", "skuName": "Shokz OpenSwim Pro 日本包装 BK", "direction": "out", "businessType": "销售出库", "qty": 1, "createTime": "2026-11-02 17:35:00", "boundTime": "2026-11-02 17:35:00" }
+  ],
+  "extraLogs": [
+    { "warehouseName": "万邑通澳洲仓", "levelName": "万邑通澳洲_分销", "sku": "S810-ST-PK-UK-170-N", "inventoryType": "可用", "businessType": "订单锁定", "businessNo": "LOCK-20261103-01", "changeQty": -4, "createTime": "2026-11-03 14:10:00" },
+    { "warehouseName": "万邑通澳洲仓", "levelName": "万邑通澳洲_分销", "sku": "S810-ST-PK-UK-170-N", "inventoryType": "锁定", "businessType": "订单锁定", "businessNo": "LOCK-20261103-01", "changeQty": 4, "createTime": "2026-11-03 14:10:00" }
+  ]
+}
