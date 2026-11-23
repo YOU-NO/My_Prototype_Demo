@@ -299,6 +299,33 @@
       gap: 8px;
     }
 
+    .report-time-filter {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .report-time-filter label {
+      color: var(--regular);
+      white-space: nowrap;
+    }
+
+    .report-time-filter input[type="month"] {
+      width: 128px;
+      height: 32px;
+      padding: 0 8px;
+      color: var(--regular);
+      border: 1px solid var(--border-dark);
+      border-radius: 4px;
+      outline: none;
+      font-size: 12px;
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+    }
+
+    .report-time-separator {
+      color: var(--regular);
+    }
+
     .search-ops {
       display: inline-flex;
       align-items: center;
@@ -2611,6 +2638,8 @@
       skuType: "platform",
       skuMode: "1",
       sku: "",
+      reportTimeStart: "",
+      reportTimeEnd: "",
       scene: "",
       bizType: "",
       generateDoc: "",
@@ -2631,6 +2660,8 @@
       skuType: val("skuType") || "platform",
       skuMode: val("skuMode") || "1",
       sku: val("sku"),
+      reportTimeStart: val("reportTimeStart"),
+      reportTimeEnd: val("reportTimeEnd"),
       scene: val("scene"),
       bizType: val("biz"),
       generateDoc: val("generateDoc"),
@@ -2658,6 +2689,9 @@
   }
 
   function matchReportFilters(f, row, platformKeys) {
+    const reportMonth = String(row.localDate || row.date || "").slice(0, 7);
+    if (f.reportTimeStart && reportMonth < f.reportTimeStart) return false;
+    if (f.reportTimeEnd && reportMonth > f.reportTimeEnd) return false;
     if (!matchSkuFilter(f, row, platformKeys)) return false;
     if (f.scene && row.scene !== f.scene) return false;
     if (f.bizType && row.bizType !== f.bizType) return false;
@@ -2679,6 +2713,12 @@
     const hideDocFilters = !!opts.hideDocFilters;
     return (
       '<div class="search-bar" id="' + prefix + 'Filters">' +
+        '<div class="report-time-filter">' +
+          '<label for="' + prefix + '-reportTimeStart">报告时间：</label>' +
+          '<input id="' + prefix + '-reportTimeStart" type="month" max="' + esc(f.reportTimeEnd) + '" value="' + esc(f.reportTimeStart) + '" />' +
+          '<span class="report-time-separator">-</span>' +
+          '<input id="' + prefix + '-reportTimeEnd" type="month" min="' + esc(f.reportTimeStart) + '" value="' + esc(f.reportTimeEnd) + '" />' +
+        "</div>" +
         '<div class="sku-combo">' +
           '<select id="' + prefix + '-skuType" class="control sku-type">' +
             '<option value="platform"' + (f.skuType !== "system" ? " selected" : "") + ">SKU</option>" +
@@ -4835,6 +4875,23 @@
       state.stk[key + "PageSize"] = parseInt(e.target.value, 10) || 10;
       state.stk[key + "Page"] = 1;
       refreshStkPage(key);
+      return;
+    }
+    if (e.target && /-reportTime(Start|End)$/.test(e.target.id)) {
+      const prefix = e.target.id.replace(/-reportTime(Start|End)$/, "");
+      const startEl = $(prefix + "-reportTimeStart");
+      const endEl = $(prefix + "-reportTimeEnd");
+      const start = startEl && startEl.value;
+      const end = endEl && endEl.value;
+      if (startEl && endEl) {
+        startEl.max = end || "";
+        endEl.min = start || "";
+        if (start && end && end < start) {
+          if (e.target === startEl) startEl.value = end;
+          else endEl.value = start;
+          showToast("结束月份不能早于开始月份", "error");
+        }
+      }
       return;
     }
     if (e.target && (e.target.id === "stk-platform" || e.target.id === "stk-warehouse" || e.target.id === "stk-month")) {
