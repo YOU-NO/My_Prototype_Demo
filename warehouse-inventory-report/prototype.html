@@ -326,6 +326,17 @@
       color: var(--regular);
     }
 
+    .report-sku-filter {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .report-sku-filter label {
+      color: var(--regular);
+      white-space: nowrap;
+    }
+
     .search-ops {
       display: inline-flex;
       align-items: center;
@@ -2253,8 +2264,8 @@
     const filters = meta.filters.map(function (label, i) {
       if (label === "SKU") {
         return (
-          '<div class="sku-combo">' +
-            '<select class="control sku-type"><option>SKU</option></select>' +
+          '<div class="report-sku-filter">' +
+            '<label>SKU：</label>' +
             '<select id="ex-skuMode" class="control sku-mode" data-sku-mode="ex-sku">' +
               '<option value="1">精确</option>' +
               '<option value="2">模糊</option>' +
@@ -2719,11 +2730,8 @@
           '<span class="report-time-separator">-</span>' +
           '<input id="' + prefix + '-reportTimeEnd" type="month" min="' + esc(f.reportTimeStart) + '" value="' + esc(f.reportTimeEnd) + '" />' +
         "</div>" +
-        '<div class="sku-combo">' +
-          '<select id="' + prefix + '-skuType" class="control sku-type">' +
-            '<option value="platform"' + (f.skuType !== "system" ? " selected" : "") + ">SKU</option>" +
-            '<option value="system"' + (f.skuType === "system" ? " selected" : "") + ">系统SKU</option>" +
-          "</select>" +
+        '<div class="report-sku-filter">' +
+          '<label for="' + prefix + '-sku">SKU：</label>' +
           '<select id="' + prefix + '-skuMode" class="control sku-mode" data-sku-mode="' + prefix + '-sku">' +
             '<option value="1"' + (f.skuMode !== "2" ? " selected" : "") + ">精确</option>" +
             '<option value="2"' + (f.skuMode === "2" ? " selected" : "") + ">模糊</option>" +
