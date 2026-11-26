@@ -1921,8 +1921,8 @@
     { key: "fulfillmentSkuName", label: "Fulfillment SKU Name", group: "platform" },
     { key: "shopName", label: "Shop Name", group: "platform" },
     { key: "warehouse", label: "Warehouse", group: "platform" },
-    { key: "processType", label: "Type", group: "platform" },
-    { key: "qty", label: "Quantity", group: "platform", align: "right" },
+    { key: "processType", label: "Type", group: "process" },
+    { key: "processQty", label: "Quantity", group: "process", align: "right" },
     { key: "matchRuleId", label: "匹配规则ID", group: "parsed" },
     { key: "newQuantity", label: "New Quantity", group: "parsed" },
     { key: "site", label: "站点", group: "parsed" },
@@ -1955,8 +1955,8 @@
     { key: "orderCode", label: "Order Code", group: "platform" },
     { key: "marketPlace", label: "Market Place", group: "platform" },
     { key: "operateTime", label: "Operate Time", group: "platform" },
-    { key: "processType", label: "Type", group: "platform" },
-    { key: "qty", label: "Quantity", group: "platform", align: "right" },
+    { key: "processType", label: "Type", group: "process" },
+    { key: "processQty", label: "Quantity", group: "process", align: "right" },
     { key: "matchRuleId", label: "匹配规则ID", group: "parsed" },
     { key: "newQuantity", label: "New Quantity", group: "parsed" },
     { key: "site", label: "站点", group: "parsed" },
@@ -1981,13 +1981,15 @@
     { key: "docAbnormalReason", label: "单据生成异常原因", group: "exception" }
   ];
   function lazadaBase(extra) {
-    return Object.assign({
+    const row = Object.assign({
       newQuantity: "-", matchRuleId: "", site: "Lazada-SG", warehouse: "Lel SG-Crossborder FC",
       localDate: "2026-10-31", systemSku: "", sellable: "", scene: "", bizType: "",
       generateDoc: "", docCategory: "", docType: "", dailySummary: "", docNo: "",
       parsedDone: "否", parseAbnormal: "否", parseAbnormalReason: "",
       hasUpdate: "否", updateTime: "", docAbnormal: "否", docAbnormalReason: ""
     }, extra);
+    if (row.processQty == null) row.processQty = row.qty;
+    return row;
   }
   const LAZADA_SUMMARY_ROWS = [
     lazadaBase({ fulfillmentSku: "3178287684_SGAMZ-21616123866", sellerSku: "S821BK", fulfillmentSkuName: "【Mini】SHOKZ S821 OpenRun Pro 2 Mini Bone Conduction Sports Headphones, Open-Ear Wireless Earphones w", shopName: "SG-Shokz Store", processType: "期初可售", qty: 5 }),
@@ -2517,7 +2519,7 @@
         rowsKey: "lazadaSummaryRows",
         viewKey: "lazadaSummaryView",
         skuKeys: ["sellerSku", "systemSku"],
-        legendKind: "report"
+        legendKind: "reportDomestic"
       };
     }
     if (page === "lazadaDetailInventory") {
@@ -2527,7 +2529,7 @@
         rowsKey: "lazadaDetailRows",
         viewKey: "lazadaDetailView",
         skuKeys: ["sellerSku", "systemSku"],
-        legendKind: "report"
+        legendKind: "reportDomestic"
       };
     }
     if (page === "coupangGlobalInventory") {
