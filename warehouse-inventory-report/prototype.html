@@ -225,6 +225,14 @@
       background: var(--primary-weak);
     }
 
+    .el-menu-item.is-scope.phase-two {
+      background: #f0f9eb;
+    }
+
+    .el-menu-item.is-scope.phase-two.is-active {
+      background: var(--primary-weak);
+    }
+
     .menu-scope-tag {
       flex: none;
       margin-left: 6px;
@@ -235,6 +243,10 @@
       color: #fff;
       background: #e6a23c;
       border-radius: 2px;
+    }
+
+    .menu-scope-tag.phase-two {
+      background: #67c23a;
     }
 
     .submenu-arrow {
@@ -1377,6 +1389,10 @@
         { "id": "amazonReimburse", "label": "亚马逊赔偿报告", "icon": "leaf" },
         { "id": "detail", "label": "亚马逊分类明细报告" },
         { "id": "summary", "label": "亚马逊库存汇总报告" }
+      ],
+      "lazadaPlatformChildren": [
+        { "id": "lazadaSummaryInventory", "label": "Lazada汇总库存报告", "icon": "leaf", "scope": true, "phase": "二期" },
+        { "id": "lazadaDetailInventory", "label": "Lazada明细库存报告", "icon": "leaf", "scope": true, "phase": "二期" }
       ]
     },
     "filters": {
@@ -1470,6 +1486,7 @@
       { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
       { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" },
       { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
+      { "key": "updateTime", "label": "更新时间", "group": "exception" },
       { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
       { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" }
     ],
@@ -1514,6 +1531,7 @@
       { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
       { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" },
       { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
+      { "key": "updateTime", "label": "更新时间", "group": "exception" },
       { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
       { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" }
     ],
@@ -1569,7 +1587,7 @@
         "site": "Amazon_US", "localDate": "2026-05-31", "systemSku": "S710-ST-GY-US-326-AZB", "scene": "备货接收",
         "bizType": "备货接收", "warehouse": "ST-Amazon US", "sellable": "是", "qty": -2, "generateDoc": "是", "docCategory": "其他出入库单", "docType": "其他入库单,其他出库单",
         "dailySummary": "否", "parsedDone": "是", "docNo": "IR202601,IA202603,IA202604,IA202605",
-        "hasUpdate": "是", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
+        "hasUpdate": "是", "updateTime": "2026-06-01 10:30:00", "docAbnormal": "否", "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
       },
       {
         "sellerid": "A3U5E183ODUBBN", "date": "05/30/2026", "fnsku": "X002FOUNDJP", "asin": "B0FOUNDJP1",
@@ -1614,7 +1632,7 @@
         "monthEnd": "是", "site": "Amazon_US", "localDate": "2026-03-31", "systemSku": "S710-ST-GY-US-326-AZB",
         "scene": "Unknown Events", "bizType": "Unknown Events", "warehouse": "ST-Returns(Amazon US)",
         "sellable": "是", "qty": 1, "generateDoc": "是", "docCategory": "其他出入库单", "docType": "其他入库单,其他出库单", "dailySummary": "是", "parsedDone": "是",
-        "docNo": "IA202603,AS202602", "hasUpdate": "是", "docAbnormal": "否",
+        "docNo": "IA202603,AS202602", "hasUpdate": "是", "updateTime": "2026-03-15 14:20:00", "docAbnormal": "否",
         "docAbnormalReason": "", "parseAbnormal": "否", "parseAbnormalReason": ""
       },
       {
@@ -1717,6 +1735,7 @@
       { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
       { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" },
       { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
+      { "key": "updateTime", "label": "更新时间", "group": "exception" },
       { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
       { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" }
     ],
@@ -1743,6 +1762,7 @@
       { "key": "parseAbnormal", "label": "报告解析是否异常", "group": "exception" },
       { "key": "parseAbnormalReason", "label": "报告解析异常原因", "group": "exception" },
       { "key": "hasUpdate", "label": "是否存在更新", "group": "exception" },
+      { "key": "updateTime", "label": "更新时间", "group": "exception" },
       { "key": "docAbnormal", "label": "单据生成是否异常", "group": "exception" },
       { "key": "docAbnormalReason", "label": "单据生成异常原因", "group": "exception" }
     ],
@@ -1895,6 +1915,99 @@
     ];
   })();
 
+  const LAZADA_SUMMARY_COLUMNS = [
+    { key: "fulfillmentSku", label: "Fulfillment SKU", group: "platform" },
+    { key: "sellerSku", label: "Seller SKU", group: "platform" },
+    { key: "fulfillmentSkuName", label: "Fulfillment SKU Name", group: "platform" },
+    { key: "shopName", label: "Shop Name", group: "platform" },
+    { key: "warehouse", label: "Warehouse", group: "platform" },
+    { key: "processType", label: "Type", group: "platform" },
+    { key: "qty", label: "Quantity", group: "platform", align: "right" },
+    { key: "matchRuleId", label: "匹配规则ID", group: "parsed" },
+    { key: "newQuantity", label: "New Quantity", group: "parsed" },
+    { key: "site", label: "站点", group: "parsed" },
+    { key: "warehouse", label: "仓库", group: "parsed" },
+    { key: "localDate", label: "当地日期", group: "parsed" },
+    { key: "systemSku", label: "系统SKU", group: "parsed" },
+    { key: "qty", label: "数量", group: "parsed", align: "right" },
+    { key: "sellable", label: "是否可售", group: "parsed" },
+    { key: "scene", label: "一级场景", group: "parsed" },
+    { key: "bizType", label: "二级场景", group: "parsed" },
+    { key: "generateDoc", label: "是否生成单据", group: "parsed" },
+    { key: "docCategory", label: "生成单据大类", group: "parsed" },
+    { key: "docType", label: "生成单据类型", group: "parsed" },
+    { key: "dailySummary", label: "是否按天汇总", group: "parsed" },
+    { key: "docNo", label: "生成单据号", group: "parsed" },
+    { key: "parsedDone", label: "是否解析完成", group: "exception" },
+    { key: "parseAbnormal", label: "报告解析是否异常", group: "exception" },
+    { key: "parseAbnormalReason", label: "报告解析异常原因", group: "exception" },
+    { key: "hasUpdate", label: "是否存在更新", group: "exception" },
+    { key: "updateTime", label: "更新时间", group: "exception" },
+    { key: "docAbnormal", label: "单据生成是否异常", group: "exception" },
+    { key: "docAbnormalReason", label: "单据生成异常原因", group: "exception" }
+  ];
+  const LAZADA_DETAIL_COLUMNS = [
+    { key: "fulfillmentSku", label: "Fulfillment SKU", group: "platform" },
+    { key: "sellerSku", label: "Seller SKU", group: "platform" },
+    { key: "warehouseName", label: "Warehouse Name", group: "platform" },
+    { key: "warehouseCode", label: "Warehouse Code", group: "platform" },
+    { key: "inventoryType", label: "Inventory Type", group: "platform" },
+    { key: "orderCode", label: "Order Code", group: "platform" },
+    { key: "marketPlace", label: "Market Place", group: "platform" },
+    { key: "operateTime", label: "Operate Time", group: "platform" },
+    { key: "processType", label: "Type", group: "platform" },
+    { key: "qty", label: "Quantity", group: "platform", align: "right" },
+    { key: "matchRuleId", label: "匹配规则ID", group: "parsed" },
+    { key: "newQuantity", label: "New Quantity", group: "parsed" },
+    { key: "site", label: "站点", group: "parsed" },
+    { key: "warehouse", label: "仓库", group: "parsed" },
+    { key: "localDate", label: "当地日期", group: "parsed" },
+    { key: "systemSku", label: "系统SKU", group: "parsed" },
+    { key: "qty", label: "数量", group: "parsed", align: "right" },
+    { key: "sellable", label: "是否可售", group: "parsed" },
+    { key: "scene", label: "一级场景", group: "parsed" },
+    { key: "bizType", label: "二级场景", group: "parsed" },
+    { key: "generateDoc", label: "是否生成单据", group: "parsed" },
+    { key: "docCategory", label: "生成单据大类", group: "parsed" },
+    { key: "docType", label: "生成单据类型", group: "parsed" },
+    { key: "dailySummary", label: "是否按天汇总", group: "parsed" },
+    { key: "docNo", label: "生成单据号", group: "parsed" },
+    { key: "parsedDone", label: "是否解析完成", group: "exception" },
+    { key: "parseAbnormal", label: "报告解析是否异常", group: "exception" },
+    { key: "parseAbnormalReason", label: "报告解析异常原因", group: "exception" },
+    { key: "hasUpdate", label: "是否存在更新", group: "exception" },
+    { key: "updateTime", label: "更新时间", group: "exception" },
+    { key: "docAbnormal", label: "单据生成是否异常", group: "exception" },
+    { key: "docAbnormalReason", label: "单据生成异常原因", group: "exception" }
+  ];
+  function lazadaBase(extra) {
+    return Object.assign({
+      newQuantity: "-", matchRuleId: "", site: "Lazada-SG", warehouse: "Lel SG-Crossborder FC",
+      localDate: "2026-10-31", systemSku: "", sellable: "", scene: "", bizType: "",
+      generateDoc: "", docCategory: "", docType: "", dailySummary: "", docNo: "",
+      parsedDone: "否", parseAbnormal: "否", parseAbnormalReason: "",
+      hasUpdate: "否", updateTime: "", docAbnormal: "否", docAbnormalReason: ""
+    }, extra);
+  }
+  const LAZADA_SUMMARY_ROWS = [
+    lazadaBase({ fulfillmentSku: "3178287684_SGAMZ-21616123866", sellerSku: "S821BK", fulfillmentSkuName: "【Mini】SHOKZ S821 OpenRun Pro 2 Mini Bone Conduction Sports Headphones, Open-Ear Wireless Earphones w", shopName: "SG-Shokz Store", processType: "期初可售", qty: 5 }),
+    lazadaBase({ fulfillmentSku: "3178287684_SGAMZ-21616123866", sellerSku: "S821BK", fulfillmentSkuName: "【Mini】SHOKZ S821 OpenRun Pro 2 Mini Bone Conduction Sports Headphones, Open-Ear Wireless Earphones w", shopName: "SG-Shokz Store", processType: "期初不可售", qty: 3 }),
+    lazadaBase({ fulfillmentSku: "3178287684_SGAMZ-21616123866", sellerSku: "S821BK", fulfillmentSkuName: "【Mini】SHOKZ S821 OpenRun Pro 2 Mini Bone Conduction Sports Headphones, Open-Ear Wireless Earphones w", shopName: "SG-Shokz Store", processType: "销售出库", qty: -12, scene: "销售", bizType: "销售出库", generateDoc: "是", docCategory: "其他出入库单", docType: "其他出库单", parsedDone: "是" }),
+    lazadaBase({ fulfillmentSku: "3178287684_SGAMZ-21616123866", sellerSku: "S821BK", fulfillmentSkuName: "【Mini】SHOKZ S821 OpenRun Pro 2 Mini Bone Conduction Sports Headphones, Open-Ear Wireless Earphones w", shopName: "SG-Shokz Store", processType: "备货接收", qty: 20, scene: "备货", bizType: "备货接收", generateDoc: "是", docCategory: "其他出入库单", docType: "其他入库单", parsedDone: "是" }),
+    lazadaBase({ fulfillmentSku: "3178287684_SGAMZ-21616123866", sellerSku: "S821BK", fulfillmentSkuName: "【Mini】SHOKZ S821 OpenRun Pro 2 Mini Bone Conduction Sports Headphones, Open-Ear Wireless Earphones w", shopName: "SG-Shokz Store", processType: "其他入库", qty: 0 }),
+    lazadaBase({ fulfillmentSku: "3178287684_SGAMZ-21616123866", sellerSku: "S821BK", fulfillmentSkuName: "【Mini】SHOKZ S821 OpenRun Pro 2 Mini Bone Conduction Sports Headphones, Open-Ear Wireless Earphones w", shopName: "SG-Shokz Store", processType: "丢失", qty: -5, scene: "库内调整", bizType: "丢失", generateDoc: "是", docCategory: "其他出入库单", docType: "其他出库单", parsedDone: "是" }),
+    lazadaBase({ fulfillmentSku: "3178287684_SGAMZ-21616123866", sellerSku: "S821BK", fulfillmentSkuName: "【Mini】SHOKZ S821 OpenRun Pro 2 Mini Bone Conduction Sports Headphones, Open-Ear Wireless Earphones w", shopName: "SG-Shokz Store", processType: "找回", qty: 1, scene: "库内调整", bizType: "找回", generateDoc: "是", docCategory: "其他出入库单", docType: "其他入库单", parsedDone: "是" }),
+    lazadaBase({ fulfillmentSku: "3178287684_SGAMZ-21616123866", sellerSku: "S821BK", fulfillmentSkuName: "【Mini】SHOKZ S821 OpenRun Pro 2 Mini Bone Conduction Sports Headphones, Open-Ear Wireless Earphones w", shopName: "SG-Shokz Store", processType: "调拨出库", qty: -7, scene: "调拨", bizType: "调拨出库", generateDoc: "是", docCategory: "其他出入库单", docType: "其他出库单", parsedDone: "是" }),
+    lazadaBase({ fulfillmentSku: "3178287684_SGAMZ-21616123866", sellerSku: "S821BK", fulfillmentSkuName: "【Mini】SHOKZ S821 OpenRun Pro 2 Mini Bone Conduction Sports Headphones, Open-Ear Wireless Earphones w", shopName: "SG-Shokz Store", processType: "其他出库", qty: -2 }),
+    lazadaBase({ fulfillmentSku: "3178287684_SGAMZ-21616123866", sellerSku: "S821BK", fulfillmentSkuName: "【Mini】SHOKZ S821 OpenRun Pro 2 Mini Bone Conduction Sports Headphones, Open-Ear Wireless Earphones w", shopName: "SG-Shokz Store", processType: "期末可售", qty: 1 }),
+    lazadaBase({ fulfillmentSku: "3178287684_SGAMZ-21616123866", sellerSku: "S821BK", fulfillmentSkuName: "【Mini】SHOKZ S821 OpenRun Pro 2 Mini Bone Conduction Sports Headphones, Open-Ear Wireless Earphones w", shopName: "SG-Shokz Store", processType: "期末不可售", qty: 1 })
+  ];
+  const LAZADA_DETAIL_ROWS = [
+    lazadaBase({ fulfillmentSku: "13761147661_SGAMZ-124724135590", sellerSku: "E320WT", warehouseName: "Lel SG-Crossborder FC", warehouseCode: "OMS-LAZADA-SG-W-4", inventoryType: "GOOD", orderCode: "173586889465000", marketPlace: "SG-Shokz Store", operateTime: "2026-10-31 16:23:11", processType: "Fulfillment Outbound", qty: -13, parsedDone: "是" }),
+    lazadaBase({ fulfillmentSku: "3550689188_SGAMZ-23443534556", sellerSku: "8020100009", warehouseName: "Lel SG-Crossborder FC", warehouseCode: "OMS-LAZADA-SG-W-4", inventoryType: "GOOD", orderCode: "173605642264231", marketPlace: "SG-Shokz Store", operateTime: "2026-10-31 16:23:11", processType: "Fulfillment Outbound", qty: -10, parsedDone: "是" }),
+    lazadaBase({ fulfillmentSku: "2373504558_SGAMZ-13887276152", sellerSku: "S803BK", warehouseName: "Lel SG-Crossborder FC", warehouseCode: "OMS-LAZADA-SG-W-4", inventoryType: "GOOD", orderCode: "175155107450628", marketPlace: "SG-Shokz Store", operateTime: "2026-10-31 16:23:09", processType: "Fulfillment Outbound", qty: -5, parsedDone: "是" })
+  ];
+
   function stkLocalLine(month, sku, scene, report, system) {
     return { month: month, sku: sku, name: sku, warehouse: "韩国Coupang本土店仓", scene: scene, adjustable: true, generationError: "", report: report, system: system, opening: "", flow: "", closing: "" };
   }
@@ -1910,11 +2023,15 @@
     configRows: JSON.parse(JSON.stringify(MOCK.configRows)),
     cdiRows: JSON.parse(JSON.stringify(MOCK.coupangDomesticRows)),
     cgiRows: JSON.parse(JSON.stringify(MOCK.coupangGlobalRows)),
+    lazadaSummaryRows: JSON.parse(JSON.stringify(LAZADA_SUMMARY_ROWS)),
+    lazadaDetailRows: JSON.parse(JSON.stringify(LAZADA_DETAIL_ROWS)),
     detailView: [],
     summaryView: [],
     configView: [],
     cdiView: [],
     cgiView: [],
+    lazadaSummaryView: [],
+    lazadaDetailView: [],
     docSeq: 700,
     configSeq: 6,
     editingConfigId: null,
@@ -1923,7 +2040,7 @@
     toastTimer: null,
     module: "finance",
     financePage: "detail",
-    menuOpen: { sales: true, coupang: true, amazon: false, finance: false, ship: false, io: true, whset: false, stocktake: true },
+    menuOpen: { sales: true, coupang: true, amazon: false, lazada: true, finance: false, ship: false, io: true, whset: false, stocktake: true },
     stk: {
       results: [
         { id: "202608-Coupang-B-0", letter: "B", seq: 0, platform: "Coupang", warehouse: "韩国Coupang海外1店仓", month: "2026-08", type: "o1", status: "已完成", created: "2026-08-31 18:20:11", pending: 0, rows: [stkOverseasLine("韩国Coupang海外1店仓", "2026-08", "S700-ST-BL-KR-615-REF", 19, -5, 10), stkOverseasLine("韩国Coupang海外1店仓", "2026-08", "E310-ST-GY-KR-615", 41, -8, 30)], siteSummaryCondition: "是", generationAttempt: true, generatedDocumentCount: 2, generationRunning: false },
@@ -2039,11 +2156,23 @@
     coupangDomesticInventory: {
       title: "Coupang本土库存报告",
       desc: "展示 Coupang 本土库存事件明细及 EVA 解析、单据生成结果；筛选与操作对齐亚马逊分类明细报告。"
+    },
+    lazadaSummaryInventory: {
+      title: "Lazada汇总库存报告",
+      desc: ""
+    },
+    lazadaDetailInventory: {
+      title: "Lazada明细库存报告",
+      desc: ""
     }
   };
 
   function isCoupangInvPage(page) {
-    return page === "coupangGlobalInventory" || page === "coupangDomesticInventory";
+    return page === "coupangGlobalInventory" || page === "coupangDomesticInventory" || isLazadaPage(page);
+  }
+
+  function isLazadaPage(page) {
+    return page === "lazadaSummaryInventory" || page === "lazadaDetailInventory";
   }
 
   const ICONS = {
@@ -2185,10 +2314,11 @@
       const scope = item.scope ? " is-scope" : "";
       const icon = ICONS[item.icon] || ICONS.leaf;
       const tag = item.scope
-        ? '<span class="menu-scope-tag" title="本期需求改动页面">本期</span>'
+        ? '<span class="menu-scope-tag' + (item.phase === "二期" ? " phase-two" : "") + '" title="' + (item.phase || "一期") + '需求改动页面">' + (item.phase || "一期") + "</span>"
         : "";
+      const phaseClass = item.phase === "二期" ? " phase-two" : "";
       return (
-        '<div class="el-menu-item level-3' + active + scope + '" data-menu="' + item.id + '">' +
+        '<div class="el-menu-item level-3' + active + scope + phaseClass + '" data-menu="' + item.id + '">' +
           '<span class="menu-icon">' + icon + "</span>" +
           '<span class="sle">' + esc(item.label) + "</span>" +
           tag +
@@ -2212,6 +2342,7 @@
     const salesOpen = groupOpen("sales");
     const coupangOpen = groupOpen("coupang");
     const amazonOpen = groupOpen("amazon");
+    const lazadaOpen = groupOpen("lazada");
     const financeOpen = groupOpen("finance");
 
     $("sideMenu").innerHTML =
@@ -2237,11 +2368,19 @@
         '<div class="menu-group' + (amazonOpen ? " is-open" : "") + '">' +
           leafItemsHtml(MOCK.menu.amazonPlatformChildren) +
         "</div>" +
+        '<div class="el-sub-menu__title level-2" data-toggle="lazada">' +
+          '<span class="menu-icon">' + ICONS.globe + "</span>" +
+          '<span class="sle">Lazada平台报告</span>' +
+          '<span class="submenu-arrow">' + (lazadaOpen ? "⌃" : "⌄") + "</span>" +
+        "</div>" +
+        '<div class="menu-group' + (lazadaOpen ? " is-open" : "") + '">' +
+          leafItemsHtml(MOCK.menu.lazadaPlatformChildren) +
+        "</div>" +
       "</div>" +
       '<div class="el-menu-item level-1' + (state.page === "config" ? " is-active" : "") + ' is-scope" data-menu="config">' +
         '<span class="menu-icon">' + ICONS.warehouse + "</span>" +
         '<span class="sle">库存报告规则配置</span>' +
-        '<span class="menu-scope-tag" title="本期需求改动页面">本期</span>' +
+        '<span class="menu-scope-tag" title="一期需求改动页面">一期</span>' +
       "</div>" +
       '<div class="el-sub-menu__title" data-toggle="finance">' +
         '<span class="menu-icon">' + ICONS.push + "</span>" +
@@ -2253,9 +2392,14 @@
   function expandMenuForPage(page) {
     const inAmazon = MOCK.menu.amazonPlatformChildren.some(function (item) { return item.id === page; });
     const inCoupang = MOCK.menu.coupangPlatformChildren.some(function (item) { return item.id === page; });
+    const inLazada = MOCK.menu.lazadaPlatformChildren.some(function (item) { return item.id === page; });
     if (inAmazon || inCoupang) state.menuOpen.sales = true;
     if (inAmazon) state.menuOpen.amazon = true;
     if (inCoupang) state.menuOpen.coupang = true;
+    if (inLazada) {
+      state.menuOpen.sales = true;
+      state.menuOpen.lazada = true;
+    }
   }
 
   function renderExistingPage(page) {
@@ -2366,6 +2510,26 @@
   }
 
   function coupangInvCtx(page) {
+    if (page === "lazadaSummaryInventory") {
+      return {
+        page: page,
+        cols: LAZADA_SUMMARY_COLUMNS,
+        rowsKey: "lazadaSummaryRows",
+        viewKey: "lazadaSummaryView",
+        skuKeys: ["sellerSku", "systemSku"],
+        legendKind: "report"
+      };
+    }
+    if (page === "lazadaDetailInventory") {
+      return {
+        page: page,
+        cols: LAZADA_DETAIL_COLUMNS,
+        rowsKey: "lazadaDetailRows",
+        viewKey: "lazadaDetailView",
+        skuKeys: ["sellerSku", "systemSku"],
+        legendKind: "report"
+      };
+    }
     if (page === "coupangGlobalInventory") {
       return {
         page: page,
@@ -2592,6 +2756,9 @@
   function cellHtml(col, row) {
     const num = col.align === "right" ? " num" : "";
     let val = col.key === "matchRuleId" ? matchRuleIdForRow(row) : row[col.key];
+    if (col.key === "updateTime") {
+      val = row.hasUpdate === "是" ? (row.updateTime || "2026-06-01 10:30:00") : "-";
+    }
     if (val == null) val = "";
     if (col.key === "docType" || col.key === "docCategory") {
       const items = splitCsv(val);
@@ -4598,7 +4765,7 @@
     function arrow(key) { return state.menuOpen[key] ? "⌃" : "⌄"; }
     function item(id, label, scope) {
       const active = (state.page === id || (id === "stocktakeResults" && state.page === "stocktakeDetail")) ? " is-active" : "";
-      const tag = scope ? '<span class="menu-scope-tag" title="本期需求改动页面">本期</span>' : "";
+      const tag = scope ? '<span class="menu-scope-tag" title="一期需求改动页面">一期</span>' : "";
       return '<div class="el-menu-item level-3' + active + (scope ? " is-scope" : "") + '" data-menu="' + id + '"><span class="menu-icon">' + ICONS.leaf + '</span><span class="sle">' + label + "</span>" + tag + "</div>";
     }
     function group(key, label, inner) {
@@ -4614,9 +4781,10 @@
   function switchPage(page) {
     const isExisting = !!EXISTING_REPORTS[page];
     const isCoupangInv = isCoupangInvPage(page);
+    const isLazada = isLazadaPage(page);
     const isStorage = !!STORAGE_PAGES[page];
     if (!PAGE_META[page] && !isExisting && !isStorage) {
-      showToast("该菜单为正式环境参考入口，本期原型未展开", "warning");
+      showToast("该菜单为正式环境参考入口，一期原型未展开", "warning");
       return;
     }
     state.page = page;
@@ -4635,8 +4803,9 @@
     if (isExisting) renderExistingPage(page);
     const emptyEl = $("page-empty");
     if (emptyEl) {
-      emptyEl.classList.toggle("active", isCoupangInv);
+      emptyEl.classList.toggle("active", isCoupangInv || isLazada);
       if (isCoupangInv) renderCoupangInvPage(false);
+      else if (isLazada) emptyEl.innerHTML = "";
       else emptyEl.innerHTML = "";
     }
     const storageEl = $("page-storage");
